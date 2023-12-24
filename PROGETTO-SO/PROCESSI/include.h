@@ -51,7 +51,10 @@
 void initializeScr();	// inizializzazione dello schermo per ncurses
 
 // menu.c
-void menu();    // visualizzazione del menu
+void mainMenu();    // visualizzazione del menu principale
+
+// menu.c
+void menuDifficulty();     // visualizzazione del menu per la scelta della difficoltà
 
 
 

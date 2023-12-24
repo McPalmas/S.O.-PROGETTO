@@ -18,7 +18,7 @@ int main(){
     cbreak(); 
 
     /* funzione per il menu principale */
-    menu();
+    mainMenu();
 
     /* Ripristino la modalità di funzionamento normale del terminale */
     endwin();
