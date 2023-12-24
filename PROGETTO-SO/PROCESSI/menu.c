@@ -149,8 +149,9 @@ void menuDifficulty(){
                 break;
         }
     }
-
+    
     refresh();
+    gameField();
 }
 
 
