@@ -32,11 +32,52 @@
 /*----------------------------------------------------------------------
    MACRO UTILIZZATE PER DEFINIRE LE DIMENSIONI MASSIME DELLO SCHERMO
    ----------------------------------------------------------------------*/
-#define MAXX    80    /* Dimensione dello schermo di output (colonne) */
+#define MAXX    60    /* Dimensione dello schermo di output (colonne) */
 #define MAXY    40    /* Dimensione dello schermo di output (righe)   */
 
 
 
+/*----------------------------------------------------------------------
+   			   GREEN
+   ----------------------------------------------------------------------*/
+#define SCORE_ZONE_HEIGHT 3          /* altezza zona blue con i punteggi ecc.*/
+#define DENS_ZONE_HEGHT 3       /* altezza zona tane */
+#define PLANTS_ZONE_HEIGHT 4    /* altezza zona piante */
+#define START_ZONE_HEIGHT 3    /* altezza zona di partenza */
+#define RIVER_LANES_NUMBER 8    /* numero corsie fiume*/
+
+
+/*----------------------------------------------------------------------
+   			   STRUTTURE
+   ----------------------------------------------------------------------*/
+
+typedef struct {
+    int id;
+    int x;
+    int y;
+
+    bool is_good;
+
+
+} Crocodile;
+
+/*----------------------------------------------------------------------
+   			   COPPIE DI COLORI
+   ----------------------------------------------------------------------*/
+#define WHITE_GREEN 1          
+#define WHITE_RED 2            
+#define BLACK_BLACK 3    	
+#define WHITE_WHITE 4    	
+#define GREEN_GREEN 5    	
+#define CYAN_CYAN 6    	
+#define MAGENTA_MAGENTA 7    	
+#define BLUE_BLUE 8    	
+#define GREEN_BLACK 9     	
+#define GREEN_YELLOW 10            
+#define RED_YELLOW 11 
+#define BLACK_RED 12 	
+#define BLACK_GREEN 13 	
+#define RED_GREEN 14	
 
 
 
@@ -59,5 +100,9 @@ void menuDifficulty();     // visualizzazione del menu per la scelta della diffi
 //graphic.c
 void gameField();   //disegna il terreno di gioco
 
+//graphic.c
+void frogBody(int y, int x);   //disegna lo sprite della rana
 
+//graphic.c
+void crocodileBody(Crocodile c);	//disegna lo sprite del coccodrillo
 

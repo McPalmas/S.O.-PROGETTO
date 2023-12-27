@@ -11,8 +11,8 @@ void mainMenu(){
     int c; /* Carattere della Getch, per le varie opzioni del menù */
     bool exitMenu = false;
 
-    bkgd(COLOR_PAIR(1)); /* Setta il background color dello schermo */
-
+    bkgd(COLOR_PAIR(WHITE_GREEN)); /* Setta il background color dello schermo */
+    
     mvprintw(MAXY/3-5, 5,"     _____  _____   _____   _____  _____  ____  _____  \n");
     mvprintw(MAXY/3-4, 5,"    |_____ |_____] |     | |   _  |   _  |____ |_____] \n");
     mvprintw(MAXY/3-3, 5,"    |      |   \\\\  |_____| |____| |____| |____ |   \\\\  \n");
@@ -152,6 +152,11 @@ void menuDifficulty(){
     
     refresh();
     gameField();
+    Crocodile cr;
+    cr.x=(MAXX)/2; cr.y=32; cr.is_good=false;
+    frogBody((MAXX)/2, 35);
+    crocodileBody(cr);
+    getch();
 }
 
 
