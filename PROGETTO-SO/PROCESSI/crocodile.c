@@ -3,10 +3,11 @@
 
 //* LOG ----------------------------------------------
 
-void crocodile_process(int id, int pipe[2], int pipe_frog_on_crocodile[2], int difficulty){
+void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int pipe_frog_on_crocodile[2], int difficulty){
 
     // Gestione pipe
     close(pipe[0]);
+    close(pipe_crocodile_position[1]);
     close(pipe_frog_on_crocodile[0]);
 
     srand(getpid());
@@ -18,9 +19,9 @@ void crocodile_process(int id, int pipe[2], int pipe_frog_on_crocodile[2], int d
 
 
     int i;
-
-    // delay del while per l'immersione del crocodile (più è basso, più è veloce) 
+    // Velocità di spostamento del crocodile
     int crocodile_delay;
+
     switch (difficulty)
     {
     case EASY:
@@ -57,9 +58,14 @@ void crocodile_process(int id, int pipe[2], int pipe_frog_on_crocodile[2], int d
 
     while(1){
         
-        // se il crocodile tocca il bordo sinistro o il bordo destro dell'area di gioco
-        if(crocodile.x <= 0 || crocodile.x >= MAXX - CROCODILE_W){
-            // Fai sparire il crocodile
+        // se il crocodile tocca il bordo sinistro dell'area di gioco
+        if(crocodile.x <= 0){
+            // cambia lato
+            crocodile.x=  MAXX - CROCODILE_W;
+        }
+        else if(crocodile.x>= MAXX - CROCODILE_W){
+            // cambia lato
+            crocodile.x = 0;
         }
 
         // spostamento del crocodile
