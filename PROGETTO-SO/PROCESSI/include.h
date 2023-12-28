@@ -87,7 +87,7 @@ typedef struct {
 
     enum Direction direction;
     bool is_good;
-    int direction;
+    //int direction;
 } Crocodile;
 
 /*----------------------------------------------------------------------

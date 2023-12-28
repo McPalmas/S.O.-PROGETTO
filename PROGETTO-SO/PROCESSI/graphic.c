@@ -167,7 +167,7 @@ void crocodileBody(Crocodile c){
             mvprintw(c.y+1, c.x, " |/  |/   ");
         }else{
             mvprintw(c.y, c.x,   "__0       ");
-            mvprintw(c.y+1, c.x, "   \|  \| ");
+            mvprintw(c.y+1, c.x, "   \\|  \\| ");
         }
         attroff(COLOR_PAIR(BLACK_GREEN));
         
@@ -178,7 +178,8 @@ void crocodileBody(Crocodile c){
             mvprintw(c.y+1, c.x," |/  |/   ");
         }else{
             mvprintw(c.y, c.x,   "__0       ");		
-            mvprintw(c.y+1, c.x, "   \|  \| ");
+            mvprintw(c.y+1, c.x, "   \\|  \\| ");
+        }
         attroff(COLOR_PAIR(BLACK_RED));
     }
 }
