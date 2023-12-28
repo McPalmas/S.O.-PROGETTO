@@ -56,6 +56,11 @@
    			   STRUTTURE
    ----------------------------------------------------------------------*/
 
+enum Direction {
+    LEFT,
+    RIGHT
+};
+
 typedef struct 
 {
    int id;
@@ -72,6 +77,7 @@ typedef struct {
     int x;
     int y;
 
+    enum Direction direction;
     bool is_good;
     int direction;
 } Crocodile;
