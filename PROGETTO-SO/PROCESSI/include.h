@@ -35,6 +35,11 @@
 #define MAXX    60    /* Dimensione dello schermo di output (colonne) */
 #define MAXY    40    /* Dimensione dello schermo di output (righe)   */
 
+/*----------------------------------------------------------------------
+   MACRO UTILIZZATE PER DEFINIRE LE DIMENSIONI DEGLI OGGETTI
+   ----------------------------------------------------------------------*/
+#define FROG_W 3    /* Larghezza della rana */
+#define FROG_H 2    /* Altezza della rana */
 
 
 /*----------------------------------------------------------------------
@@ -51,15 +56,39 @@
    			   STRUTTURE
    ----------------------------------------------------------------------*/
 
+typedef struct 
+{
+   int id;
+   int x;
+   int y;
+   bool frog_canshoot;
+   bool frog_candie;
+   bool frog_bulletisactive;
+} Position;
+
+
 typedef struct {
     int id;
     int x;
     int y;
 
     bool is_good;
-
-
+    int direction;
 } Crocodile;
+
+/*----------------------------------------------------------------------
+   			   PARAMETRI DI GIOCO
+   ----------------------------------------------------------------------*/
+#define FROG_BULLET_DELAY 50000
+
+
+/*----------------------------------------------------------------------
+   			   ID OGGETTI
+   ----------------------------------------------------------------------*/
+
+#define FROG_ID 1
+#define FROG_BULLET_ID 2
+
 
 /*----------------------------------------------------------------------
    			   COPPIE DI COLORI
@@ -78,10 +107,6 @@ typedef struct {
 #define BLACK_RED 12 	
 #define BLACK_GREEN 13 	
 #define RED_GREEN 14	
-
-
-
-
 
 
 /*----------------------------------------------------------------------
