@@ -51,11 +51,17 @@
    			   STRUTTURE
    ----------------------------------------------------------------------*/
 
+enum Direction {
+    LEFT,
+    RIGHT
+};
+
 typedef struct {
     int id;
     int x;
     int y;
 
+    enum Direction direction;
     bool is_good;
 
 
