@@ -41,6 +41,8 @@
 #define FROG_W 3    /* Larghezza della rana */
 #define FROG_H 2    /* Altezza della rana */
 
+#define CROCODILE_W 6    /* Larghezza del coccodrillo */
+#define CROCODILE_H 2    /* Altezza del coccodrillo */
 
 /*----------------------------------------------------------------------
    			   GREEN
@@ -59,6 +61,12 @@
 enum Direction {
     LEFT,
     RIGHT
+};
+
+enum Difficulty {
+    EASY,
+    NORMAL,
+    HARD
 };
 
 typedef struct 
@@ -87,6 +95,11 @@ typedef struct {
    ----------------------------------------------------------------------*/
 #define FROG_BULLET_DELAY 50000
 
+#define CROCODILE_DELAY_EASY 10000
+#define CROCODILE_DELAY_NORMAL 8000
+#define CROCODILE_DELAY_HARD 6000
+
+
 
 /*----------------------------------------------------------------------
    			   ID OGGETTI
@@ -95,7 +108,11 @@ typedef struct {
 #define FROG_ID 1
 #define FROG_BULLET_ID 2
 
-
+#define CROCODILE_ID_0 3
+#define CROCODILE_ID_1 4
+#define CROCODILE_ID_2 5
+#define CROCODILE_ID_3 6
+#define CROCODILE_ID_4 7
 /*----------------------------------------------------------------------
    			   COPPIE DI COLORI
    ----------------------------------------------------------------------*/
