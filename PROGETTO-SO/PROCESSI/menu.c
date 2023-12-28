@@ -154,9 +154,13 @@ void menuDifficulty(){
     }
     
     refresh();
+    
+    
+    
+    
     gameField();
     Crocodile cr;			// righe di prova per le stampe da non prendere sul serio
-    cr.x=(MAXX)/2; cr.y=32; cr.is_good=false;
+    cr.x=(MAXX)/2; cr.y=32; cr.is_good=false; cr.direction=LEFT;
     frogBody((MAXX)/2, 35);
     crocodileBody(cr);
     getch();
