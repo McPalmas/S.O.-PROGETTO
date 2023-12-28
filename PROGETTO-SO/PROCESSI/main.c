@@ -19,6 +19,7 @@ int main(){
 
     /* funzione per il menu principale */
     mainMenu();
+    //endGameMenu(false); //solo per provarlo
 
     /* Ripristino la modalità di funzionamento normale del terminale */
     endwin();

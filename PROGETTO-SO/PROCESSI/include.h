@@ -97,6 +97,9 @@ void mainMenu();    // visualizzazione del menu principale
 // menu.c
 void menuDifficulty();     // visualizzazione del menu per la scelta della difficoltà
 
+// menu.c
+void endGameMenu(bool win);     // menu di fine partita in base a se si è vinto o meno
+
 //graphic.c
 void gameField();   //disegna il terreno di gioco
 
