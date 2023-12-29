@@ -7,11 +7,14 @@
 
 
 void mainMenu(){
+    system("aplay -q ../SUONI/mainMenu.wav & > /dev/null 2>&1");
+    refresh();
     int selection = 0; /* Tiene traccia dell'opzione correntemente selezionata */
     int c; /* Carattere della Getch, per le varie opzioni del menù */
     bool exitMenu = false;
 
     bkgd(COLOR_PAIR(WHITE_GREEN)); /* Setta il background color dello schermo */
+    
     
     mvprintw(MAXY/3-5, 5,"     _____  _____   _____   _____  _____  ____  _____  \n");
     mvprintw(MAXY/3-4, 5,"    |_____ |_____] |     | |   _  |   _  |____ |_____] \n");
@@ -24,8 +27,8 @@ void mainMenu(){
 
     mvprintw(MAXY/3+6, 23, " Play             Quit");
 
-    mvprintw(MAXY/3+8, 13, " SPACE to select, ARROW KEYS to move ");
-    
+    mvprintw(MAXY/3+8, 13, " SPACE to select, ARROW KEYS to move ");   
+     
      while(!exitMenu) { /* Finché non si è scelto una delle due opzioni per poter uscire dal menù */
         mvprintw(MAXY/3+6, 23, " ");
         mvprintw(MAXY/3+6, 40, " ");
@@ -41,18 +44,19 @@ void mainMenu(){
         switch(c) {
 
             case KEY_RIGHT: /* L'UTENTE PREME LA FRECCIA VERSO DESTRA */
-
+		system("aplay ../SUONI/menuSelection.wav > /dev/null 2>&1");
                 if(selection == 1) selection = 0;
                 else selection++;
                 break;
 
             case KEY_LEFT: /* L'UTENTE PREME LA FRECCIA VERSO SINISTRA */
-
+		system("aplay ../SUONI/menuSelection.wav > /dev/null 2>&1");
                 if(selection == 0) selection = 1;
                 else selection--;
                 break;
 
             case SPACE: /* L'UTENTE PREME LA BARRA SPAZIATRICE PER CONFERMARE L'OPZIONE SCELTA */
+            	system("aplay ../SUONI/menuSelection.wav > /dev/null 2>&1");
                 if(selection == 0) { /* Passa al menu selezione della difficoltà*/
                     exitMenu = true;
                 }
@@ -118,7 +122,7 @@ void menuDifficulty(){
         switch(c) {
 
             case KEY_RIGHT: /* L'UTENTE PREME LA FRECCIA VERSO DESTRA */
-
+		system("aplay ../SUONI/menuSelection.wav > /dev/null 2>&1");
                 if(selection == 2) { /* Cicla le opzioni del menù */
 
                     selection = 0;
@@ -129,7 +133,7 @@ void menuDifficulty(){
                 break;
 
             case KEY_LEFT: /* L'UTENTE PREME LA FRECCIA VERSO SINISTRA */
-
+		system("aplay ../SUONI/menuSelection.wav > /dev/null 2>&1");
                 if(selection == 0) { /* Cicla le opzioni del menù */
                     selection = 2;
                 }
@@ -138,6 +142,8 @@ void menuDifficulty(){
                 } break;
 
             case SPACE: /* L'UTENTE PREME LA BARRA SPAZIATRICE PER CONFERMARE L'OPZIONE SCELTA */
+            	system("aplay ../SUONI/menuSelection.wav > /dev/null 2>&1");
+		system("killall aplay");
                 if(selection == 0) { /* Play: Avvia il gioco in modalita easy */
                     exitMenu = true;
                 }
@@ -220,18 +226,19 @@ void endGameMenu(bool win){
         switch(c) {
 
             case KEY_RIGHT: /* L'UTENTE PREME LA FRECCIA VERSO DESTRA */
-
+		system("aplay ../SUONI/menuSelection.wav > /dev/null 2>&1");
                 if(selection == 1) selection = 0;
                 else selection++;
                 break;
 
             case KEY_LEFT: /* L'UTENTE PREME LA FRECCIA VERSO SINISTRA */
-
+		system("aplay ../SUONI/menuSelection.wav > /dev/null 2>&1");
                 if(selection == 0) selection = 1;
                 else selection--;
                 break;
 
             case SPACE: /* L'UTENTE PREME LA BARRA SPAZIATRICE PER CONFERMARE L'OPZIONE SCELTA */
+                system("aplay ../SUONI/menuSelection.wav > /dev/null 2>&1");
                 if(selection == 0) { /* Passa al menu selezione della difficoltà*/
                     exitMenu = true;
                 }

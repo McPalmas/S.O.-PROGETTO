@@ -5,7 +5,7 @@ all: compile link clean
 compile:
 	@echo "Compiling..."
 	@gcc -c graphic.c -o graphic.o
-	@gcc -c menu.c -o menu.o
+	@gcc -c menu.c -o menu.o 
 	@gcc -c main.c -o main.o
 
 link:
