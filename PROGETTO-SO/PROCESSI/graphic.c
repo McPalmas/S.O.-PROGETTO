@@ -53,7 +53,7 @@ void gameField(){
 
     
     // stampa zona tane
-    for(i = 0; i < DENS_ZONE_HEGHT; i++){
+    for(i = 0; i < DENS_ZONE_HEIGHT; i++){
         attron(COLOR_PAIR(GREEN_GREEN));
             mvhline(y, 0, ' ', MAXX);
         attroff(COLOR_PAIR(GREEN_GREEN));
@@ -71,7 +71,7 @@ void gameField(){
 
 
     // stampa zona piante
-    for(i = 0; i < (3*RIVER_LANES_NUMBER); i++){
+    for(i = 0; i < (2*RIVER_LANES_NUMBER); i++){
         attron(COLOR_PAIR(CYAN_CYAN));
             mvhline(y, 0, ' ', MAXX);
         attroff(COLOR_PAIR(CYAN_CYAN));

@@ -24,7 +24,7 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
 
 
     // Posizione Frog iniziale
-    int frog_start_y = DENS_ZONE_HEGHT + PLANTS_ZONE_HEIGHT + RIVER_LANES_NUMBER + START_ZONE_HEIGHT - 2;
+    int frog_start_y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 2;
     int frog_start_x = (MAXX / 2) - 3;
 
     // Parametri Frog
@@ -150,7 +150,7 @@ void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_des
                     frog_bullet.frog_bulletisactive = false;
                 }
 
-                if(frog_bullet.y <= DENS_ZONE_HEGHT){
+                if(frog_bullet.y <= DENS_ZONE_HEIGHT){
                     frog_bullet.frog_bulletisactive = false;
                 }
                 else if(frog_bullet.frog_bulletisactive){

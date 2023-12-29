@@ -48,7 +48,7 @@
    			   GREEN
    ----------------------------------------------------------------------*/
 #define SCORE_ZONE_HEIGHT 3          /* altezza zona blue con i punteggi ecc.*/
-#define DENS_ZONE_HEGHT 3       /* altezza zona tane */
+#define DENS_ZONE_HEIGHT 3       /* altezza zona tane */
 #define PLANTS_ZONE_HEIGHT 4    /* altezza zona piante */
 #define START_ZONE_HEIGHT 3    /* altezza zona di partenza */
 #define RIVER_LANES_NUMBER 8    /* numero corsie fiume*/

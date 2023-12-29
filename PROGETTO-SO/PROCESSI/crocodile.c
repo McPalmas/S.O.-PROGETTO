@@ -40,7 +40,7 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
     // inizializzazione crocodile
     crocodile.id = id;
     crocodile.x = 1 + rand() % (MAXX - CROCODILE_W - 2);
-    crocodile.y = DENS_ZONE_HEGHT + ((id - CROCODILE_ID_0) * 2);
+    crocodile.y = DENS_ZONE_HEIGHT + ((id - CROCODILE_ID_0) * 2);
     crocodile.is_good = rand() % 2;
     crocodile.direction = rand() % 2 ? RIGHT : LEFT;
 
