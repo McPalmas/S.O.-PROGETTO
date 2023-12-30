@@ -58,11 +58,11 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
             //Movimenti
             case KEY_UP: 
                 if(frog.y > FROG_H)
-                    frog.y -= FROG_H; 
+                    frog.y -= 2; 
                 break;
             case KEY_DOWN:
                 if(frog.y < frog_start_y)
-                    frog.y += FROG_H; 
+                    frog.y += 2; 
                 break;
             case KEY_LEFT: 
                 if(frog.x > 0)

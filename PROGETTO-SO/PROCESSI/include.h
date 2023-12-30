@@ -157,3 +157,7 @@ void frogBody(int y, int x);   //disegna lo sprite della rana
 //graphic.c
 void crocodileBody(Crocodile c);	//disegna lo sprite del coccodrillo
 
+
+void game(int difficulty);    // creazione e comunicazione tra processi
+
+

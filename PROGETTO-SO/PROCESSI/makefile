@@ -6,6 +6,7 @@ compile:
 	@echo "Compiling..."
 	@gcc -c graphic.c -o graphic.o
 	@gcc -c menu.c -o menu.o 
+	@gcc -c logic.c -o logic.o 
 	@gcc -c main.c -o main.o
 
 link:

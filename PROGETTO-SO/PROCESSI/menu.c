@@ -87,6 +87,7 @@ void menuDifficulty(){
     int selection = 0; /* Tiene traccia dell'opzione correntemente selezionata */
     int c; /* Carattere della Getch, per le varie opzioni del menù */
     bool exitMenu = false;
+    int difficulty;
 
     mvprintw(MAXY/3+6, 12, " Easy             Medium            Hard ");
 
@@ -146,12 +147,15 @@ void menuDifficulty(){
 		system("killall aplay");
                 if(selection == 0) { /* Play: Avvia il gioco in modalita easy */
                     exitMenu = true;
+                    difficulty = 0;
                 }
                 if(selection == 1) { /* Play: Avvia il gioco in modalita medium  */
                     exitMenu = true;
+                    difficulty = 1;
                 }
                 if(selection == 2) { /* Play: Avvia il gioco in modalita hard  */
                     exitMenu = true;
+                    difficulty = 2;
                 }
                 break;
             default:
@@ -161,15 +165,7 @@ void menuDifficulty(){
     
     refresh();
     
-    
-    
-    
-    gameField();
-    Crocodile cr;			// righe di prova per le stampe da non prendere sul serio
-    cr.x=(MAXX)/2; cr.y=SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 5; cr.is_good=false; cr.direction=LEFT;
-    frogBody((MAXX)/2, SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 2);
-    crocodileBody(cr);
-    getch();
+    game(difficulty);
 }
 
 

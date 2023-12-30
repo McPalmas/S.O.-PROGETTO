@@ -97,16 +97,6 @@ void gameField(){
     }
     
     refresh();
-    
-    bool exit=false;
-    int c=0;
-    while(!exit){
-    	getch();
-    	if(KEY_RIGHT)exit=true;
-    }
-    
-    
-    
 
 }
 
