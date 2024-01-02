@@ -23,27 +23,21 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
     // Velocità di spostamento del crocodile
     int crocodile_delay;
 
-    switch (difficulty)
-    {
-    case EASY:
-        crocodile_delay == CROCODILE_DELAY_EASY;
-        break;
-    case NORMAL:
-        crocodile_delay == CROCODILE_DELAY_NORMAL;
-        break;
-    case HARD:
-        crocodile_delay == CROCODILE_DELAY_HARD;
-        break;
-    default:
-        break;
-    }
-
     // inizializzazione crocodile
+
+    // Scegli un flusso casuale
+    int random_flow = rand() % RIVER_LANES_NUMBER;
+            
+    // Inizializza il coccodrillo con la direzione e la velocità del flusso
+    crocodile.direction = river_flows[random_flow].direction;
+    crocodile_delay = river_flows[random_flow].speed;
+
     crocodile.id = id;
     crocodile.x = 1 + rand() % (MAXX - CROCODILE_W - 2);
     crocodile.y = DENS_ZONE_HEIGHT + ((id - CROCODILE_ID_0) * 2);
     crocodile.is_good = rand() % 2;
-    crocodile.direction = rand() % 2 ? RIGHT : LEFT;
+
+
 
     // tempo minimo di attesa del crocodile prima di diventare malvagio
     int crocodile_switch_min_time= 80;

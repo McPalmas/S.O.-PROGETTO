@@ -24,12 +24,35 @@ void game(GameData gamedata){
 	//implementazione della funzione per definire gli oggetti a inizio di ogni manche incompleta e da rivedere
 	
 	
-	/*
+	
     pid_t frog;
     pid_t frog_bullet;
     pid_t plant[N_PLANTS];
     pid_t crocodile[N_CROCODILE];
     pid_t time;
+
+    // Inizializza i flussi del fiume con direzioni e velocità casuali
+    RiverFlow river_flows[RIVER_LANES_NUMBER];
+    for (int i = 0; i < RIVER_LANES_NUMBER; ++i) {
+        river_flows[i].direction = rand() % 2;
+        switch (gamedata.difficulty)
+        {
+        case EASY:
+            river_flows[i].speed = MIN_RIVER_SPEED_EASY + rand() % (MAX_RIVER_SPEED_EASY - MIN_RIVER_SPEED_EASY + 1);
+            break;
+        case NORMAL:
+            river_flows[i].speed = MIN_RIVER_SPEED_NORMAL + rand() % (MAX_RIVER_SPEED_NORMAL - MIN_RIVER_SPEED_NORMAL + 1);
+            break;
+        case HARD:
+            river_flows[i].speed = MIN_RIVER_SPEED_HARD + rand() % (MAX_RIVER_SPEED_HARD - MIN_RIVER_SPEED_HARD + 1);
+            break;
+        default:
+            break;
+        
+        }
+    }
+
+    /*
     
     
     // creazione pipes 
@@ -81,7 +104,8 @@ void game(GameData gamedata){
                             }else{
                             
                             //... fino all'ultimo coccodrillo. Ma se usassi un ciclo invece di scrivere mille if & else ?? quello di sotto non so se funge
-                            
+                            // Sono d'accordo sull'uso del ciclo
+
 		                    for(int i = 0; i < N_CROCODILE; i++){
 		                    	crocodile[i] = fork();
 		                    	if(crocodile[i] == 0){

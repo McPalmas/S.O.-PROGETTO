@@ -73,6 +73,11 @@ enum Direction {
     RIGHT
 };
 
+typedef struct {
+    Direction direction; // Direzione del flusso: 0 per sinistra, 1 per destra
+    int speed;     // Velocità del flusso
+} RiverFlow;
+
 // Struttura dati della difficoltà
 enum Difficulty {
     EASY,
@@ -113,6 +118,9 @@ typedef struct {
 } Plant;
 
 
+extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
+
+
 /*----------------------------------------------------------------------
    			   PARAMETRI DI GIOCO
    ----------------------------------------------------------------------*/
@@ -121,6 +129,14 @@ typedef struct {
 #define CROCODILE_DELAY_EASY 10000
 #define CROCODILE_DELAY_NORMAL 8000
 #define CROCODILE_DELAY_HARD 6000
+
+#define MIN_RIVER_SPEED_EASY 10000
+#define MIN_RIVER_SPEED_NORMAL 15000
+#define MIN_RIVER_SPEED_HARD 20000
+
+#define MAX_RIVER_SPEED_EASY 15000
+#define MAX_RIVER_SPEED_NORMAL 20000
+#define MAX_RIVER_SPEED_HARD 30000
 
 #define TIMELIMIT_EASY 60
 #define TIMELIMIT_NORMAL 45
@@ -132,6 +148,7 @@ typedef struct {
 #define N_PLANTS 3 //numero di vite
 #define N_LIVES 3 //numero di vite
 #define N_CROCODILE 24 //numero di coccodrilli se ne mettiamo 3 per corsia (eventualmente aumentabile a 4)
+
 
 /*----------------------------------------------------------------------
    			   ID OGGETTI

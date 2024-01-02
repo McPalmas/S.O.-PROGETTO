@@ -181,6 +181,6 @@ void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_des
  * Controlla se due Frog sono equivalenti
 */
 // controlla se due frogs passate come parametro sono uguali
-bool areFrogsEqual(Position frog1, Position frog2){
+int areFrogsEqual(Position frog1, Position frog2){
     return (frog1.x == frog2.x) && (frog1.y == frog2.y) && (frog1.frog_candie == frog2.frog_candie) && (frog1.frog_canshoot == frog2.frog_canshoot);
 }
