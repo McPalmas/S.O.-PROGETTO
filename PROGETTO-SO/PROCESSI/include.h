@@ -57,18 +57,30 @@
 /*----------------------------------------------------------------------
    			   STRUTTURE
    ----------------------------------------------------------------------*/
+// Struttura dati di gioco
+typedef struct{
+    _Bool game_lost;
+    _Bool game_won;
+    _Bool available_dens[5];
+    int player_score;
+    int player_lives;
+    int difficulty;
+} GameData;
 
+// Struttura dati della direzione
 enum Direction {
     LEFT,
     RIGHT
 };
 
+// Struttura dati della difficoltà
 enum Difficulty {
     EASY,
     NORMAL,
     HARD
 };
 
+// Struttura dati della rana
 typedef struct 
 {
    int id;
@@ -79,7 +91,7 @@ typedef struct
    bool frog_bulletisactive;
 } Position;
 
-
+// Struttura dati del coccodrillo
 typedef struct {
     int id;
     int x;
@@ -90,6 +102,7 @@ typedef struct {
     //int direction;
 } Crocodile;
 
+
 /*----------------------------------------------------------------------
    			   PARAMETRI DI GIOCO
    ----------------------------------------------------------------------*/
@@ -99,7 +112,14 @@ typedef struct {
 #define CROCODILE_DELAY_NORMAL 8000
 #define CROCODILE_DELAY_HARD 6000
 
+#define TIMELIMIT_EASY 60
+#define TIMELIMIT_NORMAL 45
+#define TIMELIMIT_HARD 30
 
+#define DIFFICULTIES 3 //possibili difficoltà di gioco
+
+#define N_DENS 5 //numero di tane
+#define N_LIVES 3 //numero di vite
 
 /*----------------------------------------------------------------------
    			   ID OGGETTI
@@ -158,6 +178,6 @@ void frogBody(int y, int x);   //disegna lo sprite della rana
 void crocodileBody(Crocodile c);	//disegna lo sprite del coccodrillo
 
 
-void game(int difficulty);    // creazione e comunicazione tra processi
+void game(GameData gamedata);    // creazione e comunicazione tra processi
 
 

@@ -84,7 +84,7 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
         }
 
         
-        // Legge la posiione di Log dalla pipe
+        // Legge la posiione di Crocodile dalla pipe
         if(read(pipe_frogoncrocodile[0], &crocodile, sizeof(Position)) != -1){
             
             if(frog.y == crocodile.y){
