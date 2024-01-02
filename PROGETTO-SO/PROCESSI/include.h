@@ -103,6 +103,15 @@ typedef struct {
     //int direction;
 } Crocodile;
 
+// Struttura dati della pianta
+typedef struct {
+    int id;
+    int x;
+    int y;
+
+   bool plant_canshoot;
+} Plant;
+
 
 /*----------------------------------------------------------------------
    			   PARAMETRI DI GIOCO
@@ -120,7 +129,9 @@ typedef struct {
 #define DIFFICULTIES 3 //possibili difficoltà di gioco
 
 #define N_DENS 5 //numero di tane
+#define N_PLANTS 3 //numero di vite
 #define N_LIVES 3 //numero di vite
+#define N_CROCODILE 24 //numero di coccodrilli se ne mettiamo 3 per corsia (eventualmente aumentabile a 4)
 
 /*----------------------------------------------------------------------
    			   ID OGGETTI
@@ -134,8 +145,34 @@ typedef struct {
 #define CROCODILE_ID_2 5
 #define CROCODILE_ID_3 6
 #define CROCODILE_ID_4 7
+#define CROCODILE_ID_5 8
+#define CROCODILE_ID_6 9
+#define CROCODILE_ID_7 10
+#define CROCODILE_ID_8 11
+#define CROCODILE_ID_9 12
+#define CROCODILE_ID_10 13
+#define CROCODILE_ID_11 14
+#define CROCODILE_ID_12 15
+#define CROCODILE_ID_13 16
+#define CROCODILE_ID_14 17
+#define CROCODILE_ID_15 18
+#define CROCODILE_ID_16 19
+#define CROCODILE_ID_17 20
+#define CROCODILE_ID_18 21
+#define CROCODILE_ID_19 22
+#define CROCODILE_ID_20 23
+#define CROCODILE_ID_21 24
+#define CROCODILE_ID_22 25
+#define CROCODILE_ID_23 26
+#define CROCODILE_ID_24 27
 
- #define TIME_ID 8
+#define PLANT_ID_0 28
+#define PLANT_ID_1 29
+#define PLANT_ID_2 30
+
+ #define TIME_ID 31
+ 
+ 
 /*----------------------------------------------------------------------
    			   COPPIE DI COLORI
    ----------------------------------------------------------------------*/
@@ -153,6 +190,9 @@ typedef struct {
 #define BLACK_RED 12 	
 #define BLACK_GREEN 13 	
 #define RED_GREEN 14	
+#define YELLOW_GREEN 15	
+#define GREEN_MAGENTA 16
+
 
 
 /*----------------------------------------------------------------------
@@ -179,6 +219,9 @@ void frogBody(int y, int x);   //disegna lo sprite della rana
 
 //graphic.c
 void crocodileBody(Crocodile c);	//disegna lo sprite del coccodrillo
+
+//graphic.c
+void plantBody(Plant p);
 
 
 void game(GameData gamedata);    // creazione e comunicazione tra processi

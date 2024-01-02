@@ -31,6 +31,8 @@ void initializeScr(){
     init_pair(BLACK_RED, COLOR_BLACK, COLOR_RED); 
     init_pair(BLACK_GREEN, COLOR_BLACK, COLOR_GREEN); 
     init_pair(RED_GREEN, COLOR_RED, COLOR_GREEN); 
+    init_pair(YELLOW_GREEN, COLOR_YELLOW, COLOR_GREEN); 
+    init_pair(GREEN_MAGENTA, COLOR_GREEN, COLOR_MAGENTA); 
 }
 
 
@@ -174,4 +176,20 @@ void crocodileBody(Crocodile c){
     }
 }
 
+
+
+
+/*----------------------------------------------------------------------
+   	    PROCEDURA CHE STAMPA LO SPRITE DELLA PIANTA
+   ----------------------------------------------------------------------*/
+void plantBody(Plant p){
+
+        attron(COLOR_PAIR(GREEN_YELLOW));
+            mvprintw(p.y, p.x+1, "0 ");
+        attroff(COLOR_PAIR(YELLOW_GREEN));
+        attron(COLOR_PAIR(GREEN_MAGENTA));
+        mvprintw(p.y+1, p.x, "_|_");
+        attroff(COLOR_PAIR(GREEN_MAGENTA));
+       
+}
 
