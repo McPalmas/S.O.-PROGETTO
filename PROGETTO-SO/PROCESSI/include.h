@@ -89,6 +89,7 @@ typedef struct
    bool frog_canshoot;
    bool frog_candie;
    bool frog_bulletisactive;
+   int time_left;
 } Position;
 
 // Struttura dati del coccodrillo
@@ -133,6 +134,8 @@ typedef struct {
 #define CROCODILE_ID_2 5
 #define CROCODILE_ID_3 6
 #define CROCODILE_ID_4 7
+
+ #define TIME_ID 8
 /*----------------------------------------------------------------------
    			   COPPIE DI COLORI
    ----------------------------------------------------------------------*/

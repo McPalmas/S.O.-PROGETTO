@@ -1,5 +1,8 @@
 #include "include.h"
 
+/* ----------------------------------------------   
+          LOGIC PARTITA E PROCESSI
+   ----------------------------------------------*/
 void game(GameData gamedata){
 
 Crocodile cr;			// righe di prova per le stampe da non prendere sul serio

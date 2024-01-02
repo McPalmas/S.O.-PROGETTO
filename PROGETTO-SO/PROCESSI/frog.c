@@ -1,8 +1,9 @@
 #include "include.h"
 
 
-//* FROG ----------------------------------------------
-
+/* ----------------------------------------------   
+		  FROG
+   ----------------------------------------------*/ 
 void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe_frogoncrocodile[2], int pipe_enemycanspawn[2], int difficulty){
 
     // Gestione pipe
