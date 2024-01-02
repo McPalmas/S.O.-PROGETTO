@@ -52,6 +52,7 @@
 #define PLANTS_ZONE_HEIGHT 4    /* altezza zona piante */
 #define START_ZONE_HEIGHT 3    /* altezza zona di partenza */
 #define RIVER_LANES_NUMBER 8    /* numero corsie fiume*/
+#define TOTAL_HEIGHT SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + RIVER_LANES_NUMBER + START_ZONE_HEIGHT /* altezza totale del campo di gioco */
 
 
 /*----------------------------------------------------------------------
@@ -97,6 +98,7 @@ typedef struct
    int time_left;
 } Position;
 
+
 // Struttura dati del coccodrillo
 typedef struct {
     int id;
@@ -115,6 +117,7 @@ typedef struct {
     int y;
 
    bool plant_canshoot;
+   bool plant_bullet_isactive;
 } Plant;
 
 
@@ -239,6 +242,10 @@ void crocodileBody(Crocodile c);	//disegna lo sprite del coccodrillo
 
 //graphic.c
 void plantBody(Plant p);
+
+//plant.c
+void plant_process(int id, int pipe[2], int pipe_plant_position[2], int difficulty)
+void plant_bullet_process(int p[2], Plant plant, int p_destroy_plant_bullet[2], int difficulty)
 
 
 void game(GameData gamedata);    // creazione e comunicazione tra processi
