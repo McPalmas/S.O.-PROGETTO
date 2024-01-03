@@ -29,8 +29,8 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
     int random_flow = rand() % RIVER_LANES_NUMBER;
             
     // Inizializza il coccodrillo con la direzione e la velocità del flusso
-    crocodile.direction = river_flows[random_flow].direction;
-    crocodile_delay = river_flows[random_flow].speed;
+    //crocodile.direction = river_flows[random_flow].direction;
+    //crocodile_delay = river_flows[random_flow].speed;
 
     crocodile.id = id;
     crocodile.x = 1 + rand() % (MAXX - CROCODILE_W - 2);

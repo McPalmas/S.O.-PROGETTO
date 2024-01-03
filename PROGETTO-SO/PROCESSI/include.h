@@ -52,7 +52,7 @@
 #define PLANTS_ZONE_HEIGHT 4    /* altezza zona piante */
 #define START_ZONE_HEIGHT 3    /* altezza zona di partenza */
 #define RIVER_LANES_NUMBER 8    /* numero corsie fiume*/
-#define TOTAL_HEIGHT SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + RIVER_LANES_NUMBER + START_ZONE_HEIGHT /* altezza totale del campo di gioco */
+#define TOTAL_HEIGHT SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT /* altezza totale del campo di gioco */
 
 
 /*----------------------------------------------------------------------
@@ -75,7 +75,7 @@ enum Direction {
 };
 
 typedef struct {
-    Direction direction; // Direzione del flusso: 0 per sinistra, 1 per destra
+    int direction; // Direzione del flusso: 0 per sinistra, 1 per destra
     int speed;     // Velocità del flusso
 } RiverFlow;
 
@@ -212,6 +212,7 @@ extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
 #define RED_GREEN 14	
 #define YELLOW_GREEN 15	
 #define GREEN_MAGENTA 16
+#define BLACK_WHITE 17
 
 
 
@@ -235,6 +236,9 @@ void endGameMenu(bool win);     // menu di fine partita in base a se si è vinto
 void gameField();   //disegna il terreno di gioco
 
 //graphic.c
+void printDens(int dens[]); 	//stampa delle tane 
+
+//graphic.c
 void frogBody(int y, int x);   //disegna lo sprite della rana
 
 //graphic.c
@@ -244,8 +248,8 @@ void crocodileBody(Crocodile c);	//disegna lo sprite del coccodrillo
 void plantBody(Plant p);
 
 //plant.c
-void plant_process(int id, int pipe[2], int pipe_plant_position[2], int difficulty)
-void plant_bullet_process(int p[2], Plant plant, int p_destroy_plant_bullet[2], int difficulty)
+//void plant_process(int id, int pipe[2], int pipe_plant_position[2], int difficulty)
+//void plant_bullet_process(int p[2], Plant plant, int p_destroy_plant_bullet[2], int difficulty)
 
 
 void game(GameData gamedata);    // creazione e comunicazione tra processi

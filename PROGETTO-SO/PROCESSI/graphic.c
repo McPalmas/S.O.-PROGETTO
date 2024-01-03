@@ -33,6 +33,7 @@ void initializeScr(){
     init_pair(RED_GREEN, COLOR_RED, COLOR_GREEN); 
     init_pair(YELLOW_GREEN, COLOR_YELLOW, COLOR_GREEN); 
     init_pair(GREEN_MAGENTA, COLOR_GREEN, COLOR_MAGENTA); 
+    init_pair(BLACK_WHITE, COLOR_BLACK, COLOR_WHITE);
 }
 
 
@@ -102,6 +103,57 @@ void gameField(){
 
 }
 
+
+
+
+
+/*----------------------------------------------------------------------
+   	    PROCEDURA CHE STAMPA LE TANE
+   ----------------------------------------------------------------------*/
+void printDens(int dens[]){
+	int start_dens[5] = {6,17,28,39,50};
+	for(int i=0; i < 5; i++)
+		if(dens[i]==0){
+			attron(COLOR_PAIR(WHITE_WHITE));
+			mvaddch(SCORE_ZONE_HEIGHT, start_dens[i], ' ');
+			mvaddch(SCORE_ZONE_HEIGHT, start_dens[i]+1, ' ');
+			mvaddch(SCORE_ZONE_HEIGHT, start_dens[i]+2, ' ');
+			mvaddch(SCORE_ZONE_HEIGHT, start_dens[i]+3, ' ');
+			mvaddch(SCORE_ZONE_HEIGHT, start_dens[i]+4, ' ');
+			mvaddch(SCORE_ZONE_HEIGHT+1, start_dens[i], ' ');
+			mvaddch(SCORE_ZONE_HEIGHT+1, start_dens[i]+1, ' ');
+			mvaddch(SCORE_ZONE_HEIGHT+1, start_dens[i]+2, ' ');
+			mvaddch(SCORE_ZONE_HEIGHT+1, start_dens[i]+3, ' ');
+			mvaddch(SCORE_ZONE_HEIGHT+1, start_dens[i]+4, ' ');	
+			mvaddch(SCORE_ZONE_HEIGHT+2, start_dens[i], ' ');
+			mvaddch(SCORE_ZONE_HEIGHT+2, start_dens[i]+1, ' ');
+			mvaddch(SCORE_ZONE_HEIGHT+2, start_dens[i]+2, ' ');
+			mvaddch(SCORE_ZONE_HEIGHT+2, start_dens[i]+3, ' ');
+			mvaddch(SCORE_ZONE_HEIGHT+2, start_dens[i]+4, ' ');	
+			attroff(COLOR_PAIR(WHITE_WHITE));	
+		}else{
+			attron(COLOR_PAIR(BLACK_WHITE));
+			mvaddch(SCORE_ZONE_HEIGHT, start_dens[i], ' ');
+			mvaddch(SCORE_ZONE_HEIGHT, start_dens[i]+1, '\\');
+			mvaddch(SCORE_ZONE_HEIGHT, start_dens[i]+2, ' ');
+			mvaddch(SCORE_ZONE_HEIGHT, start_dens[i]+3, '/');
+			mvaddch(SCORE_ZONE_HEIGHT, start_dens[i]+4, ' ');
+			mvaddch(SCORE_ZONE_HEIGHT+1, start_dens[i], ' ');
+			mvaddch(SCORE_ZONE_HEIGHT+1, start_dens[i]+1, ' ');
+			mvaddch(SCORE_ZONE_HEIGHT+1, start_dens[i]+2, 'X');
+			mvaddch(SCORE_ZONE_HEIGHT+1, start_dens[i]+3, ' ');
+			mvaddch(SCORE_ZONE_HEIGHT+1, start_dens[i]+4, ' ');	
+			mvaddch(SCORE_ZONE_HEIGHT+2, start_dens[i], ' ');
+			mvaddch(SCORE_ZONE_HEIGHT+2, start_dens[i]+1, '/');
+			mvaddch(SCORE_ZONE_HEIGHT+2, start_dens[i]+2, ' ');
+			mvaddch(SCORE_ZONE_HEIGHT+2, start_dens[i]+3, '\\');
+			mvaddch(SCORE_ZONE_HEIGHT+2, start_dens[i]+4, ' ');	
+			attroff(COLOR_PAIR(BLACK_WHITE));
+		
+		}
+
+
+}
 
 
 
