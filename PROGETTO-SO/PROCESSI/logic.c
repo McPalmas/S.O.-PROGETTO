@@ -245,12 +245,12 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         // stampa dello sfondo di gioco
         gameField();
         // stampa tane
-        caves_screen();
+        //caves_screen(); errore
 
-        // stampa di una rana nelle tane occupate
+        // stampa di una rana in tana
         for(i = 0; i < N_DENS; i++){
             if(!gamedata.available_dens[i]){
-                frog_screen_normal(2, 5 + (i * 20) + 2);
+                //stampa
             }
         }
 
@@ -297,29 +297,29 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
         // stampa della rana
         if(frog_bullet.frog_bulletisactive){
-            frog_screen_shooting(frog.y, frog.x);
+            //stampa
         }
         else{
-            frog_screen_normal(frog.y, frog.x);
+            //stampa
         }
         // stampa del proiettile della rana
         if(frog_bullet.frog_bulletisactive == true){    
-            frog_bullet_screen(frog_bullet.y, frog_bullet.x);
+            //stampa
         }
 
         // stampa dei coccodrilli
         for(i = 0; i < N_CROCODILE; i++){
-            logs_screen(crocodile[i]);
+            //stampa
         }
 
         // stampa piante
         for (i = 0; i < N_PLANTS; i++){
-            car_screen(plant[i]);
+            //stampa
         }
         // stampa dei proiettili delle piante
         for(i = 0; i < N_PLANT_BULLETS; i++){
             if(plant_bullet[i].plant_bulletisactive){
-                log_bullet_screen(plant_bullet[i]);
+                //stampa
             }   
         }
 
