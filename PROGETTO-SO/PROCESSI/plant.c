@@ -4,15 +4,17 @@
 /* ----------------------------------------------   
 		  PLANT
    ----------------------------------------------*/ 
-void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_destroy_plant_bullet[2], int difficulty){
+void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_plant_spawn[2], int pipe_plant_is_dead[2], int pipe_destroy_plant_bullet[2], int difficulty){
 
     // Gestione pipe
     close(pipe[0]);
     close(pipe_frog_on_plant[0]);
+    close(pipe_can_plant_spawn[1]);
+    close(pipe_plant_is_dead[1]);
 
     srand(getpid());
     // Posizione oggetti di gioco
-    Plant plant;
+    Position plant;
     Position plant_data;
     Position frog;
     Position frog_data;
@@ -28,9 +30,15 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_dest
     plant_bullet_timer = plant_bullet_timer + rand() % 70; //Da rivedere
     
     while (1) {
-        
-        if(1){ //Al posto di 1 ci andrebbe la condizione alive della pianta. Se è viva, allora può sparare
-            
+        if(read(pipe_plant_is_dead[0], &plant_data, sizeof(Position)) != -1){
+            plant = plant_data;     
+        }
+
+        if(read(pipe_can_plant_spawn[0], &frog_data, sizeof(Position)) != -1){        
+            frog = frog_data;
+        }
+
+        if(plant.plant_isalive){
             plant_bullet_timer--;
             // Se il timer è scaduto
             if(plant_bullet_timer <= 0){
@@ -58,29 +66,29 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_dest
     }
 }
 
-void plant_bullet_process(int p[2], Plant plant, int pipe_destroy_plant_bullet[2], int difficulty){
+void plant_bullet_process(int p[2], Position plant, int pipe_destroy_plant_bullet[2], int difficulty){
 
     // Gestione pipe
     close(p[0]);
 
-    Plant plant_bullet;
-    Plant plant_bullet_data;
+    Position plant_bullet;
+    Position plant_bullet_data;
     int plant_bullet_delay;
 
     // Inizializzazione proiettile
     plant_bullet.id = plant.id + 5;
     plant_bullet.x = plant.x + 5;
     plant_bullet.y = plant.y + 1;
-    plant_bullet.plant_bullet_isactive = true;
+    plant_bullet.plant_bulletisactive = true;
 
     // comunica con display per la stampa e le collisioni
     write(p[1], &plant_bullet, sizeof(Position));
 
     // Finché il proiettile è attivo e non è uscito dall'area di gioco
-    while(plant_bullet.plant_bullet_isactive && plant_bullet.y < TOTAL_HEIGHT - 1){
+    while(plant_bullet.plant_bulletisactive && plant_bullet.y < TOTAL_HEIGHT - 1){
         // Aggiorna lo stato
         if(read(pipe_destroy_plant_bullet[0], &plant_bullet_data, sizeof(Position)) != -1){
-            plant_bullet.plant_bullet_isactive = false;
+            plant_bullet.plant_bulletisactive = false;
         }
 
         // Sposta il proiettile
@@ -92,7 +100,7 @@ void plant_bullet_process(int p[2], Plant plant, int pipe_destroy_plant_bullet[2
     }
 
     // disattiva il bullet quando supera l'area di gioco
-    plant_bullet.plant_bullet_isactive = false;
+    plant_bullet.plant_bulletisactive = false;
     // comunica con display per la stampa e le collisioni
     write(p[1], &plant_bullet, sizeof(Position));
     

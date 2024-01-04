@@ -234,7 +234,7 @@ void crocodileBody(Crocodile c){
 /*----------------------------------------------------------------------
    	    PROCEDURA CHE STAMPA LO SPRITE DELLA PIANTA
    ----------------------------------------------------------------------*/
-void plantBody(Plant p){
+void plantBody(Position p){
 
         attron(COLOR_PAIR(GREEN_YELLOW));
             mvprintw(p.y, p.x+1, "0 ");

@@ -95,6 +95,9 @@ typedef struct
    bool frog_canshoot;
    bool frog_candie;
    bool frog_bulletisactive;
+   bool plant_isalive;
+   bool plant_canshoot;
+   bool plant_bulletisactive;
    int time_left;
 } Position;
 
@@ -109,16 +112,6 @@ typedef struct {
     bool is_good;
     //int direction;
 } Crocodile;
-
-// Struttura dati della pianta
-typedef struct {
-    int id;
-    int x;
-    int y;
-
-   bool plant_canshoot;
-   bool plant_bullet_isactive;
-} Plant;
 
 
 extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
@@ -152,6 +145,13 @@ extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
 #define N_LIVES 3 //numero di vite
 #define N_CROCODILE 24 //numero di coccodrilli se ne mettiamo 3 per corsia (eventualmente aumentabile a 4)
 
+#define N_PLANT_BULLETS 3 //numero di proiettili per pianta
+#define N_FROG_BULLETS 3 //numero di proiettili per rana
+
+#define DEN_SCORE_EASY 100
+#define DEN_SCORE_NORMAL 200
+#define DEN_SCORE_HARD 300
+#define DEATH_SCORE 100
 
 /*----------------------------------------------------------------------
    			   ID OGGETTI
@@ -190,7 +190,11 @@ extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
 #define PLANT_ID_1 29
 #define PLANT_ID_2 30
 
- #define TIME_ID 31
+#define PLANT_BULLET_ID_0 31
+#define PLANT_BULLET_ID_1 32
+#define PLANT_BULLET_ID_2 33
+
+ #define TIME_ID 34
  
  
 /*----------------------------------------------------------------------
@@ -245,7 +249,7 @@ void frogBody(int y, int x);   //disegna lo sprite della rana
 void crocodileBody(Crocodile c);	//disegna lo sprite del coccodrillo
 
 //graphic.c
-void plantBody(Plant p);
+void plantBody(Position p);
 
 //plant.c
 //void plant_process(int id, int pipe[2], int pipe_plant_position[2], int difficulty)
