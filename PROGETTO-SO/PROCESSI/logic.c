@@ -92,14 +92,21 @@ void game(GameData gamedata){
     pipe(pipe_destroy_plant_bullet);
     fcntl(pipe_destroy_plant_bullet[0], F_SETFL, fcntl(pipe_destroy_plant_bullet[0], F_GETFL) | O_NONBLOCK);
 
-    // display comunica a car la posizione iniziale delle macchine
+    // display comunica a crocodile la posizione iniziale dei coccodrilli
     int pipe_crocodile_position[N_CROCODILE][2];
     for(int i = 0; i < N_CROCODILE; i++){
         pipe(pipe_crocodile_position[i]);
     }
 
+    // display comunica alla pianta quando è morta
+    int pipe_plant_is_dead[N_PLANTS][2];
+    for(int i = 0; i < N_PLANTS; i++){
+        pipe(pipe_plant_is_dead[i]);
+        fcntl(pipe_plant_is_dead[i][0], F_SETFL, fcntl(pipe_plant_is_dead[i][0], F_GETFL) | O_NONBLOCK);
+    }
+
     
-    
+    /*
     //  creazione processi  
     frog = fork();
     
@@ -161,7 +168,107 @@ void game(GameData gamedata){
     if(gamedata.game_lost || gamedata.game_won){
         endgame_menu(gamedata);
     }
+*/
+
+
+    frog = fork();
+
+    if (frog == 0){
+        frog_process(pip, pipe_shoot, pipe_canshoot, pipe_frog_on_crocodile, pipe_can_plant_spawn, gamedata.difficulty);    
+    }
+    else{
+        frog_bullet = fork();
+        if(frog_bullet == 0){
+            frog_bullet_process(pip, pipe_shoot, pipe_canshoot, pipe_destroy_frog_bullet);
+        }
+        else{
+            time = fork();
+            if(time == 0){
+                time_process(pip, gamedata.difficulty);
+            }
+            else{
+                crocodile[0] = fork();
+                if(crocodile[0] == 0){
+                    crocodile_process(CROCODILE_ID_0, pip, pipe_crocodile_position, pipe_frog_on_crocodile, gamedata.difficulty);
+                }
+                else{
+                    crocodile[1] = fork();
+                    if(crocodile[1] == 0){
+                        crocodile_process(CROCODILE_ID_1, pip, pipe_crocodile_position, pipe_frog_on_crocodile, gamedata.difficulty);
+                        }
+                    else{
+                        crocodile[2] = fork();
+                        if(crocodile[2] == 0){
+                        crocodile_process(CROCODILE_ID_2, pip, pipe_crocodile_position, pipe_frog_on_crocodile, gamedata.difficulty);                   
+                        }
+                        else{
+                            crocodile[3] = fork();
+                            if(crocodile[3] == 0){
+                                crocodile_process(CROCODILE_ID_3, pip, pipe_crocodile_position, pipe_frog_on_crocodile, gamedata.difficulty);                    
+                                }
+                            else{
+                                crocodile[4] = fork();
+                                if(crocodile[4] == 0){
+                                    crocodile_process(CROCODILE_ID_4, pip, pipe_crocodile_position, pipe_frog_on_crocodile, gamedata.difficulty);              
+                                }
+                                //Qua ci andrebbero altri coccodrilli
+                                else{
+                                    plant[0] = fork();
+                                    if(plant[0] == 0){
+                                        plant_process(PLANT_ID_0, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead, pipe_destroy_plant_bullet, gamedata.difficulty);
+                                    }
+                                    else{ 
+                                        plant[1] = fork();
+                                        if(plant[1] == 0){
+                                            plant_process(PLANT_ID_1, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead, pipe_destroy_plant_bullet, gamedata.difficulty);
+                                        }
+                                        else{
+                                            plant[2] = fork();
+                                            if(plant[2] == 0){
+                                                plant_process(PLANT_ID_2, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead, pipe_destroy_plant_bullet, gamedata.difficulty);
+                                            }
+                                            else{
+                                                // stampa e collisioni
+                                                // la funzione restituisce il riepilogo della partita
+                                                //gamedata = gameManche(pip, pipe_plant_is_dead, pipe_destroy_frog_bullet,pipe_destroy_plant_bullet, pipe_crocodile_position, gamedata);
+                                                // se la manche è stata vinta
+                                                if(gamedata.game_won){
+                                                    gamedata.game_lost = false;
+                                                    }
+                                                    // se la manche è stata persa
+                                                    else{
+                                                        gamedata.game_won = false;
+                                                        gamedata.game_lost = true;
+                                                    }
+                                                // se la manche finisce, carica una schermata di attesa in cui notifica al player le informazioni del game precedente
+                                                // Qua ci va la parte delle tane
+
+                                                // kill dei processi
+                                                kill(frog, 1);
+                                                kill(frog_bullet, 1);
+                                                kill(time, 1);
+                                                for(int i = 0; i < N_CROCODILE; i++){
+                                                    kill(crocodile[i], 1);
+                                                    }
+                                                for(int i = 0; i < N_PLANTS; i++){
+                                                    kill(plant[i], 1);
+                                                }
+                                                // se il player vince o perde la partita
+                                                reset_scene(gamedata);
+                                            }
+                                        }
+                                    }
+                                }
+                            } 
+                        } 
+                    } 
+                } 
+            } 
+        }
+    }
 }
+
+void reset_scene(GameData gamedata){return;}; //temporaneo
             
 // FUNZIONE PER LA GESTIONE DELLA MANCHE (COLLLISIONI E STAMPE) nell'altro progetto era in un file a parte però era una sola funzione quindi lasciamola pure qui anche per diversificare,
 
