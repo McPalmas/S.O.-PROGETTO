@@ -113,6 +113,15 @@ typedef struct {
     //int direction;
 } Crocodile;
 
+// Struttura dati della pianta
+typedef struct {
+    int id;
+    int x;
+    int y;
+
+    bool plant_canshoot;
+    bool plant_isalive;
+} Plant;
 
 extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
 
@@ -251,11 +260,15 @@ void crocodileBody(Crocodile c);	//disegna lo sprite del coccodrillo
 //graphic.c
 void plantBody(Position p);
 
-//plant.c
-//void plant_process(int id, int pipe[2], int pipe_plant_position[2], int difficulty)
-//void plant_bullet_process(int p[2], Plant plant, int p_destroy_plant_bullet[2], int difficulty)
+void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe_frogoncrocodile[2], int pipe_enemycanspawn[2], int difficulty);
+void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_destroy_frog_bullet[2]);
+int areFrogsEqual(Position frog1, Position frog2);
+void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int pipe_frog_on_crocodile[2], int difficulty);
+void plant_process(int id, int pipe[2], int pipe_plant_position[2], int difficulty);
+void plant_bullet_process(int p[2], Plant plant, int p_destroy_plant_bullet[2], int difficulty);
+void time_process(int p[2], int difficulty);
 
+void initialize_game(GameData gamedata);    // creazione e comunicazione tra processi
 
-void game(GameData gamedata);    // creazione e comunicazione tra processi
-
+void analyze_data(GameData gamedata);  // analizza i dati e in base a essi decide se la partita deve continuare o finire
 

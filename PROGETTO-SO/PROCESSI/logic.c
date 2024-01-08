@@ -3,7 +3,7 @@
 /* ----------------------------------------------   
           LOGIC PARTITA E PROCESSI
    ----------------------------------------------*/
-void game(GameData gamedata){
+void initialize_game(GameData gamedata){
 
     int dens[5]={0,1,0,1,0};
     Crocodile cr;			// righe di prova per le stampe da non prendere sul serio
@@ -19,7 +19,7 @@ void game(GameData gamedata){
 		plantBody(plnt);
 		printDens(dens);
         	getch();
-	}
+	}*/
 
 	//implementazione della funzione per definire gli oggetti a inizio di ogni manche incompleta e da rivedere
 	
@@ -234,13 +234,12 @@ void game(GameData gamedata){
                                                 // se la manche è stata vinta
                                                 if(gamedata.game_won){
                                                     gamedata.game_lost = false;
-                                                    }
+                                                }
                                                     // se la manche è stata persa
-                                                    else{
+                                                else{
                                                         gamedata.game_won = false;
                                                         gamedata.game_lost = true;
-                                                    }
-                                                // se la manche finisce, carica una schermata di attesa in cui notifica al player le informazioni del game precedente
+                                                }
                                                 // Qua ci va la parte delle tane
 
                                                 // kill dei processi
@@ -253,8 +252,9 @@ void game(GameData gamedata){
                                                 for(int i = 0; i < N_PLANTS; i++){
                                                     kill(plant[i], 1);
                                                 }
-                                                // se il player vince o perde la partita
-                                                reset_scene(gamedata);
+                                                
+                                                // se il player vince o perde la partita o continua alla manche successiva
+                                                analyze_data(gamedata);
                                             }
                                         }
                                     }
@@ -268,7 +268,57 @@ void game(GameData gamedata){
     }
 }
 
-void reset_scene(GameData gamedata){return;}; //temporaneo
+
+void analyze_data(GameData gamedata){
+
+	int taken_caves = 0;
+	
+	erase();
+	
+	// conta il numero di tane occupate
+	for(int i = 0; i < N_CAVES; i++)
+		if(game_data.free_cave[i] == false){
+		        taken_caves++;
+		        
+		        
+
+	if(game_data.game_won){
+		// se ha occupato tutte le tane si va al menu della vittoria
+		if(taken_caves >= 5){
+		    endGameMenu(1);
+		}
+		else{	// altrimenti stampa relativa alle tane occupate e inizio manche successiva
+		    mvprintw(MAXY/2, MAXX/2-8, "Tane occupate: %d", taken_caves);
+		    mvprintw(MAXY/2 +1, MAXX/2-8, "Vite rimanenti: %d", game_data.n_lives_player);
+		    refresh();
+		    
+		    // tempo di attesa prima del caricamento della schermata successiva
+		    sleep(2);
+		
+		    game(game_data);
+		} 
+
+	       
+		
+	}else if (game_data.game_lost){
+	
+		game_data.n_lives_player--;
+		
+		if(game_data.n_lives_player <= 0) // se ha esaurito le vite si va al menu della sconfitta
+            		endGameMenu(0);
+            	else{      // altrimenti stampa relativa al numero di vite rimanenti         
+            		mvprintw(MAXY/2, MAXX/2-8, "Vite rimanenti: %d", game_data.n_lives_player);
+            		mvprintw(MAXY/2 +1, MAXX/2-8, "Tane occupate: %d", taken_caves);
+            		refresh();
+		    
+		    	// tempo di attesa prima del caricamento della schermata successiva
+		    	sleep(2);
+		
+		    	game(game_data);
+        	}
+        }
+	
+}
             
 // FUNZIONE PER LA GESTIONE DELLA MANCHE (COLLLISIONI E STAMPE) nell'altro progetto era in un file a parte però era una sola funzione quindi lasciamola pure qui anche per diversificare,
 
