@@ -270,5 +270,7 @@ void time_process(int p[2], int difficulty);
 
 void initialize_game(GameData gamedata);    // creazione e comunicazione tra processi
 
+GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[N_CROCODILE][2], GameData gamedata);     // gestione della manche stampe e collsioni
+
 void analyze_data(GameData gamedata);  // analizza i dati e in base a essi decide se la partita deve continuare o finire
 
