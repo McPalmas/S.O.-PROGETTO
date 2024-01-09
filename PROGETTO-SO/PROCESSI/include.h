@@ -260,13 +260,22 @@ void crocodileBody(Crocodile c);	//disegna lo sprite del coccodrillo
 //graphic.c
 void plantBody(Position p);
 
+
+
+
 void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe_frogoncrocodile[2], int pipe_enemycanspawn[2], int difficulty);
 void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_destroy_frog_bullet[2]);
 int areFrogsEqual(Position frog1, Position frog2);
+
 void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int pipe_frog_on_crocodile[2], int difficulty);
-void plant_process(int id, int pipe[2], int pipe_plant_position[2], int difficulty);
+
+void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_plant_spawn[2], int pipe_plant_is_dead[2], int pipe_destroy_plant_bullet[2], int difficulty);
 void plant_bullet_process(int p[2], Plant plant, int p_destroy_plant_bullet[2], int difficulty);
+
 void time_process(int p[2], int difficulty);
+
+
+
 
 void initialize_game(GameData gamedata);    // creazione e comunicazione tra processi
 

@@ -269,59 +269,71 @@ void initialize_game(GameData gamedata){
 }
 
 
+
+
+
+/* ----------------------------------------------   
+          CONTINUA O TERMINA LA PARTITA 
+   ----------------------------------------------*/
 void analyze_data(GameData gamedata){
 
-	int taken_caves = 0;
+	int taken_dens = 0;
 	
 	erase();
 	
 	// conta il numero di tane occupate
-	for(int i = 0; i < N_CAVES; i++)
-		if(game_data.free_cave[i] == false){
-		        taken_caves++;
+	for(int i = 0; i < N_DENS; i++)
+		if(gamedata.available_dens[i] == false){
+		        taken_dens++;
 		        
 		        
 
-	if(game_data.game_won){
+	if(gamedata.game_won){
 		// se ha occupato tutte le tane si va al menu della vittoria
-		if(taken_caves >= 5){
+		if(taken_dens >= 5){
 		    endGameMenu(1);
 		}
 		else{	// altrimenti stampa relativa alle tane occupate e inizio manche successiva
-		    mvprintw(MAXY/2, MAXX/2-8, "Tane occupate: %d", taken_caves);
-		    mvprintw(MAXY/2 +1, MAXX/2-8, "Vite rimanenti: %d", game_data.n_lives_player);
+		    mvprintw(MAXY/2, MAXX/2-8, "Tane occupate: %d", taken_dens);
+		    mvprintw(MAXY/2 +1, MAXX/2-8, "Vite rimanenti: %d", gamedata.player_lives);
 		    refresh();
 		    
 		    // tempo di attesa prima del caricamento della schermata successiva
 		    sleep(2);
 		
-		    game(game_data);
+		    initialize_game(gamedata);
 		} 
 
 	       
 		
-	}else if (game_data.game_lost){
+	}else if (gamedata.game_lost){
 	
-		game_data.n_lives_player--;
+		gamedata.player_lives--;
 		
-		if(game_data.n_lives_player <= 0) // se ha esaurito le vite si va al menu della sconfitta
+		if(gamedata.player_lives <= 0) // se ha esaurito le vite si va al menu della sconfitta
             		endGameMenu(0);
             	else{      // altrimenti stampa relativa al numero di vite rimanenti         
-            		mvprintw(MAXY/2, MAXX/2-8, "Vite rimanenti: %d", game_data.n_lives_player);
-            		mvprintw(MAXY/2 +1, MAXX/2-8, "Tane occupate: %d", taken_caves);
+            		mvprintw(MAXY/2, MAXX/2-8, "Vite rimanenti: %d", gamedata.player_lives);
+            		mvprintw(MAXY/2 +1, MAXX/2-8, "Tane occupate: %d", taken_dens);
             		refresh();
 		    
 		    	// tempo di attesa prima del caricamento della schermata successiva
 		    	sleep(2);
 		
-		    	game(game_data);
+		    	initialize_game(gamedata);
         	}
         }
 	
 }
-            
-// FUNZIONE PER LA GESTIONE DELLA MANCHE (COLLLISIONI E STAMPE) nell'altro progetto era in un file a parte però era una sola funzione quindi lasciamola pure qui anche per diversificare,
 
+
+
+
+            
+
+/* ----------------------------------------------   
+         GESTIONE MANCHE, STAMPE E COLLISIONI
+   ----------------------------------------------*/
 GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[N_CROCODILE][2], GameData gamedata){
 
     int i, j;
@@ -662,6 +674,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
     // restituisce la condizione alla fine della manche
     return gamedata;
+}
 }
 
 
