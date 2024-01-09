@@ -82,8 +82,8 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
 
         
         // Comunica stato di crocodile
-        write(pipe[1], &crocodile, sizeof(Position));
-        write(pipe_frog_on_crocodile[1], &crocodile, sizeof(Position));
+        write(pipe[1], &crocodile, sizeof(Crocodile));
+        write(pipe_frog_on_crocodile[1], &crocodile, sizeof(Crocodile));
 
         usleep(crocodile_delay);
     }

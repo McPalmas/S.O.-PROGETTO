@@ -189,43 +189,43 @@ void initialize_game(GameData gamedata){
             else{
                 crocodile[0] = fork();
                 if(crocodile[0] == 0){
-                    crocodile_process(CROCODILE_ID_0, pip, pipe_crocodile_position, pipe_frog_on_crocodile, gamedata.difficulty);
+                    crocodile_process(CROCODILE_ID_0, pip, pipe_crocodile_position[0], pipe_frog_on_crocodile, gamedata.difficulty);
                 }
                 else{
                     crocodile[1] = fork();
                     if(crocodile[1] == 0){
-                        crocodile_process(CROCODILE_ID_1, pip, pipe_crocodile_position, pipe_frog_on_crocodile, gamedata.difficulty);
+                        crocodile_process(CROCODILE_ID_1, pip, pipe_crocodile_position[1], pipe_frog_on_crocodile, gamedata.difficulty);
                         }
                     else{
                         crocodile[2] = fork();
                         if(crocodile[2] == 0){
-                        crocodile_process(CROCODILE_ID_2, pip, pipe_crocodile_position, pipe_frog_on_crocodile, gamedata.difficulty);                   
+                        crocodile_process(CROCODILE_ID_2, pip, pipe_crocodile_position[2], pipe_frog_on_crocodile, gamedata.difficulty);                   
                         }
                         else{
                             crocodile[3] = fork();
                             if(crocodile[3] == 0){
-                                crocodile_process(CROCODILE_ID_3, pip, pipe_crocodile_position, pipe_frog_on_crocodile, gamedata.difficulty);                    
+                                crocodile_process(CROCODILE_ID_3, pip, pipe_crocodile_position[3], pipe_frog_on_crocodile, gamedata.difficulty);                    
                                 }
                             else{
                                 crocodile[4] = fork();
                                 if(crocodile[4] == 0){
-                                    crocodile_process(CROCODILE_ID_4, pip, pipe_crocodile_position, pipe_frog_on_crocodile, gamedata.difficulty);              
+                                    crocodile_process(CROCODILE_ID_4, pip, pipe_crocodile_position[4], pipe_frog_on_crocodile, gamedata.difficulty);              
                                 }
                                 //Qua ci andrebbero altri coccodrilli
                                 else{
                                     plant[0] = fork();
                                     if(plant[0] == 0){
-                                        plant_process(PLANT_ID_0, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead, pipe_destroy_plant_bullet, gamedata.difficulty);
+                                        plant_process(PLANT_ID_0, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead[0], pipe_destroy_plant_bullet, gamedata.difficulty);
                                     }
                                     else{ 
                                         plant[1] = fork();
                                         if(plant[1] == 0){
-                                            plant_process(PLANT_ID_1, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead, pipe_destroy_plant_bullet, gamedata.difficulty);
+                                            plant_process(PLANT_ID_1, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead[1], pipe_destroy_plant_bullet, gamedata.difficulty);
                                         }
                                         else{
                                             plant[2] = fork();
                                             if(plant[2] == 0){
-                                                plant_process(PLANT_ID_2, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead, pipe_destroy_plant_bullet, gamedata.difficulty);
+                                                plant_process(PLANT_ID_2, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead[2], pipe_destroy_plant_bullet, gamedata.difficulty);
                                             }
                                             else{
                                                 // stampa e collisioni

@@ -121,6 +121,7 @@ typedef struct {
 
     bool plant_canshoot;
     bool plant_isalive;
+    bool plant_bulletisactive;
 } Plant;
 
 extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
