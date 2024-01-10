@@ -16,8 +16,8 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_
     // Posizione oggetti di gioco
     Plant plant;
     Plant plant_data;
-    Position frog;
-    Position frog_data;
+    Frog frog;
+    Frog frog_data;
     pid_t plant_bullet;
     int plant_bullet_timer;
     int i;
@@ -34,7 +34,7 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_
             plant = plant_data;     
         }
 
-        if(read(pipe_can_plant_spawn[0], &frog_data, sizeof(Position)) != -1){        
+        if(read(pipe_can_plant_spawn[0], &frog_data, sizeof(Frog)) != -1){        
             frog = frog_data;
         }
 

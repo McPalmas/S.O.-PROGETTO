@@ -9,7 +9,7 @@ void time_process(int p[2], int difficulty){
     // Gestione pipe
     close(p[0]);
 
-    Position time;
+    Frog time;
     
     // Tempo massimo
     int time_limit;
@@ -33,7 +33,7 @@ void time_process(int p[2], int difficulty){
     while(1){
         // Aggiorna lo stato
         time.time_left--;
-        write(p[1], &time, sizeof(Position));
+        write(p[1], &time, sizeof(Frog));
         sleep(1);
     }
 

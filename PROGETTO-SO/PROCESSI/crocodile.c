@@ -14,9 +14,9 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
     srand(getpid());
 
     Crocodile crocodile;
-    Position crocodile_data;
-    Position frog;
-    Position frog_data;
+    Crocodile crocodile_data;
+    Frog frog;
+    Frog frog_data;
 
 
     int i;
@@ -53,7 +53,7 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
 
     while(1){
         // Se è presente il dato (Frog è su di lui)
-        if(read(pipe_frog_on_crocodile[0], &frog_data, sizeof(Position)) != -1){
+        if(read(pipe_frog_on_crocodile[0], &frog_data, sizeof(Frog)) != -1){
             // Se il crocodile è buono, diventa malvagio dopo il tempo definito da crocodile_switch_timer
             if(crocodile.is_good == true){
                 crocodile_switch_timer--;

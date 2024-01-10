@@ -357,13 +357,13 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
     srand(getpid());
 
 
-    struct DataPacket receivedPacket; // dove ricevo i dati letti
-    Position frog;
-    Position frog_bullet;
+    DataPacket receivedPacket; // dove ricevo i dati letti
+    Frog frog;
+    Frog frog_bullet;
     Plant plant[N_PLANTS];
     Plant plant_bullet[N_PLANT_BULLETS];
     Crocodile crocodile[N_CROCODILE];
-    Position time;
+    Frog time;
 
 
     // posizone di partenza della rana
@@ -389,7 +389,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
     // Plant
     for(i = 0; i < N_PLANTS; i++){
-        plant[i].y = DENS_ZONE_HEIGHT + (i * 2); //Da rivedere
+        plant[i].y = SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT; //Da rivedere dipende da quante piante ho in vita per poi gestire la x e lo spazio tra di loro
     }
 
     // Plant bullet
@@ -400,12 +400,12 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
     // time
     time.time_left = TIMELIMIT_EASY;
 
-    // inizializzazione delle macchine (car.c)
-    //cars_inizializer(car);
+    // inizializzazione dei coccodrilli
+    //crocodile_inizializer(car);  // da fare 
 
-    // l'inizializzazione delle macchine viene comunicata a car
+    // l'inizializzazione dei coccodrilli viene comunicata a car
     for(i = 0; i < N_CROCODILE; i++){
-        write(pipe_crocodile_position[i][1], &crocodile[i], sizeof(Position));
+        write(pipe_crocodile_position[i][1], &crocodile[i], sizeof(Crocodile));
     }
 
     
@@ -418,7 +418,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         // stampa dello sfondo di gioco
         gameField();
         // stampa tane
-        //caves_screen(); errore
+        printDens((int[]){0, 0, 0, 0, 0}); //prova con tane tutte aperte
 
         // stampa di una rana in tana
         for(i = 0; i < N_DENS; i++){
@@ -431,7 +431,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         //* LETTURA E ASSEGNAMENTO DATI ----------------------------------------
         
         // lettura dei dati di tutti gli oggetti di gioco
-        read(pip[0], &receivedPacket, sizeof(Position));
+        read(pip[0], &receivedPacket, sizeof(DataPacket));
 
         // assegnamento del dato al rispettivo elemento
         /*if(data.id == FROG_ID){
@@ -467,23 +467,31 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         
         
         switch (receivedPacket.type) {
-    	    case TYPE_POSITION:
-		// I dati successivi sono di tipo Position
-		if(receivedPacket.data.positionData.id == FROG_ID){
-		    frog = receivedPacket.data.positionData;
+    	    case TYPE_FROG:
+		// I dati successivi sono di tipo frog
+		if(receivedPacket.data.frogData.id == FROG_ID){
+		    frog = receivedPacket.data.frogData;
 		}
-		else if(receivedPacket.data.positionData.id == FROG_BULLET_ID){
-		    frog_bullet = receivedPacket.data.positionData;
+		else if(receivedPacket.data.frogData.id == FROG_BULLET_ID){
+		    frog_bullet = receivedPacket.data.frogData;
 		}else 
-		    time = receivedPacket.data.positionData;
+		    time = receivedPacket.data.frogData;
 		break;
 	    case TYPE_PLANT:
 		// I dati successivi sono di tipo Plant
-		for(i = 0; i < N_PLANTS; i++){
-                	if(receivedPacket.data.plantData.id == i + PLANT_ID_0){
-                    	    plant[i] = receivedPacket.data.plantData;
-               		}
-            	}
+		if(receivedPacket.data.plantData.id >= PLANT_BULLET_ID_0 && receivedPacket.data.plantData.id <= PLANT_BULLET_ID_2){
+		    for(i = 0; i < N_PLANT_BULLETS; i++){
+		        if(receivedPacket.data.plantData.id == i + PLANT_BULLET_ID_0){
+		            plant_bullet[i] = receivedPacket.data.plantData;;
+		        }
+		    }
+		}else{
+		    for(i = 0; i < N_PLANTS; i++){
+		        if(receivedPacket.data.plantData.id == i + PLANT_ID_0){
+		            plant[i] = receivedPacket.data.plantData;
+		       	}
+		    }
+		}
 		break;
 	    case TYPE_CROCODILE:
 		// I dati successivi sono di tipo Crocodile
@@ -493,7 +501,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                		}
             	}
 		break;
-}
+	}
 
         
 
@@ -620,7 +628,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                     gamedata.game_lost = true;
 
                     // comunica a log bullet che il proiettile deve essere disattivato
-                    write(pipe_destroy_plant_bullet[i][1], &plant_bullet, sizeof(Position));         
+                    write(pipe_destroy_plant_bullet[i][1], &plant_bullet, sizeof(Plant));         
                 }
             }
         }
@@ -653,9 +661,9 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                     plant[i].plant_isalive = false;
 
                     // comunica al tronco che il nemico è morto
-                    write(pipe_plant_is_dead[i][1], &plant[i], sizeof(Position));
+                    write(pipe_plant_is_dead[i][1], &plant[i], sizeof(Plant));
                     // comunica al frog bullet di distruggere il proiettile
-                    write(pipe_destroy_frog_bullet[1], &frog_bullet, sizeof(Position));
+                    write(pipe_destroy_frog_bullet[1], &frog_bullet, sizeof(Frog));
                 }
             }
         }
@@ -677,8 +685,8 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                     frog.frog_canshoot = true;
 
                     // comunica al frog bullet di distruggere il proiettile
-                    write(pipe_destroy_frog_bullet[1], &frog_bullet, sizeof(Position));
-                    write(pipe_destroy_plant_bullet[i][1], &plant_bullet, sizeof(Position));
+                    write(pipe_destroy_frog_bullet[1], &frog_bullet, sizeof(Frog));
+                    write(pipe_destroy_plant_bullet[i][1], &plant_bullet, sizeof(Plant));
                 }
             }
         }

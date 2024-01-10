@@ -14,9 +14,9 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
     close(pipe_enemycanspawn[0]);
 
     // Posizione oggetti di gioco
-    Position frog;
-    Position frog_temp;
-    Position frog_bullet;
+    Frog frog;
+    Frog frog_temp;
+    Frog frog_bullet;
     Crocodile crocodile;
 
     // Contatore
@@ -36,12 +36,12 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
     frog.frog_candie = true;
 
     // Update della posizione
-    write(pipe[1],&frog, sizeof(Position));
+    write(pipe[1],&frog, sizeof(Frog));
 
     while(1){
 
         // Se è presente il dato
-        if(read(pipe_canshoot[0], &frog_bullet, sizeof(Position)) != -1){
+        if(read(pipe_canshoot[0], &frog_bullet, sizeof(Frog)) != -1){
             // e un altro proiettile non è attivo
             if(frog_bullet.frog_bulletisactive == false){
                 // Frog può sparare
@@ -79,7 +79,7 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
                     //Aggiorna lo stato
                     frog.frog_canshoot = false;
                     //Trasmette lo stato alla pipe
-                    write(pipe_shoot[1], &frog, sizeof(Position));
+                    write(pipe_shoot[1], &frog, sizeof(Frog));
                 }
                 break;
         }
@@ -97,8 +97,8 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
         // Aggiorna la posizione della rana in funzione dell'input
         if(!areFrogsEqual(frog, frog_temp)){
             // Comunica il nuovo stato della rana
-            write(pipe[1],&frog, sizeof(Position));
-            write(pipe_enemycanspawn[1],&frog, sizeof(Position));
+            write(pipe[1],&frog, sizeof(Frog));
+            write(pipe_enemycanspawn[1],&frog, sizeof(Frog));
         }
 
         // Salva lo stato precedente
@@ -121,9 +121,9 @@ void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_des
     close(p_destroy_frog_bullet[1]);
 
     // Posizione oggetti di gioco
-    Position frog_bullet;
-    Position frog_bullet_data;
-    Position frog;
+    Frog frog_bullet;
+    Frog frog_bullet_data;
+    Frog frog;
 
     // Parametri Frog Bullet
     frog_bullet.id = FROG_BULLET_ID;
@@ -135,7 +135,7 @@ void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_des
     while(1){ 
         
         // Se è presente il dato (Frog ha sparato)
-        read(p_shoot[0], &frog, sizeof(Position)); 
+        read(p_shoot[0], &frog, sizeof(Frog)); 
 
         if(frog.frog_canshoot == false){
             // Posizione  Bullet
@@ -147,7 +147,7 @@ void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_des
             while(frog_bullet.frog_bulletisactive == true){
 
                 // Aggiorna lo stato
-                if(read(p_destroy_frog_bullet[0], &frog_bullet_data, sizeof(Position)) != -1){
+                if(read(p_destroy_frog_bullet[0], &frog_bullet_data, sizeof(Frog)) != -1){
                     frog_bullet.frog_bulletisactive = false;
                 }
 
@@ -160,7 +160,7 @@ void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_des
                 }
                 
                 // Comunica lo stato
-                write(p[1], &frog_bullet, sizeof(Position));
+                write(p[1], &frog_bullet, sizeof(Frog));
 
                 // Delay di Frog Bullet
                 usleep(FROG_BULLET_DELAY);
@@ -171,7 +171,7 @@ void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_des
         }
 
         // Comunica lo stato
-        write(p_can_shoot[1], &frog_bullet, sizeof(Position));
+        write(p_can_shoot[1], &frog_bullet, sizeof(Frog));
     
     }   
 
@@ -181,6 +181,6 @@ void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_des
  * Controlla se due Frog sono equivalenti
 */
 // controlla se due frogs passate come parametro sono uguali
-int areFrogsEqual(Position frog1, Position frog2){
+int areFrogsEqual(Frog frog1, Frog frog2){
     return (frog1.x == frog2.x) && (frog1.y == frog2.y) && (frog1.frog_candie == frog2.frog_candie) && (frog1.frog_canshoot == frog2.frog_canshoot);
 }
