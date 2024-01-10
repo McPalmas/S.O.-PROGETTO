@@ -88,9 +88,13 @@ void initialize_game(GameData gamedata){
     fcntl(pipe_can_plant_spawn[0], F_SETFL, fcntl(pipe_can_plant_spawn[0], F_GETFL) | O_NONBLOCK);
 
     // Comunicazione fra plant e plant_bullet (Bullet ha avuto una collisione)
-    int pipe_destroy_plant_bullet[2];
-    pipe(pipe_destroy_plant_bullet);
-    fcntl(pipe_destroy_plant_bullet[0], F_SETFL, fcntl(pipe_destroy_plant_bullet[0], F_GETFL) | O_NONBLOCK);
+    int pipe_destroy_plant_bullet[3][2];
+    /*pipe(pipe_destroy_plant_bullet);
+    fcntl(pipe_destroy_plant_bullet[0], F_SETFL, fcntl(pipe_destroy_plant_bullet[0], F_GETFL) | O_NONBLOCK);*/
+    for(int i = 0; i < 3; i++){
+        pipe(pipe_destroy_plant_bullet[i]);
+        fcntl(pipe_destroy_plant_bullet[i][0], F_SETFL, fcntl(pipe_destroy_plant_bullet[i][0], F_GETFL) | O_NONBLOCK);
+    }
 
     // display comunica a crocodile la posizione iniziale dei coccodrilli
     int pipe_crocodile_position[N_CROCODILE][2];
@@ -204,7 +208,7 @@ void initialize_game(GameData gamedata){
                         else{
                             crocodile[3] = fork();
                             if(crocodile[3] == 0){
-                                crocodile_process(CROCODILE_ID_3, pip, pipe_crocodile_position[3], pipe_frog_on_crocodile, gamedata.difficulty);                    
+                               crocodile_process(CROCODILE_ID_3, pip, pipe_crocodile_position[3], pipe_frog_on_crocodile, gamedata.difficulty);                    
                                 }
                             else{
                                 crocodile[4] = fork();
@@ -215,22 +219,22 @@ void initialize_game(GameData gamedata){
                                 else{
                                     plant[0] = fork();
                                     if(plant[0] == 0){
-                                        plant_process(PLANT_ID_0, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead[0], pipe_destroy_plant_bullet, gamedata.difficulty);
+                                        plant_process(PLANT_ID_0, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead[0], pipe_destroy_plant_bullet[0], gamedata.difficulty);
                                     }
                                     else{ 
                                         plant[1] = fork();
                                         if(plant[1] == 0){
-                                            plant_process(PLANT_ID_1, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead[1], pipe_destroy_plant_bullet, gamedata.difficulty);
+                                            plant_process(PLANT_ID_1, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead[1], pipe_destroy_plant_bullet[1], gamedata.difficulty);
                                         }
                                         else{
                                             plant[2] = fork();
                                             if(plant[2] == 0){
-                                                plant_process(PLANT_ID_2, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead[2], pipe_destroy_plant_bullet, gamedata.difficulty);
+                                                plant_process(PLANT_ID_2, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead[2], pipe_destroy_plant_bullet[2], gamedata.difficulty);
                                             }
                                             else{
                                                 // stampa e collisioni
                                                 // la funzione restituisce il riepilogo della partita
-                                                //gamedata = gameManche(pip, pipe_plant_is_dead, pipe_destroy_frog_bullet,pipe_destroy_plant_bullet, pipe_crocodile_position, gamedata);
+                                                gamedata = gameManche(pip, pipe_plant_is_dead, pipe_destroy_frog_bullet,pipe_destroy_plant_bullet, pipe_crocodile_position, gamedata);
                                                 // se la manche è stata vinta
                                                 if(gamedata.game_won){
                                                     gamedata.game_lost = false;
@@ -283,7 +287,7 @@ void analyze_data(GameData gamedata){
 	
 	// conta il numero di tane occupate
 	for(int i = 0; i < N_DENS; i++)
-		if(gamedata.available_dens[i] == false){
+		if(gamedata.available_dens[i] == false)
 		        taken_dens++;
 		        
 		        
@@ -353,12 +357,12 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
     srand(getpid());
 
 
-    Position data;
+    struct DataPacket receivedPacket; // dove ricevo i dati letti
     Position frog;
     Position frog_bullet;
-    Position plant[N_PLANTS];
-    Position plant_bullet[N_PLANT_BULLETS];
-    Position crocodile[N_CROCODILE];
+    Plant plant[N_PLANTS];
+    Plant plant_bullet[N_PLANT_BULLETS];
+    Crocodile crocodile[N_CROCODILE];
     Position time;
 
 
@@ -427,10 +431,10 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         //* LETTURA E ASSEGNAMENTO DATI ----------------------------------------
         
         // lettura dei dati di tutti gli oggetti di gioco
-        read(pip[0], &data, sizeof(Position));
+        read(pip[0], &receivedPacket, sizeof(Position));
 
         // assegnamento del dato al rispettivo elemento
-        if(data.id == FROG_ID){
+        /*if(data.id == FROG_ID){
             frog = data;
         }
         else if(data.id == FROG_BULLET_ID){
@@ -459,10 +463,42 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         }
         else if(data.id == TIME_ID){
             time = data;
-        }
+        }*/
+        
+        
+        switch (receivedPacket.type) {
+    	    case TYPE_POSITION:
+		// I dati successivi sono di tipo Position
+		if(receivedPacket.data.positionData.id == FROG_ID){
+		    frog = receivedPacket.data.positionData;
+		}
+		else if(receivedPacket.data.positionData.id == FROG_BULLET_ID){
+		    frog_bullet = receivedPacket.data.positionData;
+		}else 
+		    time = receivedPacket.data.positionData;
+		break;
+	    case TYPE_PLANT:
+		// I dati successivi sono di tipo Plant
+		for(i = 0; i < N_PLANTS; i++){
+                	if(receivedPacket.data.plantData.id == i + PLANT_ID_0){
+                    	    plant[i] = receivedPacket.data.plantData;
+               		}
+            	}
+		break;
+	    case TYPE_CROCODILE:
+		// I dati successivi sono di tipo Crocodile
+		for(i = 0; i < N_CROCODILE; i++){
+                	if(receivedPacket.data.crocodileData.id == i + CROCODILE_ID_0){
+                    	    crocodile[i] = receivedPacket.data.crocodileData;
+               		}
+            	}
+		break;
+}
+
+        
 
 
-        //* STAMPA ELEMENTI ----------------------------------------
+        // STAMPA ELEMENTI ----------------------------------------
 
         // stampa della rana
         if(frog_bullet.frog_bulletisactive){
@@ -503,9 +539,9 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         refresh();
 
 
-        //* COLLISIONI E MORTI --------------------------------------------------------------------------------------
+        // COLLISIONI E MORTI --------------------------------------------------------------------------------------
 
-        //* RANA - TANA --------------------------------------------------------------------------------------
+        // RANA - TANA --------------------------------------------------------------------------------------
 
         // se la rana passa nella zona delle tane
         if(frog.y < DENS_ZONE_HEIGHT){
@@ -553,7 +589,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             }
         }
 
-        //* RANA NEL FIUME --------------------------------------------------------------------------------------
+        // RANA NEL FIUME --------------------------------------------------------------------------------------
 
         // per ogni coccodrillo
         for(i = 0; i < N_CROCODILE; i++){
@@ -569,7 +605,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         }
 
 
-        //* PROIETTILI PIANTE - RANA --------------------------------------------------------------------------------------
+        // PROIETTILI PIANTE - RANA --------------------------------------------------------------------------------------
 
         // per ogni proiettile
         for(i = 0; i < N_PLANT_BULLETS; i++){
@@ -590,7 +626,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         }
 
 
-        //* PROIETTILI RANA - PIANTE --------------------------------------------------------------------------------------
+        // PROIETTILI RANA - PIANTE --------------------------------------------------------------------------------------
 
         // per ogni pianta
         for(i = 0; i < N_PLANTS; i++){
@@ -625,7 +661,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         }
 
 
-        //* PROIETTILI RANA - PROIETTILI NEMICI --------------------------------------------------------------------------------------
+        // PROIETTILI RANA - PROIETTILI NEMICI --------------------------------------------------------------------------------------
 
         // per ogni proiettile dei nemici
         for(i = 0; i < N_PLANT_BULLETS; i++){
@@ -647,7 +683,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             }
         }
 
-        //* MORTE RANA PER TEMPO --------------------------------------------------------------------------------------
+        // MORTE RANA PER TEMPO --------------------------------------------------------------------------------------
 
         // se il tempo scende a zero perdi la manche
         if(time.time_left <= 0  && frog.frog_candie){
@@ -675,7 +711,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
     // restituisce la condizione alla fine della manche
     return gamedata;
 }
-}
+
 
 
 

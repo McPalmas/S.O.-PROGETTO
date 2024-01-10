@@ -86,6 +86,7 @@ enum Difficulty {
     HARD
 };
 
+
 // Struttura dati della rana
 typedef struct 
 {
@@ -95,9 +96,9 @@ typedef struct
    bool frog_canshoot;
    bool frog_candie;
    bool frog_bulletisactive;
-   bool plant_isalive;
-   bool plant_canshoot;
-   bool plant_bulletisactive;
+   //bool plant_isalive;
+   //bool plant_canshoot;
+   //bool plant_bulletisactive;
    int time_left;
 } Position;
 
@@ -110,7 +111,6 @@ typedef struct {
 
     enum Direction direction;
     bool is_good;
-    //int direction;
 } Crocodile;
 
 // Struttura dati della pianta
@@ -123,6 +123,24 @@ typedef struct {
     bool plant_isalive;
     bool plant_bulletisactive;
 } Plant;
+
+
+//struttura data generica oggetto di gioco
+enum DataType {
+    TYPE_POSITION,
+    TYPE_PLANT,
+    TYPE_CROCODILE
+};
+
+
+struct DataPacket {
+    enum DataType type;
+    union {
+        Position positionData;
+        Plant plantData;
+        Crocodile crocodileData;
+    } data;
+};
 
 extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
 

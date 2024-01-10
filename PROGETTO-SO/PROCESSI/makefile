@@ -4,10 +4,10 @@ all: compile link clean
 
 compile:
 	@echo "Compiling..."
+	@gcc -c main.c -o main.o
 	@gcc -c graphic.c -o graphic.o
 	@gcc -c menu.c -o menu.o 
 	@gcc -c logic.c -o logic.o 
-	@gcc -c main.c -o main.o
 	@gcc -c time.c -o time.o
 	@gcc -c crocodile.c -o crocodile.o
 	@gcc -c plant.c -o plant.o
