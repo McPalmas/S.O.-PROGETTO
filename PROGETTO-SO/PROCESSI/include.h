@@ -38,10 +38,10 @@
 /*----------------------------------------------------------------------
    MACRO UTILIZZATE PER DEFINIRE LE DIMENSIONI DEGLI OGGETTI
    ----------------------------------------------------------------------*/
-#define FROG_W 3    /* Larghezza della rana */
+#define FROG_W 5    /* Larghezza della rana */
 #define FROG_H 2    /* Altezza della rana */
 
-#define CROCODILE_W 6    /* Larghezza del coccodrillo */
+#define CROCODILE_W 10    /* Larghezza del coccodrillo */
 #define CROCODILE_H 2    /* Altezza del coccodrillo */
 
 /*----------------------------------------------------------------------
@@ -111,6 +111,7 @@ typedef struct {
 
     enum Direction direction;
     bool is_good;
+    int flow_number;
 } Crocodile;
 
 // Struttura dati della pianta
@@ -301,4 +302,7 @@ void initialize_game(GameData gamedata);    // creazione e comunicazione tra pro
 GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[N_CROCODILE][2], GameData gamedata);     // gestione della manche stampe e collsioni
 
 void analyze_data(GameData gamedata);  // analizza i dati e in base a essi decide se la partita deve continuare o finire
+
+
+void crocodiles_inizializer(GameData gamedata, Crocodile crocodiles[]);   // inizializza i coccodrilli nei fiumi
 

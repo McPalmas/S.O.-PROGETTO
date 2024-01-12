@@ -29,26 +29,6 @@ void initialize_game(GameData gamedata){
     pid_t crocodile[N_CROCODILE];
     pid_t time;
 
-    // Inizializza i flussi del fiume con direzioni e velocità casuali
-    RiverFlow river_flows[RIVER_LANES_NUMBER];
-    for (int i = 0; i < RIVER_LANES_NUMBER; ++i) {
-        river_flows[i].direction = rand() % 2;
-        switch (gamedata.difficulty)
-        {
-        case EASY:
-            river_flows[i].speed = MIN_RIVER_SPEED_EASY + rand() % (MAX_RIVER_SPEED_EASY - MIN_RIVER_SPEED_EASY + 1);
-            break;
-        case NORMAL:
-            river_flows[i].speed = MIN_RIVER_SPEED_NORMAL + rand() % (MAX_RIVER_SPEED_NORMAL - MIN_RIVER_SPEED_NORMAL + 1);
-            break;
-        case HARD:
-            river_flows[i].speed = MIN_RIVER_SPEED_HARD + rand() % (MAX_RIVER_SPEED_HARD - MIN_RIVER_SPEED_HARD + 1);
-            break;
-        default:
-            break;
-        
-        }
-    }
     
     /***
      * Gestione pipes
@@ -401,7 +381,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
     time.time_left = TIMELIMIT_EASY;
 
     // inizializzazione dei coccodrilli
-    //crocodile_inizializer(car);  // da fare 
+    crocodiles_inizializer(gamedata, crocodile);
 
     // l'inizializzazione dei coccodrilli viene comunicata a car
     for(i = 0; i < N_CROCODILE; i++){
@@ -724,6 +704,61 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
 
 
+
+/* ----------------------------------------------   
+         INIZIALIZZAZIONE COCCODRILLI
+   ----------------------------------------------*/
+void crocodiles_inizializer(GameData gamedata, Crocodile crocodiles[]){
+
+     // Inizializza i flussi del fiume con direzioni e velocità casuali
+    RiverFlow river_flows[RIVER_LANES_NUMBER];
+    for (int i = 0; i < RIVER_LANES_NUMBER; ++i) {
+        river_flows[i].direction = rand() % 2;
+        switch (gamedata.difficulty)
+        {
+        case EASY:
+            river_flows[i].speed = MIN_RIVER_SPEED_EASY + rand() % (MAX_RIVER_SPEED_EASY - MIN_RIVER_SPEED_EASY + 1);
+            break;
+        case NORMAL:
+            river_flows[i].speed = MIN_RIVER_SPEED_NORMAL + rand() % (MAX_RIVER_SPEED_NORMAL - MIN_RIVER_SPEED_NORMAL + 1);
+            break;
+        case HARD:
+            river_flows[i].speed = MIN_RIVER_SPEED_HARD + rand() % (MAX_RIVER_SPEED_HARD - MIN_RIVER_SPEED_HARD + 1);
+            break;
+        default:
+            break;
+        
+        }
+    }
+    
+
+    // definizione di fiume e direzione di ogni coccodrillo
+    for (int i = 0; i < N_CROCODILE; i++){
+
+        // assegnamento dei fiumi (3 coccodrilli per ogni fiume)
+        crocodiles[i].flow_number = i % RIVER_LANES_NUMBER;
+        crocodiles[i].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (crocodiles[i].flow_number * 3);
+
+	// direzione del coccodrillo in base a quella del fiume
+	crocodiles[i].direction = river_flows[i].direction;       
+    }
+
+
+    int minDistance = 10;
+    
+    // definizione delle posizioni iniziali dei coccodrilli sullo stesso fiume
+    for (int river = 0; river < RIVER_LANES_NUMBER; river++) {
+        // Genera una posizione casuale per il primo coccodrillo nel fiume
+        int firstCrocodile = rand() % (MAXX - CROCODILE_W * (N_CROCODILE - 1) - minDistance * (N_CROCODILE - 1) + 1);
+
+        for (int i = 0; i < N_CROCODILE; i++) {
+            // Assegna posizione x e fiume a ciascun coccodrillo
+            crocodiles[i].x = firstCrocodile + i * (CROCODILE_W + minDistance);
+            crocodiles[i].flow_number = river;
+        }
+    } 
+    
+}
 
 
 
