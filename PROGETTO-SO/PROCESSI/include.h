@@ -246,6 +246,7 @@ extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
 #define YELLOW_GREEN 15	
 #define GREEN_MAGENTA 16
 #define BLACK_WHITE 17
+#define WHITE_BLUE 18
 
 
 
@@ -272,13 +273,13 @@ void gameField();   //disegna il terreno di gioco
 void printDens(int dens[]); 	//stampa delle tane 
 
 //graphic.c
-void frogBody(int y, int x);   //disegna lo sprite della rana
+void frogBody(int x, int y);   //disegna lo sprite della rana
 
 //graphic.c
 void crocodileBody(Crocodile c);	//disegna lo sprite del coccodrillo
 
 //graphic.c
-void plantBody(Plant p);
+void plantBody(Plant p);		//stampa della pianta
 
 
 

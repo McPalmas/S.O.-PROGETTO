@@ -61,6 +61,7 @@ void mainMenu(){
                     exitMenu = true;
                 }
                 if(selection == 1){  /* Esci dal gioco */
+                    system("killall aplay");
                     endwin();
                     exit(0);
                 }
@@ -249,6 +250,7 @@ void endGameMenu(bool win){
                     exitMenu = true;
                 }
                 if(selection == 1){  /* Esci dal gioco */
+                    system("killall aplay");
                     endwin();
                     exit(0);
                 }

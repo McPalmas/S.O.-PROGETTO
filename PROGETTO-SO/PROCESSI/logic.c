@@ -90,12 +90,12 @@ void initialize_game(GameData gamedata){
     }
 
     
-    /*
+    
     //  creazione processi  
     frog = fork();
     
     if (frog == 0){
-        frog_process(pip, pipe_shoot, pipe_canshoot, pipe_frog_on_crocodile, gamedata.difficulty);    
+        frog_process(pip, pipe_shoot, pipe_canshoot, pipe_frog_on_crocodile, pipe_can_plant_spawn, gamedata.difficulty);    
     }
     else{
         frog_bullet = fork();
@@ -110,52 +110,57 @@ void initialize_game(GameData gamedata){
                 time_process(pip, gamedata.difficulty);
             }
             else{
-                for(int i=0;i<N_PLANTS;i++){
-                    plant[i] = fork();
-                    if(plant[i] == 0)plant_process(pip, pipe_shoot, pipe_canshoot, pipe_destroy_plant_bullet, pipe_frog_on_plant, pipe_can_plant_spawn, gamedata.difficulty);
-                }
-            }
-    
-            for(int i=0;i<N_CROCODILE;i++){
-                crocodile[i] = fork();
-                if(crocodile[i] == 0)crocodile_process(pip, pipe_crocodile_position, pipe_frog_on_crocodile, gamedata.difficulty);
+            	// Creazione processi crocodile con un ciclo for
+		    for (int i = 0; i < N_CROCODILE; i++) {
+		        crocodile[i] = fork();
+		        if (crocodile[i] == 0) {
+		            crocodile_process(i, pip, pipe_crocodile_position[i], pipe_frog_on_crocodile, gamedata.difficulty);
+		            exit(0);  // Importante per evitare che il processo figlio entri nel ciclo for successivo
+		        }
+		    }
+
+		    // Creazione processi plant con un ciclo for
+		    for (int i = 0; i < N_PLANTS; i++) {
+		        plant[i] = fork();
+		        if (plant[i] == 0) {
+		            plant_process(i, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead[i], pipe_destroy_plant_bullet[i], gamedata.difficulty);
+		            exit(0);  // Importante per evitare che il processo figlio entri nel ciclo for successivo
+		        }
+		    }
+
+                    // stampa e collisioni
+                    // la funzione restituisce il riepilogo della partita
+                    gamedata = gameManche(pip, pipe_plant_is_dead, pipe_destroy_frog_bullet,pipe_destroy_plant_bullet, pipe_crocodile_position, gamedata);
+                    // se la manche è stata vinta
+                    if(gamedata.game_won){
+                         gamedata.game_lost = false;
+                    }
+                    // se la manche è stata persa
+                    else{
+                         gamedata.game_won = false;
+                         gamedata.game_lost = true;
+                    }
+                    // Qua ci va la parte delle tane
+
+                    // kill dei processi
+                    kill(frog, 1);
+                    kill(frog_bullet, 1);
+                    kill(time, 1);
+                    for(int i = 0; i < N_CROCODILE; i++){
+                          kill(crocodile[i], 1);
+                    }
+                    for(int i = 0; i < N_PLANTS; i++){
+                          kill(plant[i], 1);
+                    }
+                                                
+                    // se il player vince oppure perde la partita oppure continua alla manche successiva
+
+                    analyze_data(gamedata);
             }
         }
     }
 
-    for(int i=0;i<N_CROCODILE;i++){
-        crocodile[i] = fork();
-        if(crocodile[i] == 0)crocodile_process(pip, pipe_crocodile_position, pipe_frog_on_crocodile, gamedata.difficulty);
-    }
-
-	//if(i == N_CROCODILE){
-				    
-	//ottenimento dati della manche
-    
-
-    // kill dei processi
-    kill(frog, 1);
-    kill(frog_bullet, 1);
-    kill(time, 1);
-    for(int i = 0; i < N_PLANTS; i++){
-        kill(plant[i], 1);
-    }
-    for(int i = 0; i < N_CROCODILE; i++){
-        kill(crocodile[i], 1);
-    }
-
-    // se si è vinta o persa la manche allora richiamare questa stessa funzione per iniziare una nuova manche ma con i dati iniziali diversi
-    if(gamedata.game_lost || gamedata.game_won){
-        game(gamedata);
-    }
-    // altrimenti se si è proprio vinta o persa la partita richiamare il menu di endgame per uscire o rigiocare da capo
-    if(gamedata.game_lost || gamedata.game_won){
-        endgame_menu(gamedata);
-    }
-*/
-
-
-    frog = fork();
+    /*frog = fork();
 
     if (frog == 0){
         frog_process(pip, pipe_shoot, pipe_canshoot, pipe_frog_on_crocodile, pipe_can_plant_spawn, gamedata.difficulty);    
@@ -237,7 +242,7 @@ void initialize_game(GameData gamedata){
                                                     kill(plant[i], 1);
                                                 }
                                                 
-                                                // se il player vince o perde la partita o continua alla manche successiva
+                                                // se il player vince oppure perde la partita oppure continua alla manche successiva
                                                 analyze_data(gamedata);
                                             }
                                         }
@@ -249,7 +254,7 @@ void initialize_game(GameData gamedata){
                 } 
             } 
         }
-    }
+    }*/
 }
 
 
@@ -354,8 +359,8 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
     _Bool frog_in_a_den = false;
     
     //posizione y dei dati relativi al player, ovvero score, time e vite
-    int top_score_height =  0 ;
-    int bottom_score_height = TOTAL_HEIGHT -1 ;
+    int top_score_height =  1 ;
+    int bottom_score_height = TOTAL_HEIGHT +1 ;
     
     // inizializzazioni per evitare collisioni iniziali
 
@@ -490,10 +495,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
         // stampa della rana
         if(frog_bullet.frog_bulletisactive){
-            //stampa
-        }
-        else{
-            //stampa
+            frogBody(frog.x, frog.y);
         }
         // stampa del proiettile della rana
         if(frog_bullet.frog_bulletisactive == true){    
@@ -502,12 +504,12 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
         // stampa dei coccodrilli
         for(i = 0; i < N_CROCODILE; i++){
-            //stampa
+            crocodileBody(crocodile[i]);
         }
 
         // stampa piante
         for (i = 0; i < N_PLANTS; i++){
-            //stampa
+            //void plantBody(Plant p);
         }
         // stampa dei proiettili delle piante
         for(i = 0; i < N_PLANT_BULLETS; i++){
@@ -518,12 +520,14 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
 
         // stampa dello score a schermo
-        mvprintw(top_score_height, 3, "Score: %d", gamedata.player_score);
+        attron(COLOR_PAIR(WHITE_BLUE));
+        mvprintw(top_score_height, 4, "Score: %d", gamedata.player_score);
         // stampa delle vite a schermo
-        mvprintw(bottom_score_height, MAXX/3, "Vite: %d", gamedata.player_lives);
+        mvprintw(bottom_score_height, MAXX/4, "Lifes: %d", gamedata.player_lives);
         // stampa del tempo a schermo
-        mvprintw(bottom_score_height, MAXX/3 + 10, "Time: %d", time.time_left);
-
+        mvprintw(bottom_score_height, MAXX/3 + 15, "Time: %d", time.time_left);
+	attroff(COLOR_PAIR(WHITE_BLUE));
+	
         refresh();
 
 

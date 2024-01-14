@@ -34,6 +34,7 @@ void initializeScr(){
     init_pair(YELLOW_GREEN, COLOR_YELLOW, COLOR_GREEN); 
     init_pair(GREEN_MAGENTA, COLOR_GREEN, COLOR_MAGENTA); 
     init_pair(BLACK_WHITE, COLOR_BLACK, COLOR_WHITE);
+    init_pair(WHITE_BLUE, COLOR_WHITE, COLOR_BLUE);
 }
 
 
@@ -99,7 +100,7 @@ void gameField(){
         y++;
     }
     
-    refresh();
+    //refresh();
 
 }
 
