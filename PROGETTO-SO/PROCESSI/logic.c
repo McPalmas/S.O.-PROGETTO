@@ -114,7 +114,7 @@ void initialize_game(GameData gamedata){
 		    for (int i = 0; i < N_CROCODILE; i++) {
 		        crocodile[i] = fork();
 		        if (crocodile[i] == 0) {
-		            crocodile_process(i, pip, pipe_crocodile_position[i], pipe_frog_on_crocodile, gamedata.difficulty);
+		            crocodile_process(CROCODILE_ID_0+i, pip, pipe_crocodile_position[0], pipe_frog_on_crocodile, gamedata.difficulty);
 		            exit(0);  // Importante per evitare che il processo figlio entri nel ciclo for successivo
 		        }
 		    }
@@ -123,7 +123,7 @@ void initialize_game(GameData gamedata){
 		    for (int i = 0; i < N_PLANTS; i++) {
 		        plant[i] = fork();
 		        if (plant[i] == 0) {
-		            plant_process(i, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead[i], pipe_destroy_plant_bullet[i], gamedata.difficulty);
+		            plant_process(PLANT_ID_0+i, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead[0], pipe_destroy_plant_bullet[0], gamedata.difficulty);
 		            exit(0);  // Importante per evitare che il processo figlio entri nel ciclo for successivo
 		        }
 		    }
@@ -364,7 +364,6 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
     
     // inizializzazioni per evitare collisioni iniziali
 
-    // frog
     frog.frog_candie = false;
     frog.x = frog_start_x;
     frog.y = frog_start_y;
@@ -459,7 +458,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 		}
 		else if(receivedPacket.data.frogData.id == FROG_BULLET_ID){
 		    frog_bullet = receivedPacket.data.frogData;
-		}else 
+		}else if(receivedPacket.data.frogData.id == TIME_ID)
 		    time = receivedPacket.data.frogData;
 		break;
 	    case TYPE_PLANT:
@@ -735,36 +734,45 @@ void crocodiles_inizializer(GameData gamedata, Crocodile crocodiles[]){
         }
     }
     
+    
+    int crocodileIndex = 0;
 
-    // definizione di fiume e direzione di ogni coccodrillo
-    for (int i = 0; i < N_CROCODILE; i++){
+    // Itera su ciascun fiume
+    for (int riverIndex = 0; riverIndex < RIVER_LANES_NUMBER; riverIndex++) {
+        // Assegna 3 coccodrilli a ciascun fiume
+        for (int i = 0; i < CROCODILES_PER_RIVER; i++) {
+            // Assegna l'indice del fiume al coccodrillo
+            crocodiles[crocodileIndex].flow_number = riverIndex;
 
-        // assegnamento dei fiumi (3 coccodrilli per ogni fiume)
-        crocodiles[i].flow_number = i % RIVER_LANES_NUMBER;
-        crocodiles[i].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (crocodiles[i].flow_number * 3);
-
-	// direzione del coccodrillo in base a quella del fiume
-	crocodiles[i].direction = river_flows[i].direction;       
+            // Assegna speed e direction dal fiume corrispondente
+            crocodiles[crocodileIndex].speed = river_flows[riverIndex].speed;
+            crocodiles[crocodileIndex].direction = river_flows[riverIndex].direction;
+	    
+	    crocodiles[crocodileIndex].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (riverIndex * 2);
+	    
+            // Avanza all'elemento successivo nell'array di coccodrilli
+            crocodileIndex++;
+        }
     }
-
 
     int minDistance = 10;
     
-    // definizione delle posizioni iniziali dei coccodrilli sullo stesso fiume
-    for (int river = 0; river < RIVER_LANES_NUMBER; river++) {
-        // Genera una posizione casuale per il primo coccodrillo nel fiume
-        int firstCrocodile = rand() % (MAXX - CROCODILE_W * (N_CROCODILE - 1) - minDistance * (N_CROCODILE - 1) + 1);
+    for (int riverIndex = 0; riverIndex < RIVER_LANES_NUMBER; riverIndex++) {
+	int maxRiverStartX = MAXX - (CROCODILES_PER_RIVER * CROCODILE_W) - minDistance * (CROCODILES_PER_RIVER - 1);
 
-        for (int i = 0; i < N_CROCODILE; i++) {
-            // Assegna posizione x e fiume a ciascun coccodrillo
-            crocodiles[i].x = firstCrocodile + i * (CROCODILE_W + minDistance);
-            crocodiles[i].flow_number = river;
+        // Calcola la posizione casuale del primo coccodrillo nella riga
+        int riverStartX = rand() % (maxRiverStartX + 1);
+
+        for (int i = 0; i < CROCODILES_PER_RIVER; i++) {
+            // Calcola la posizione casuale del coccodrillo
+            crocodiles[riverIndex * CROCODILES_PER_RIVER + i].x = riverStartX;
+
+            // Avanza la posizione del prossimo coccodrillo garantendo una distanza minima
+            riverStartX += CROCODILE_W + minDistance;
         }
-    } 
+    }
     
 }
-
-
 
 
 

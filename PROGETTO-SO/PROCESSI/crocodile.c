@@ -26,15 +26,15 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
     // inizializzazione crocodile
 
     // Scegli un flusso casuale
-    int random_flow = rand() % RIVER_LANES_NUMBER;
+    //int random_flow = rand() % RIVER_LANES_NUMBER;
             
     // Inizializza il coccodrillo con la direzione e la velocità del flusso
     //crocodile.direction = river_flows[random_flow].direction;
     //crocodile_delay = river_flows[random_flow].speed;
 
     crocodile.id = id;
-    crocodile.x = 1 + rand() % (MAXX - CROCODILE_W - 2);
-    crocodile.y = DENS_ZONE_HEIGHT + ((id - CROCODILE_ID_0) * 2);
+    //crocodile.x = 1 + rand() % (MAXX - CROCODILE_W - 2);
+    //crocodile.y = DENS_ZONE_HEIGHT + ((id - CROCODILE_ID_0) * 2);
     crocodile.is_good = rand() % 2;
 
 
@@ -85,6 +85,6 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
         write(pipe[1], &crocodile, sizeof(Crocodile));
         write(pipe_frog_on_crocodile[1], &crocodile, sizeof(Crocodile));
 
-        usleep(crocodile_delay);
+        //usleep(crocodile_delay);
     }
 }

@@ -110,6 +110,7 @@ typedef struct {
     int y;
 
     enum Direction direction;
+    int speed;
     bool is_good;
     int flow_number;
 } Crocodile;
@@ -163,9 +164,9 @@ extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
 #define MAX_RIVER_SPEED_NORMAL 20000
 #define MAX_RIVER_SPEED_HARD 30000
 
-#define TIMELIMIT_EASY 60
-#define TIMELIMIT_NORMAL 45
-#define TIMELIMIT_HARD 30
+#define TIMELIMIT_EASY 90
+#define TIMELIMIT_NORMAL 60
+#define TIMELIMIT_HARD 40
 
 #define DIFFICULTIES 3 //possibili difficoltà di gioco
 
@@ -176,6 +177,7 @@ extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
 
 #define N_PLANT_BULLETS 3 //numero di proiettili per pianta
 #define N_FROG_BULLETS 3 //numero di proiettili per rana
+#define CROCODILES_PER_RIVER 3
 
 #define DEN_SCORE_EASY 100
 #define DEN_SCORE_NORMAL 200
@@ -213,17 +215,16 @@ extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
 #define CROCODILE_ID_21 24
 #define CROCODILE_ID_22 25
 #define CROCODILE_ID_23 26
-#define CROCODILE_ID_24 27
 
-#define PLANT_ID_0 28
-#define PLANT_ID_1 29
-#define PLANT_ID_2 30
+#define PLANT_ID_0 27
+#define PLANT_ID_1 28
+#define PLANT_ID_2 29
 
-#define PLANT_BULLET_ID_0 31
-#define PLANT_BULLET_ID_1 32
-#define PLANT_BULLET_ID_2 33
+#define PLANT_BULLET_ID_0 30
+#define PLANT_BULLET_ID_1 31
+#define PLANT_BULLET_ID_2 32
 
- #define TIME_ID 34
+ #define TIME_ID 33
  
  
 /*----------------------------------------------------------------------
