@@ -126,35 +126,37 @@ void initialize_game(GameData gamedata){
 		        }
 		    }
 
-    // stampa e collisioni
-    // la funzione restituisce il riepilogo della partita
-    gamedata = gameManche(pip, pipe_plant_is_dead, pipe_destroy_frog_bullet,pipe_destroy_plant_bullet, pipe_crocodile_position, gamedata);
-    // se la manche è stata vinta
-    if(gamedata.game_won){
-        gamedata.game_lost = false;
-    }
-    // se la manche è stata persa
-    else{
-        gamedata.game_won = false;
-        gamedata.game_lost = true;
-    }
+            // stampa e collisioni
+            // la funzione restituisce il riepilogo della partita
+            gamedata = gameManche(pip, pipe_plant_is_dead, pipe_destroy_frog_bullet,pipe_destroy_plant_bullet, pipe_crocodile_position, gamedata);
+            // se la manche è stata vinta
+            if(gamedata.game_won){
+                gamedata.game_lost = false;
+            }   
+            // se la manche è stata persa
+            else{
+                gamedata.game_won = false;
+                gamedata.game_lost = true;
+            }
     // Qua ci va la parte delle tane
 
-    // kill dei processi
-    kill(frog, 1);
-    kill(frog_bullet, 1);
-    kill(time, 1);
-    for(int i = 0; i < N_CROCODILE; i++){
-        kill(crocodile[i], 1);
-    }
-    for(int i = 0; i < N_PLANTS; i++){
-        kill(plant[i], 1);
-    }
+            // kill dei processi
+            kill(frog, 1);
+            kill(frog_bullet, 1);
+            kill(time, 1);
+            for(int i = 0; i < N_CROCODILE; i++){
+                kill(crocodile[i], 1);
+            }
+            for(int i = 0; i < N_PLANTS; i++){
+                kill(plant[i], 1);
+            }
                                                 
-    // se il player vince oppure perde la partita oppure continua alla manche successiva
-    analyze_data(gamedata);
+            // se il player vince oppure perde la partita oppure continua alla manche successiva
+            analyze_data(gamedata);
+            }
+        }
+    }
 }
-
 
 /* ----------------------------------------------   
           CONTINUA O TERMINA LA PARTITA 
