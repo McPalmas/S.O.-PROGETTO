@@ -14,19 +14,18 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
     srand(getpid());
 
     objectData crocodile;
-    objectData crocodile_data;
     objectData frog;
     objectData frog_data;
 
 
     int i;
     // Velocità di spostamento del crocodile
-    int crocodile_delay = 1000;
+    int crocodile_delay = 60000;
 
     // inizializzazione crocodile
 
-    crocodile.id = id;
-    crocodile.crocodile_is_good = rand() % 2;
+    //crocodile.id = id;
+    //crocodile.crocodile_is_good = rand() % 2;
 
 
 
@@ -43,6 +42,9 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
 
 
     read(pipe_crocodile_position[0], &crocodile, sizeof(objectData));
+	
+    crocodile.id = id;
+    crocodile.crocodile_is_good = rand() % 2;
 
     // ogni veicolo viene inviato a display
     write(pipe[1], &crocodile, sizeof(objectData));
@@ -74,13 +76,16 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
         }
 
         // spostamento del crocodile
-        crocodile.x += crocodile.direction; 
+        if (crocodile.direction == RIGHT)
+            crocodile.x += 1;
+        else
+            crocodile.x -= 1;
 
         
         // Comunica stato di crocodile
         write(pipe[1], &crocodile, sizeof(objectData));
         write(pipe_frog_on_crocodile[1], &crocodile, sizeof(objectData));
 
-        usleep(crocodile_delay);
+        usleep(crocodile.crocodile_speed);
     }
 }

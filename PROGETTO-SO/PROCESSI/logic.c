@@ -390,7 +390,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         // RANA - TANA --------------------------------------------------------------------------------------
 
         // se la rana passa nella zona delle tane
-        if(frog.y < DENS_ZONE_HEIGHT){
+       /* if(frog.y < DENS_ZONE_HEIGHT){
             
             int i;
             // carattere di partenza nell'asse delle x per le tane
@@ -527,7 +527,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                     write(pipe_destroy_plant_bullet[i][1], &plant_bullet, sizeof(objectData));
                 }
             }
-        }
+        }*/
 
         // MORTE RANA PER TEMPO --------------------------------------------------------------------------------------
 
