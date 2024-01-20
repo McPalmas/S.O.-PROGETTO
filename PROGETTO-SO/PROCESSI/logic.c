@@ -348,9 +348,8 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         // STAMPA ELEMENTI ----------------------------------------
 
         // stampa della rana
-        if(frog_bullet.frog_bulletisactive){
-            frogBody(frog.x, frog.y);
-        }
+        frogBody(frog.x, frog.y);
+        
         // stampa del proiettile della rana
         if(frog_bullet.frog_bulletisactive == true){    
             //stampa

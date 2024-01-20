@@ -11,7 +11,6 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
     close(pipe_shoot[0]);
     close(pipe_canshoot[1]);
     close(pipe_frogoncrocodile[1]);
-    close(pipe_enemycanspawn[0]);
 
     // Posizione oggetti di gioco
     objectData frog;
@@ -98,7 +97,7 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
         if(!areFrogsEqual(frog, frog_temp)){
             // Comunica il nuovo stato della rana
             write(pipe[1],&frog, sizeof(objectData));
-            write(pipe_enemycanspawn[1],&frog, sizeof(objectData));
+            //write(pipe_enemycanspawn[1],&frog, sizeof(objectData));
         }
 
         // Salva lo stato precedente
