@@ -69,8 +69,6 @@ void initialize_game(GameData gamedata){
 
     // Comunicazione fra plant e plant_bullet (Bullet ha avuto una collisione)
     int pipe_destroy_plant_bullet[3][2];
-    /*pipe(pipe_destroy_plant_bullet);
-    fcntl(pipe_destroy_plant_bullet[0], F_SETFL, fcntl(pipe_destroy_plant_bullet[0], F_GETFL) | O_NONBLOCK);*/
     for(int i = 0; i < 3; i++){
         pipe(pipe_destroy_plant_bullet[i]);
         fcntl(pipe_destroy_plant_bullet[i][0], F_SETFL, fcntl(pipe_destroy_plant_bullet[i][0], F_GETFL) | O_NONBLOCK);
@@ -128,137 +126,34 @@ void initialize_game(GameData gamedata){
 		        }
 		    }
 
-                    // stampa e collisioni
-                    // la funzione restituisce il riepilogo della partita
-                    gamedata = gameManche(pip, pipe_plant_is_dead, pipe_destroy_frog_bullet,pipe_destroy_plant_bullet, pipe_crocodile_position, gamedata);
-                    // se la manche è stata vinta
-                    if(gamedata.game_won){
-                         gamedata.game_lost = false;
-                    }
-                    // se la manche è stata persa
-                    else{
-                         gamedata.game_won = false;
-                         gamedata.game_lost = true;
-                    }
-                    // Qua ci va la parte delle tane
-
-                    // kill dei processi
-                    kill(frog, 1);
-                    kill(frog_bullet, 1);
-                    kill(time, 1);
-                    for(int i = 0; i < N_CROCODILE; i++){
-                          kill(crocodile[i], 1);
-                    }
-                    for(int i = 0; i < N_PLANTS; i++){
-                          kill(plant[i], 1);
-                    }
-                                                
-                    // se il player vince oppure perde la partita oppure continua alla manche successiva
-
-                    analyze_data(gamedata);
-            }
-        }
+    // stampa e collisioni
+    // la funzione restituisce il riepilogo della partita
+    gamedata = gameManche(pip, pipe_plant_is_dead, pipe_destroy_frog_bullet,pipe_destroy_plant_bullet, pipe_crocodile_position, gamedata);
+    // se la manche è stata vinta
+    if(gamedata.game_won){
+        gamedata.game_lost = false;
     }
-
-    /*frog = fork();
-
-    if (frog == 0){
-        frog_process(pip, pipe_shoot, pipe_canshoot, pipe_frog_on_crocodile, pipe_can_plant_spawn, gamedata.difficulty);    
-    }
+    // se la manche è stata persa
     else{
-        frog_bullet = fork();
-        if(frog_bullet == 0){
-            frog_bullet_process(pip, pipe_shoot, pipe_canshoot, pipe_destroy_frog_bullet);
-        }
-        else{
-            time = fork();
-            if(time == 0){
-                time_process(pip, gamedata.difficulty);
-            }
-            else{
-                crocodile[0] = fork();
-                if(crocodile[0] == 0){
-                    crocodile_process(CROCODILE_ID_0, pip, pipe_crocodile_position[0], pipe_frog_on_crocodile, gamedata.difficulty);
-                }
-                else{
-                    crocodile[1] = fork();
-                    if(crocodile[1] == 0){
-                        crocodile_process(CROCODILE_ID_1, pip, pipe_crocodile_position[1], pipe_frog_on_crocodile, gamedata.difficulty);
-                        }
-                    else{
-                        crocodile[2] = fork();
-                        if(crocodile[2] == 0){
-                        crocodile_process(CROCODILE_ID_2, pip, pipe_crocodile_position[2], pipe_frog_on_crocodile, gamedata.difficulty);                   
-                        }
-                        else{
-                            crocodile[3] = fork();
-                            if(crocodile[3] == 0){
-                               crocodile_process(CROCODILE_ID_3, pip, pipe_crocodile_position[3], pipe_frog_on_crocodile, gamedata.difficulty);                    
-                                }
-                            else{
-                                crocodile[4] = fork();
-                                if(crocodile[4] == 0){
-                                    crocodile_process(CROCODILE_ID_4, pip, pipe_crocodile_position[4], pipe_frog_on_crocodile, gamedata.difficulty);              
-                                }
-                                //Qua ci andrebbero altri coccodrilli
-                                else{
-                                    plant[0] = fork();
-                                    if(plant[0] == 0){
-                                        plant_process(PLANT_ID_0, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead[0], pipe_destroy_plant_bullet[0], gamedata.difficulty);
-                                    }
-                                    else{ 
-                                        plant[1] = fork();
-                                        if(plant[1] == 0){
-                                            plant_process(PLANT_ID_1, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead[1], pipe_destroy_plant_bullet[1], gamedata.difficulty);
-                                        }
-                                        else{
-                                            plant[2] = fork();
-                                            if(plant[2] == 0){
-                                                plant_process(PLANT_ID_2, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead[2], pipe_destroy_plant_bullet[2], gamedata.difficulty);
-                                            }
-                                            else{
-                                                // stampa e collisioni
-                                                // la funzione restituisce il riepilogo della partita
-                                                gamedata = gameManche(pip, pipe_plant_is_dead, pipe_destroy_frog_bullet,pipe_destroy_plant_bullet, pipe_crocodile_position, gamedata);
-                                                // se la manche è stata vinta
-                                                if(gamedata.game_won){
-                                                    gamedata.game_lost = false;
-                                                }
-                                                    // se la manche è stata persa
-                                                else{
-                                                        gamedata.game_won = false;
-                                                        gamedata.game_lost = true;
-                                                }
-                                                // Qua ci va la parte delle tane
+        gamedata.game_won = false;
+        gamedata.game_lost = true;
+    }
+    // Qua ci va la parte delle tane
 
-                                                // kill dei processi
-                                                kill(frog, 1);
-                                                kill(frog_bullet, 1);
-                                                kill(time, 1);
-                                                for(int i = 0; i < N_CROCODILE; i++){
-                                                    kill(crocodile[i], 1);
-                                                    }
-                                                for(int i = 0; i < N_PLANTS; i++){
-                                                    kill(plant[i], 1);
-                                                }
+    // kill dei processi
+    kill(frog, 1);
+    kill(frog_bullet, 1);
+    kill(time, 1);
+    for(int i = 0; i < N_CROCODILE; i++){
+        kill(crocodile[i], 1);
+    }
+    for(int i = 0; i < N_PLANTS; i++){
+        kill(plant[i], 1);
+    }
                                                 
-                                                // se il player vince oppure perde la partita oppure continua alla manche successiva
-                                                analyze_data(gamedata);
-                                            }
-                                        }
-                                    }
-                                }
-                            } 
-                        } 
-                    } 
-                } 
-            } 
-        }
-    }*/
+    // se il player vince oppure perde la partita oppure continua alla manche successiva
+    analyze_data(gamedata);
 }
-
-
-
 
 
 /* ----------------------------------------------   
@@ -342,13 +237,13 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
     srand(getpid());
 
 
-    DataPacket receivedPacket; // dove ricevo i dati letti
-    Frog frog;
-    Frog frog_bullet;
-    Plant plant[N_PLANTS];
-    Plant plant_bullet[N_PLANT_BULLETS];
-    Crocodile crocodile[N_CROCODILE];
-    Frog time;
+    objectData receivedPacket; // dove ricevo i dati letti
+    objectData frog;
+    objectData frog_bullet;
+    objectData plant[N_PLANTS];
+    objectData plant_bullet[N_PLANT_BULLETS];
+    objectData crocodile[N_CROCODILE];
+    objectData time;
 
 
     // posizone di partenza della rana
@@ -389,7 +284,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
     // l'inizializzazione dei coccodrilli viene comunicata a car
     for(i = 0; i < N_CROCODILE; i++){
-        write(pipe_crocodile_position[i][1], &crocodile[i], sizeof(Crocodile));
+        write(pipe_crocodile_position[i][1], &crocodile[i], sizeof(objectData));
     }
 
     
@@ -415,73 +310,37 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         //* LETTURA E ASSEGNAMENTO DATI ----------------------------------------
         
         // lettura dei dati di tutti gli oggetti di gioco
-        read(pip[0], &receivedPacket, sizeof(DataPacket));
+        read(pip[0], &receivedPacket, sizeof(objectData));
 
-        // assegnamento del dato al rispettivo elemento
-        /*if(data.id == FROG_ID){
-            frog = data;
-        }
-        else if(data.id == FROG_BULLET_ID){
-            frog_bullet = data;
-        } 
-        else if(data.id >= CROCODILE_ID_0 && data.id <= CROCODILE_ID_16){
-            for(i = 0; i < N_CROCODILE; i++){
-                if(data.id == i + CROCODILE_ID_0){
-                    crocodile[i] = data;
-                }
-            }
-        }
-        else if(data.id >= PLANT_BULLET_ID_0 && data.id <= PLANT_BULLET_ID_2){
-            for(i = 0; i < N_PLANT_BULLETS; i++){
-                if(data.id == i + PLANT_BULLET_ID_0){
-                    plant_bullet[i] = data;
-                }
-            }
-        }
-        else if(data.id >= PLANT_ID_0 && data.id <= PLANT_ID_2){
-            for(i = 0; i < N_PLANTS; i++){
-                if(data.id == i + PLANT_ID_0){
-                    plant[i] = data;
-                }
-            }
-        }
-        else if(data.id == TIME_ID){
-            time = data;
-        }*/
-        
-        
-        switch (receivedPacket.type) {
-    	    case TYPE_FROG:
+        // assegnamento del dato al rispettivo elemento        
 		// I dati successivi sono di tipo frog
-		if(receivedPacket.data.frogData.id == FROG_ID){
-		    frog = receivedPacket.data.frogData;
+		if(receivedPacket.id == FROG_ID){
+		    frog = receivedPacket;    
 		}
-		else if(receivedPacket.data.frogData.id == FROG_BULLET_ID){
-		    frog_bullet = receivedPacket.data.frogData;
-		}else if(receivedPacket.data.frogData.id == TIME_ID)
-		    time = receivedPacket.data.frogData;
-		break;
-	    case TYPE_PLANT:
+		else if(receivedPacket.id == FROG_BULLET_ID){
+		    frog_bullet = receivedPacket;
+		}else if(receivedPacket.id == TIME_ID)
+		    time = receivedPacket;
+		
 		// I dati successivi sono di tipo Plant
-		if(receivedPacket.data.plantData.id >= PLANT_BULLET_ID_0 && receivedPacket.data.plantData.id <= PLANT_BULLET_ID_2){
+		if(receivedPacket.id >= PLANT_BULLET_ID_0 && receivedPacket.id <= PLANT_BULLET_ID_2){
 		    for(i = 0; i < N_PLANT_BULLETS; i++){
-		        if(receivedPacket.data.plantData.id == i + PLANT_BULLET_ID_0){
-		            plant_bullet[i] = receivedPacket.data.plantData;;
+		        if(receivedPacket.id == i + PLANT_BULLET_ID_0){
+		            plant_bullet[i] = receivedPacket;
 		        }
 		    }
 		}else{
 		    for(i = 0; i < N_PLANTS; i++){
-		        if(receivedPacket.data.plantData.id == i + PLANT_ID_0){
-		            plant[i] = receivedPacket.data.plantData;
+		        if(receivedPacket.id == i + PLANT_ID_0){
+		            plant[i] = receivedPacket;
 		       	}
 		    }
 		}
-		break;
-	    case TYPE_CROCODILE:
+
 		// I dati successivi sono di tipo Crocodile
 		for(i = 0; i < N_CROCODILE; i++){
-                	if(receivedPacket.data.crocodileData.id == i + CROCODILE_ID_0){
-                    	    crocodile[i] = receivedPacket.data.crocodileData;
+                	if(receivedPacket.id == i + CROCODILE_ID_0){
+                    	    crocodile[i] = receivedPacket;
                		}
             	}
 		break;
@@ -539,7 +398,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             
             int i;
             // carattere di partenza nell'asse delle x per le tane
-            int start_x_caves = 5;
+            int start_x_dens = 5;
 
             frog_in_a_den = false;
 
@@ -547,7 +406,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             for(i = 0; i < N_DENS; i++){
                 
                 // se la rana si trova in una tana
-                if((frog.frog_candie && frog.x >= start_x_caves && frog.x < start_x_caves + FROG_W) && (gamedata.available_dens[i])){
+                if((frog.frog_candie && frog.x >= start_x_dens && frog.x < start_x_dens + FROG_W) && (gamedata.available_dens[i])){
 
                     // aumenta il punteggio
                     if(gamedata.difficulty == EASY){
@@ -569,7 +428,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                 }
 
                 // ogni inizio tana dista 20 caratteri dall'inizio tana precedente
-                start_x_caves += 20;
+                start_x_dens += 20;
             }
             // se frog in a cave non è stata settata a true nel for
             if(frog.frog_candie && frog_in_a_den == false){
@@ -611,7 +470,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                     gamedata.game_lost = true;
 
                     // comunica a log bullet che il proiettile deve essere disattivato
-                    write(pipe_destroy_plant_bullet[i][1], &plant_bullet, sizeof(Plant));         
+                    write(pipe_destroy_plant_bullet[i][1], &plant_bullet, sizeof(objectData));         
                 }
             }
         }
@@ -644,9 +503,9 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                     plant[i].plant_isalive = false;
 
                     // comunica al tronco che il nemico è morto
-                    write(pipe_plant_is_dead[i][1], &plant[i], sizeof(Plant));
+                    write(pipe_plant_is_dead[i][1], &plant[i], sizeof(objectData));
                     // comunica al frog bullet di distruggere il proiettile
-                    write(pipe_destroy_frog_bullet[1], &frog_bullet, sizeof(Frog));
+                    write(pipe_destroy_frog_bullet[1], &frog_bullet, sizeof(objectData));
                 }
             }
         }
@@ -668,8 +527,8 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                     frog.frog_canshoot = true;
 
                     // comunica al frog bullet di distruggere il proiettile
-                    write(pipe_destroy_frog_bullet[1], &frog_bullet, sizeof(Frog));
-                    write(pipe_destroy_plant_bullet[i][1], &plant_bullet, sizeof(Plant));
+                    write(pipe_destroy_frog_bullet[1], &frog_bullet, sizeof(objectData));
+                    write(pipe_destroy_plant_bullet[i][1], &plant_bullet, sizeof(objectData));
                 }
             }
         }
@@ -688,11 +547,8 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             should_not_exit = false;
         }
 
-    }  
-
     if(gamedata.game_lost){
         gamedata.player_score -= DEATH_SCORE; 
-
     }
         
     if(gamedata.player_score <= 0){
@@ -707,11 +563,10 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
 
 
-
 /* ----------------------------------------------   
          INIZIALIZZAZIONE COCCODRILLI
    ----------------------------------------------*/
-void crocodiles_inizializer(GameData gamedata, Crocodile crocodiles[]){
+void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]){
 
      // Inizializza i flussi del fiume con direzioni e velocità casuali
     RiverFlow river_flows[RIVER_LANES_NUMBER];
@@ -745,7 +600,7 @@ void crocodiles_inizializer(GameData gamedata, Crocodile crocodiles[]){
             crocodiles[crocodileIndex].flow_number = riverIndex;
 
             // Assegna speed e direction dal fiume corrispondente
-            crocodiles[crocodileIndex].speed = river_flows[riverIndex].speed;
+            crocodiles[crocodileIndex].crocodile_speed = river_flows[riverIndex].speed;
             crocodiles[crocodileIndex].direction = river_flows[riverIndex].direction;
 	    
 	    crocodiles[crocodileIndex].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (riverIndex * 2);

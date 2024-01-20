@@ -13,29 +13,20 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
 
     srand(getpid());
 
-    Crocodile crocodile;
-    Crocodile crocodile_data;
-    Frog frog;
-    Frog frog_data;
+    objectData crocodile;
+    objectData crocodile_data;
+    objectData frog;
+    objectData frog_data;
 
 
     int i;
     // Velocità di spostamento del crocodile
-    int crocodile_delay;
+    int crocodile_delay = 1000;
 
     // inizializzazione crocodile
 
-    // Scegli un flusso casuale
-    //int random_flow = rand() % RIVER_LANES_NUMBER;
-            
-    // Inizializza il coccodrillo con la direzione e la velocità del flusso
-    //crocodile.direction = river_flows[random_flow].direction;
-    //crocodile_delay = river_flows[random_flow].speed;
-
     crocodile.id = id;
-    //crocodile.x = 1 + rand() % (MAXX - CROCODILE_W - 2);
-    //crocodile.y = DENS_ZONE_HEIGHT + ((id - CROCODILE_ID_0) * 2);
-    crocodile.is_good = rand() % 2;
+    crocodile.crocodile_is_good = rand() % 2;
 
 
 
@@ -53,12 +44,12 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
 
     while(1){
         // Se è presente il dato (Frog è su di lui)
-        if(read(pipe_frog_on_crocodile[0], &frog_data, sizeof(Frog)) != -1){
+        if(read(pipe_frog_on_crocodile[0], &frog_data, sizeof(objectData)) != -1){
             // Se il crocodile è buono, diventa malvagio dopo il tempo definito da crocodile_switch_timer
-            if(crocodile.is_good == true){
+            if(crocodile.crocodile_is_good == true){
                 crocodile_switch_timer--;
                 if(crocodile_switch_timer == 0){
-                    crocodile.is_good = false;
+                    crocodile.crocodile_is_good = false;
                 }
             }
             // Se il crocodile è malvagio, si immerge dopo il tempo definito da crocodile_vanish_timer
@@ -82,9 +73,10 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
 
         
         // Comunica stato di crocodile
-        write(pipe[1], &crocodile, sizeof(Crocodile));
-        write(pipe_frog_on_crocodile[1], &crocodile, sizeof(Crocodile));
+        write(pipe[1], &crocodile, sizeof(objectData));
+        write(pipe_crocodile_position[1], &crocodile, sizeof(objectData));
+        write(pipe_frog_on_crocodile[1], &crocodile, sizeof(objectData));
 
-        //usleep(crocodile_delay);
+        usleep(crocodile_delay);
     }
 }

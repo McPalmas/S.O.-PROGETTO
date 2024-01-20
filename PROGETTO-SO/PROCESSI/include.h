@@ -86,63 +86,28 @@ enum Difficulty {
     HARD
 };
 
-
-// Struttura dati della rana
-typedef struct 
-{
-   int id;
-   int x;
-   int y;
-   bool frog_canshoot;
-   bool frog_candie;
-   bool frog_bulletisactive;
-   //bool plant_isalive;
-   //bool plant_canshoot;
-   //bool plant_bulletisactive;
-   int time_left;
-} Frog;
-
-
-// Struttura dati del coccodrillo
-typedef struct {
+typedef struct{
     int id;
     int x;
     int y;
+
+    bool frog_canshoot;
+    bool frog_candie;
+    bool frog_bulletisactive;
+
+    bool plant_isalive;
+    bool plant_canshoot;
+    bool plant_bulletisactive;
 
     enum Direction direction;
-    int speed;
-    bool is_good;
+    int crocodile_speed;
+    bool crocodile_is_good;
     int flow_number;
-} Crocodile;
 
-// Struttura dati della pianta
-typedef struct {
-    int id;
-    int x;
-    int y;
+    int time_left;
 
-    bool plant_canshoot;
-    bool plant_isalive;
-    bool plant_bulletisactive;
-} Plant;
+} objectData;
 
-
-// enumerazione oggetti di gioco
-enum DataType {
-    TYPE_FROG,
-    TYPE_PLANT,
-    TYPE_CROCODILE
-};
-
-// struttura dati generica oggetto di gioco
-typedef struct {
-    enum DataType type;
-    union {
-        Frog frogData;
-        Plant plantData;
-        Crocodile crocodileData;
-    } data;
-} DataPacket;
 
 extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
 
@@ -277,22 +242,22 @@ void printDens(int dens[]); 	//stampa delle tane
 void frogBody(int x, int y);   //disegna lo sprite della rana
 
 //graphic.c
-void crocodileBody(Crocodile c);	//disegna lo sprite del coccodrillo
+void crocodileBody(objectData c);	//disegna lo sprite del coccodrillo
 
 //graphic.c
-void plantBody(Plant p);		//stampa della pianta
+void plantBody(objectData p);		//stampa della pianta
 
 
 
 
 void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe_frogoncrocodile[2], int pipe_enemycanspawn[2], int difficulty);
 void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_destroy_frog_bullet[2]);
-int areFrogsEqual(Frog frog1, Frog frog2);
+int areFrogsEqual(objectData frog1, objectData frog2);
 
 void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int pipe_frog_on_crocodile[2], int difficulty);
 
 void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_plant_spawn[2], int pipe_plant_is_dead[2], int pipe_destroy_plant_bullet[2], int difficulty);
-void plant_bullet_process(int p[2], Plant plant, int p_destroy_plant_bullet[2], int difficulty);
+void plant_bullet_process(int p[2], objectData plant, int p_destroy_plant_bullet[2], int difficulty);
 
 void time_process(int p[2], int difficulty);
 
@@ -306,5 +271,5 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 void analyze_data(GameData gamedata);  // analizza i dati e in base a essi decide se la partita deve continuare o finire
 
 
-void crocodiles_inizializer(GameData gamedata, Crocodile crocodiles[]);   // inizializza i coccodrilli nei fiumi
+void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]);   // inizializza i coccodrilli nei fiumi
 

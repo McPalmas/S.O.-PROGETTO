@@ -202,10 +202,10 @@ void frogBody(int x, int y){
 /*----------------------------------------------------------------------
    	    PROCEDURA CHE STAMPA LO SPRITE DEL COCCODRILLO 
    ----------------------------------------------------------------------*/
-void crocodileBody(Crocodile c){
+void crocodileBody(objectData c){
 
     /* se il coccodrillo è buono è verde senno è rosso*/
-    if(c.is_good){
+    if(c.crocodile_is_good){
         attron(COLOR_PAIR(BLACK_GREEN));
         if(c.direction == RIGHT){  /* stampa del coccodrillo in base alla direzione */
             mvprintw(c.y, c.x,   "       0__");
@@ -235,7 +235,7 @@ void crocodileBody(Crocodile c){
 /*----------------------------------------------------------------------
    	    PROCEDURA CHE STAMPA LO SPRITE DELLA PIANTA
    ----------------------------------------------------------------------*/
-void plantBody(Plant p){
+void plantBody(objectData p){
 
         attron(COLOR_PAIR(GREEN_YELLOW));
             mvprintw(p.y, p.x+1, "0 ");
