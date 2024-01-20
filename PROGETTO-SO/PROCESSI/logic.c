@@ -112,7 +112,7 @@ void initialize_game(GameData gamedata){
 		    for (int i = 0; i < N_CROCODILE; i++) {
 		        crocodile[i] = fork();
 		        if (crocodile[i] == 0) {
-		            crocodile_process(CROCODILE_ID_0+i, pip, pipe_crocodile_position[0], pipe_frog_on_crocodile, gamedata.difficulty);
+		            crocodile_process(CROCODILE_ID_0+i, pip, pipe_crocodile_position[i], pipe_frog_on_crocodile, gamedata.difficulty);
 		            exit(0);  // Importante per evitare che il processo figlio entri nel ciclo for successivo
 		        }
 		    }
@@ -121,7 +121,7 @@ void initialize_game(GameData gamedata){
 		    for (int i = 0; i < N_PLANTS; i++) {
 		        plant[i] = fork();
 		        if (plant[i] == 0) {
-		            plant_process(PLANT_ID_0+i, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead[0], pipe_destroy_plant_bullet[0], gamedata.difficulty);
+		            plant_process(PLANT_ID_0+i, pip, pipe_frog_on_plant, pipe_can_plant_spawn, pipe_plant_is_dead[i], pipe_destroy_plant_bullet[i], gamedata.difficulty);
 		            exit(0);  // Importante per evitare che il processo figlio entri nel ciclo for successivo
 		        }
 		    }
@@ -314,39 +314,33 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         // lettura dei dati di tutti gli oggetti di gioco
         read(pip[0], &receivedPacket, sizeof(objectData));
 
-        // assegnamento del dato al rispettivo elemento        
-		// I dati successivi sono di tipo frog
+        // assegnamento del dato al rispettivo elemento    
 		if(receivedPacket.id == FROG_ID){
 		    frog = receivedPacket;    
 		}
 		else if(receivedPacket.id == FROG_BULLET_ID){
 		    frog_bullet = receivedPacket;
-		}else if(receivedPacket.id == TIME_ID)
+		}else if(receivedPacket.id == TIME_ID){
 		    time = receivedPacket;
-		
-		// I dati successivi sono di tipo Plant
-		if(receivedPacket.id >= PLANT_BULLET_ID_0 && receivedPacket.id <= PLANT_BULLET_ID_2){
+		}else if(receivedPacket.id >= PLANT_BULLET_ID_0 && receivedPacket.id <= PLANT_BULLET_ID_2){
 		    for(i = 0; i < N_PLANT_BULLETS; i++){
 		        if(receivedPacket.id == i + PLANT_BULLET_ID_0){
 		            plant_bullet[i] = receivedPacket;
 		        }
 		    }
-		}else{
+		}else if (receivedPacket.id >= PLANT_ID_0 && receivedPacket.id <= PLANT_ID_2){
 		    for(i = 0; i < N_PLANTS; i++){
 		        if(receivedPacket.id == i + PLANT_ID_0){
 		            plant[i] = receivedPacket;
 		       	}
 		    }
-		}
-
-		// I dati successivi sono di tipo Crocodile
-		for(i = 0; i < N_CROCODILE; i++){
-                	if(receivedPacket.id == i + CROCODILE_ID_0){
-                    	    crocodile[i] = receivedPacket;
-               		}
+		}else if (receivedPacket.id >= CROCODILE_ID_0 && receivedPacket.id <= CROCODILE_ID_23){
+			for(i = 0; i < N_CROCODILE; i++){
+		        	if(receivedPacket.id == i + CROCODILE_ID_0){
+		            	    crocodile[i] = receivedPacket;
+		       		}
+		    	}
             	}
-		break;
-	}
 
         
 
@@ -549,6 +543,12 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             should_not_exit = false;
         }
 
+
+    }
+    
+    
+    
+    
     if(gamedata.game_lost){
         gamedata.player_score -= DEATH_SCORE; 
     }

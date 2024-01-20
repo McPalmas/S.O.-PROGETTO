@@ -42,6 +42,11 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
 
 
 
+    read(pipe_crocodile_position[0], &crocodile, sizeof(objectData));
+
+    // ogni veicolo viene inviato a display
+    write(pipe[1], &crocodile, sizeof(objectData));
+    
     while(1){
         // Se è presente il dato (Frog è su di lui)
         if(read(pipe_frog_on_crocodile[0], &frog_data, sizeof(objectData)) != -1){
@@ -74,7 +79,6 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
         
         // Comunica stato di crocodile
         write(pipe[1], &crocodile, sizeof(objectData));
-        write(pipe_crocodile_position[1], &crocodile, sizeof(objectData));
         write(pipe_frog_on_crocodile[1], &crocodile, sizeof(objectData));
 
         usleep(crocodile_delay);
