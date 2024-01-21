@@ -201,30 +201,18 @@ void frogBody(int x, int y){
    	    PROCEDURA CHE STAMPA LO SPRITE DEL COCCODRILLO 
    ----------------------------------------------------------------------*/
 void crocodileBody(objectData c){
-
     /* se il coccodrillo è buono è verde senno è rosso*/
-    if(c.crocodile_is_good){
-        attron(COLOR_PAIR(BLACK_GREEN));
-        if(c.direction == RIGHT){  /* stampa del coccodrillo in base alla direzione */
-            mvprintw(c.y, c.x,   "       0__");
-            mvprintw(c.y+1, c.x, " |/  |/   ");
-        }else{
-            mvprintw(c.y, c.x,   "__0       ");
-            mvprintw(c.y+1, c.x, "   \\|  \\| ");
-        }
-        attroff(COLOR_PAIR(BLACK_GREEN));
-        
+    if(c.crocodile_is_good)attron(COLOR_PAIR(BLACK_GREEN));
+    else attron(COLOR_PAIR(BLACK_RED));
+    if(c.direction == RIGHT){  /* stampa del coccodrillo in base alla direzione */
+        mvprintw(c.y, c.x,   "       0__");
+        mvprintw(c.y+1, c.x, " |/  |/   ");
     }else{
-    	attron(COLOR_PAIR(BLACK_RED));
-    	if(c.direction == RIGHT){
-            mvprintw(c.y, c.x,  "       0__");
-            mvprintw(c.y+1, c.x," |/  |/   ");
-        }else{
-            mvprintw(c.y, c.x,   "__0       ");		
-            mvprintw(c.y+1, c.x, "   \\|  \\| ");
-        }
-        attroff(COLOR_PAIR(BLACK_RED));
+        mvprintw(c.y, c.x,   "__0       ");
+        mvprintw(c.y+1, c.x, "   \\|  \\| ");
     }
+    if(c.crocodile_is_good)attroff(COLOR_PAIR(BLACK_GREEN));
+    else attroff(COLOR_PAIR(BLACK_RED));
 }
 
 
