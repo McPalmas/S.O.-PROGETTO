@@ -41,7 +41,7 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
     crocodile.id = id;
     crocodile.crocodile_is_good = rand() % 2;
 
-    // ogni veicolo viene inviato a display
+    // ogni crocodile viene inviato a display
     write(pipe[1], &crocodile, sizeof(objectData));
     
     while(1){

@@ -138,7 +138,7 @@ void initialize_game(GameData gamedata){
                 gamedata.game_won = false;
                 gamedata.game_lost = true;
             }
-    // Qua ci va la parte delle tane
+            // Qua ci va la parte delle tane
 
             // kill dei processi
             kill(frog, 1);
@@ -176,7 +176,7 @@ void analyze_data(GameData gamedata){
 
 	if(gamedata.game_won){
 		// se ha occupato tutte le tane si va al menu della vittoria
-		if(taken_dens >= 5){
+		if(taken_dens >= N_DENS){
 		    endGameMenu(1);
 		}
 		else{	// altrimenti stampa relativa alle tane occupate e inizio manche successiva
@@ -260,7 +260,6 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
     int bottom_score_height = TOTAL_HEIGHT +1 ;
     
     // inizializzazioni per evitare collisioni iniziali
-
     frog.frog_candie = false;
     frog.x = frog_start_x;
     frog.y = frog_start_y;
@@ -291,7 +290,6 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
     
     while (should_not_exit) {
-
 
         //* STAMPA SFONDO DI GIOCO ----------------------------------------
 
@@ -340,20 +338,10 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 		            	    crocodile[i] = receivedPacket;
 		       		}
 		    	}
-            	}
-
-        
+            }
 
 
         // STAMPA ELEMENTI ----------------------------------------
-
-        // stampa della rana
-        frogBody(frog.x, frog.y);
-        
-        // stampa del proiettile della rana
-        if(frog_bullet.frog_bulletisactive == true){    
-            //stampa
-        }
 
         // stampa dei coccodrilli
         for(i = 0; i < N_CROCODILE; i++){
@@ -364,12 +352,21 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         for (i = 0; i < N_PLANTS; i++){
             //void plantBody(Plant p);
         }
+        
         // stampa dei proiettili delle piante
         for(i = 0; i < N_PLANT_BULLETS; i++){
             if(plant_bullet[i].plant_bulletisactive){
                 //stampa
             }   
         }
+
+        // stampa del proiettile della rana
+        if(frog_bullet.frog_bulletisactive == true){    
+            //stampa
+        }
+
+        // stampa della rana
+        frogBody(frog.x, frog.y);
 
 
         // stampa dello score a schermo
@@ -379,7 +376,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         mvprintw(bottom_score_height, MAXX/4, "Lifes: %d", gamedata.player_lives);
         // stampa del tempo a schermo
         mvprintw(bottom_score_height, MAXX/3 + 15, "Time: %d", time.time_left);
-	attroff(COLOR_PAIR(WHITE_BLUE));
+	    attroff(COLOR_PAIR(WHITE_BLUE));
 	
         refresh();
 
@@ -533,7 +530,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         // se il tempo scende a zero perdi la manche
         if(time.time_left <= 0  && frog.frog_candie){
             frog.frog_candie = false;
-            gamedata.game_lost = true;
+            gamedata.game_lost = true; //Va in game over anzichè perdere la manche
         }
 
 

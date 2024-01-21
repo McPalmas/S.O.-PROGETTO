@@ -21,8 +21,6 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
     // Contatore
     int i;
 
-
-
     // Posizione Frog iniziale
     int frog_start_y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 3;
     int frog_start_x = (MAXX / 2) - 3;
@@ -87,8 +85,7 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
         // Legge la posiione di Crocodile dalla pipe
         if(read(pipe_frogoncrocodile[0], &crocodile, sizeof(objectData)) != -1){
             if(frog.y == crocodile.y){
-                
-                frog.x += crocodile.direction;
+                frog.x += crocodile.direction; 
             }
         }
         
