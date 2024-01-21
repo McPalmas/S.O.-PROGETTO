@@ -380,13 +380,13 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 	
         refresh();
 
-
+        /*
         // COLLISIONI E MORTI --------------------------------------------------------------------------------------
 
         // RANA - TANA --------------------------------------------------------------------------------------
 
         // se la rana passa nella zona delle tane
-       /* if(frog.y < DENS_ZONE_HEIGHT){
+        if(frog.y < DENS_ZONE_HEIGHT){
             
             int i;
             // carattere di partenza nell'asse delle x per le tane
@@ -432,20 +432,25 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         }
 
         // RANA NEL FIUME --------------------------------------------------------------------------------------
-
+        
         // per ogni coccodrillo
+
         for(i = 0; i < N_CROCODILE; i++){
-
             // se la rana non si trova sopra il coccodrillo, perdi una vita
-            if(frog.frog_candie && frog.y == crocodile[i].y && (!(frog.x >= crocodile[i].x && frog.x + 5 <= crocodile[i].x + CROCODILE_W))){
 
+            /*
+            Questo controllo funziona bene, tuttavia viene fatto da tutti i coccodrilli. Ciò vale a dire che, se anche la rana si trova sopra un coccodrillo,
+            non si troverà sopra gli altri, e quindi muore lo stesso, perchè il controllo viene fatto da tutti i coccodrilli.
+            In più bisogna aggiungere la condizione che la rana sia nei fiumi, altrimenti viene uccisa anche quando si trova nelle zone di partenza.
+            *//*
+            if(frog.frog_candie && !(frog.y == crocodile[i].y && (frog.x > crocodile[i].x+2 && frog.x < crocodile[i].x + CROCODILE_W-1))){
                 frog.frog_candie = false;
                 gamedata.game_lost = true;
             }
             // se la rana si trova sopra il coccodrillo, ma lui si immerge
-            //...
+            // ...
         }
-
+        /*
 
         // PROIETTILI PIANTE - RANA --------------------------------------------------------------------------------------
 
@@ -455,13 +460,13 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             // se il proeittile è attivo e la rana può morire
             if(frog.frog_candie && plant_bullet[i].plant_bulletisactive){
 
-                // se un proiettile dei nemici collide con la rana, perdi la manche
+                // se un proiettile delle collide con la rana, perdi la manche
                 if(plant_bullet[i].plant_bulletisactive && (plant_bullet[i].y == frog.y || plant_bullet[i].y == frog.y + 1) && (plant_bullet[i].x >= frog.x && plant_bullet[i].x <= frog.x + 4)) {
 
                     frog.frog_candie = false;
                     gamedata.game_lost = true;
 
-                    // comunica a log bullet che il proiettile deve essere disattivato
+                    // comunica a plant bullet che il proiettile deve essere disattivato
                     write(pipe_destroy_plant_bullet[i][1], &plant_bullet, sizeof(objectData));         
                 }
             }
@@ -473,9 +478,9 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         // per ogni pianta
         for(i = 0; i < N_PLANTS; i++){
 
-            // se è presente un nemico
+            // se è presente plant e la rana può sparare
             if(plant[i].plant_isalive){
-                // se il proiettile della rana collide col nemico
+                // se il proiettile della rana collide con plant
                 if(frog_bullet.frog_bulletisactive && (frog_bullet.y == plant[i].y || frog_bullet.y == plant[i].y + 1) && (frog_bullet.x >= plant[i].x + 4 && frog_bullet.x <= plant[i].x + 6)) {  
                     
                     // aumenta lo score
@@ -489,12 +494,12 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                         gamedata.player_score += DEN_SCORE_HARD;
                     }
 
-                    // disattiva il proiettile e uccidi il nemico
+                    // disattiva il proiettile e uccidi plant
                     frog_bullet.frog_bulletisactive = false;
                     frog.frog_canshoot = true;
                     plant[i].plant_isalive = false;
 
-                    // comunica al tronco che il nemico è morto
+                    // comunica che la pianta è morta
                     write(pipe_plant_is_dead[i][1], &plant[i], sizeof(objectData));
                     // comunica al frog bullet di distruggere il proiettile
                     write(pipe_destroy_frog_bullet[1], &frog_bullet, sizeof(objectData));
@@ -523,8 +528,8 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                     write(pipe_destroy_plant_bullet[i][1], &plant_bullet, sizeof(objectData));
                 }
             }
-        }*/
-
+        }
+        */
         // MORTE RANA PER TEMPO --------------------------------------------------------------------------------------
 
         // se il tempo scende a zero perdi la manche
@@ -538,7 +543,6 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         if(gamedata.game_lost || gamedata.game_won){
             should_not_exit = false;
         }
-
 
     }
     

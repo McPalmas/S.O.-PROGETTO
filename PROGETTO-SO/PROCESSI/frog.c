@@ -4,7 +4,7 @@
 /* ----------------------------------------------   
 		  FROG
    ----------------------------------------------*/ 
-void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe_frogoncrocodile[2], int pipe_enemycanspawn[2], int difficulty){
+void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe_frogoncrocodile[2], int pipe_plantcanspawn[2], int difficulty){
 
     // Gestione pipe
     close(pipe[0]);
@@ -84,8 +84,9 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
         
         // Legge la posiione di Crocodile dalla pipe
         if(read(pipe_frogoncrocodile[0], &crocodile, sizeof(objectData)) != -1){
-            if(frog.y == crocodile.y){
-                frog.x += crocodile.direction; 
+            if(frog.y == crocodile.y && (frog.x > crocodile.x+2 && frog.x < crocodile.x + CROCODILE_W-1)){
+                if(crocodile.direction==LEFT)frog.x -= 1;
+                else frog.x += 1;
             }
         }
         
@@ -93,7 +94,7 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
         if(!areFrogsEqual(frog, frog_temp)){
             // Comunica il nuovo stato della rana
             write(pipe[1],&frog, sizeof(objectData));
-            //write(pipe_enemycanspawn[1],&frog, sizeof(objectData));
+            //write(pipe_plantcanspawn[1],&frog, sizeof(objectData));
         }
 
         // Salva lo stato precedente
