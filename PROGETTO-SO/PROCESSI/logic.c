@@ -434,7 +434,11 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         // RANA NEL FIUME --------------------------------------------------------------------------------------
         
         // per ogni coccodrillo
-
+*/
+        bool onCrocodile = false;
+        //Se la rana si trova nel fiume
+        if(frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2)){
+            // per ogni coccodrillo
         for(i = 0; i < N_CROCODILE; i++){
             // se la rana non si trova sopra il coccodrillo, perdi una vita
 
@@ -442,11 +446,16 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             Questo controllo funziona bene, tuttavia viene fatto da tutti i coccodrilli. Ciò vale a dire che, se anche la rana si trova sopra un coccodrillo,
             non si troverà sopra gli altri, e quindi muore lo stesso, perchè il controllo viene fatto da tutti i coccodrilli.
             In più bisogna aggiungere la condizione che la rana sia nei fiumi, altrimenti viene uccisa anche quando si trova nelle zone di partenza.
-            *//*
-            if(frog.frog_candie && !(frog.y == crocodile[i].y && (frog.x > crocodile[i].x+2 && frog.x < crocodile[i].x + CROCODILE_W-1))){
-                frog.frog_candie = false;
-                gamedata.game_lost = true;
-            }
+            */
+            if(frog.frog_candie && frog.y==crocodile[i].y && (frog.x > crocodile[i].x+2 && frog.x < crocodile[i].x + CROCODILE_W-1)){
+                onCrocodile = true;
+                break;
+            }else onCrocodile = false;
+        }
+        if(!onCrocodile){
+            frog.frog_candie = false;
+            gamedata.game_lost = true;
+        }
             // se la rana si trova sopra il coccodrillo, ma lui si immerge
             // ...
         }
