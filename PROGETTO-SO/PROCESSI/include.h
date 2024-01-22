@@ -102,6 +102,7 @@ typedef struct{
     enum Direction direction;
     int crocodile_speed;
     bool crocodile_is_good;
+    //int crocodile_vanish_time; Il solo dichiararla fa crashare il gioco con difficoltà medium e hard. Credo che il limite di dati in questa struttura sia 32 byte
     int flow_number;
 
     int time_left;
@@ -124,6 +125,10 @@ extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
 #define CROCODILE_IS_BAD_PROBABILITY_EASY 0.2
 #define CROCODILE_IS_BAD_PROBABILITY_NORMAL 0.35
 #define CROCODILE_IS_BAD_PROBABILITY_HARD 0.5
+
+#define CROCODILE_VANISH_TIME_EASY 6
+#define CROCODILE_VANISH_TIME_NORMAL 4
+#define CROCODILE_VANISH_TIME_HARD 2
 
 #define MIN_RIVER_SPEED_EASY 200000
 #define MIN_RIVER_SPEED_NORMAL 150000

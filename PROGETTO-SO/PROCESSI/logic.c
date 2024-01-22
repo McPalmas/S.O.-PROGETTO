@@ -437,19 +437,36 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         //Se la rana si trova nel fiume
         if(frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2)){
             // per ogni coccodrillo
-        for(i = 0; i < N_CROCODILE; i++){
-            // se la rana si trova su almeno un coccodrillo, aggiorna la variabile ed esce dal ciclo
-            if(frog.frog_candie && frog.y==crocodile[i].y && (frog.x > crocodile[i].x+1 && frog.x < crocodile[i].x + CROCODILE_W-1)){
-                onCrocodile = true;
-                break;
-            }else onCrocodile = false;
-        }
-        if(!onCrocodile){
-            frog.frog_candie = false;
-            gamedata.game_lost = true;
+            for(i = 0; i < N_CROCODILE; i++){
+                // se la rana si trova su almeno un coccodrillo, aggiorna la variabile ed esce dal ciclo
+                if(frog.frog_candie && frog.y==crocodile[i].y && (frog.x > crocodile[i].x+1 && frog.x < crocodile[i].x + CROCODILE_W-1)){
+                    onCrocodile = true;
+                    break;
+                }else onCrocodile = false;
+            }
+            if(!onCrocodile){
+                frog.frog_candie = false;
+                gamedata.game_lost = true;
+            }
         }
 
-        }
+        // IMMERSIONE DI CROCODILE
+        /*
+        if(frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2)){
+            // per ogni coccodrillo
+            for(i = 0; i < N_CROCODILE; i++){
+                // se la rana si trova su un coccodrillo cattivo,
+                if(frog.frog_candie && frog.y==crocodile[i].y && (frog.x > crocodile[i].x+1 && frog.x < crocodile[i].x + CROCODILE_W-1) && !crocodile[i].crocodile_is_good){
+                    crocodile[i].crocodile_vanish_timer--;
+                    if(crocodile[i].crocodile_vanish_timer <= 0){
+                        frog.frog_candie = false;
+                        gamedata.game_lost = true;
+                    }
+                    break;
+                }
+            }
+        */
+
         /*
 
         // PROIETTILI PIANTE - RANA --------------------------------------------------------------------------------------
@@ -606,18 +623,21 @@ void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]){
             crocodiles[crocodileIndex].direction = river_flows[riverIndex].direction;
 	    
 	        crocodiles[crocodileIndex].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (riverIndex * 2);
-
+        
             switch (gamedata.difficulty)
             {
             case EASY:
                 crocodiles[crocodileIndex].crocodile_is_good = getRandomBoolean(CROCODILE_IS_BAD_PROBABILITY_EASY);
+                //crocodiles[crocodileIndex].crocodile_vanish_time = 1 + rand() % CROCODILE_VANISH_TIME_EASY; //Commentate -> vedi struttura crocodile in include.h
                 break;
             case NORMAL:
                 crocodiles[crocodileIndex].crocodile_is_good = getRandomBoolean(CROCODILE_IS_BAD_PROBABILITY_NORMAL);
+                //crocodiles[crocodileIndex].crocodile_vanish_time = 1 + rand() % CROCODILE_VANISH_TIME_NORMAL;
                 break;
             case HARD:
                 crocodiles[crocodileIndex].crocodile_is_good = getRandomBoolean(CROCODILE_IS_BAD_PROBABILITY_HARD);
-                break;            
+                //crocodiles[crocodileIndex].crocodile_vanish_time = 1 + rand() % CROCODILE_VANISH_TIME_HARD;
+                break;
             default:
                 break;
             }
