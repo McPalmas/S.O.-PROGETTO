@@ -121,6 +121,10 @@ extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
 #define CROCODILE_DELAY_NORMAL 60000000
 #define CROCODILE_DELAY_HARD 40000000
 
+#define CROCODILE_IS_BAD_PROBABILITY_EASY 0.2
+#define CROCODILE_IS_BAD_PROBABILITY_NORMAL 0.35
+#define CROCODILE_IS_BAD_PROBABILITY_HARD 0.5
+
 #define MIN_RIVER_SPEED_EASY 200000
 #define MIN_RIVER_SPEED_NORMAL 150000
 #define MIN_RIVER_SPEED_HARD 300000
@@ -273,3 +277,4 @@ void analyze_data(GameData gamedata);  // analizza i dati e in base a essi decid
 
 void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]);   // inizializza i coccodrilli nei fiumi
 
+bool getRandomBoolean(float probability);

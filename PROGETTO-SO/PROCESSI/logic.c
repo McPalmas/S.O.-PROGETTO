@@ -605,7 +605,22 @@ void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]){
             crocodiles[crocodileIndex].crocodile_speed = river_flows[riverIndex].speed;
             crocodiles[crocodileIndex].direction = river_flows[riverIndex].direction;
 	    
-	    crocodiles[crocodileIndex].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (riverIndex * 2);
+	        crocodiles[crocodileIndex].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (riverIndex * 2);
+
+            switch (gamedata.difficulty)
+            {
+            case EASY:
+                crocodiles[crocodileIndex].crocodile_is_good = getRandomBoolean(CROCODILE_IS_BAD_PROBABILITY_EASY);
+                break;
+            case NORMAL:
+                crocodiles[crocodileIndex].crocodile_is_good = getRandomBoolean(CROCODILE_IS_BAD_PROBABILITY_NORMAL);
+                break;
+            case HARD:
+                crocodiles[crocodileIndex].crocodile_is_good = getRandomBoolean(CROCODILE_IS_BAD_PROBABILITY_HARD);
+                break;            
+            default:
+                break;
+            }
 	    
             // Avanza all'elemento successivo nell'array di coccodrilli
             crocodileIndex++;
@@ -632,11 +647,9 @@ void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]){
 }
 
 
-
-
-
-
-
-
-
-
+// Function to generate a random boolean with a given probability 
+bool getRandomBoolean(float probability){ ; 
+    if (probability < 0 || probability > 1) 
+        return false; // Error 
+    return rand() >  probability * ((float)RAND_MAX + 1.0); 
+} 
