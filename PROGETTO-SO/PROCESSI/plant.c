@@ -28,6 +28,7 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_
     plant.y = 0; //Modificato solo per compilazione
     plant.plant_canshoot = true;
     plant_bullet_timer = plant_bullet_timer + rand() % 70; //Da rivedere
+    plant.plant_isalive = true;
     
     while (1) {
         if(read(pipe_plant_is_dead[0], &plant_data, sizeof(objectData)) != -1){

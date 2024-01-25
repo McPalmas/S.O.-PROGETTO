@@ -96,7 +96,7 @@ void menuDifficulty(){
     game_data.player_score = 0;
     game_data.player_lives = N_LIVES;
     for(i = 0; i < N_DENS; i++){
-        game_data.available_dens[i] = true;
+        game_data.dens[i] = false;
     }
 
 

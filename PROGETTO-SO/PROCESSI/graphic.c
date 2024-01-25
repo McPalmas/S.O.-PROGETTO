@@ -111,10 +111,10 @@ void gameField(){
 /*----------------------------------------------------------------------
    	    PROCEDURA CHE STAMPA LE TANE
    ----------------------------------------------------------------------*/
-void printDens(int dens[]){
-	int start_dens[5] = {6,17,28,39,50};
+void printDens(bool dens[]){
+	int start_dens[] = {6,17,28,39,50};
 	for(int i=0; i < 5; i++)
-		if(dens[i]==0){
+		if(dens[i]==false){
 			attron(COLOR_PAIR(WHITE_WHITE));
 			mvaddch(SCORE_ZONE_HEIGHT, start_dens[i], ' ');
 			mvaddch(SCORE_ZONE_HEIGHT, start_dens[i]+1, ' ');
@@ -222,13 +222,30 @@ void crocodileBody(objectData c){
    	    PROCEDURA CHE STAMPA LO SPRITE DELLA PIANTA
    ----------------------------------------------------------------------*/
 void plantBody(objectData p){
+	
+	p.y= SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT;
+	
+	if(p.id == PLANT_ID_0)
+		p.x = PLANT_0_START;
+	else if (p.id == PLANT_ID_1)
+		p.x = PLANT_1_START;
+	else if(p.id == PLANT_ID_2)
+		p.x = PLANT_2_START;
 
-        attron(COLOR_PAIR(GREEN_YELLOW));
-            mvprintw(p.y, p.x+1, "0 ");
-        attroff(COLOR_PAIR(YELLOW_GREEN));
-        attron(COLOR_PAIR(GREEN_MAGENTA));
-        mvprintw(p.y+1, p.x, "_|_");
-        attroff(COLOR_PAIR(GREEN_MAGENTA));
+	if(p.plant_isalive){
+		attron(COLOR_PAIR(GREEN_YELLOW));
+		    mvprintw(p.y, p.x+1, "0 ");
+		attroff(COLOR_PAIR(YELLOW_GREEN));
+		attron(COLOR_PAIR(GREEN_MAGENTA));
+		mvprintw(p.y+1, p.x, "_|_");
+		attroff(COLOR_PAIR(GREEN_MAGENTA));
+	}
        
 }
+
+
+
+
+
+
 

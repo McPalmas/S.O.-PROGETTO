@@ -169,7 +169,7 @@ void analyze_data(GameData gamedata){
 	
 	// conta il numero di tane occupate
 	for(int i = 0; i < N_DENS; i++)
-		if(gamedata.available_dens[i] == false)
+		if(gamedata.dens[i] == true)
 		        taken_dens++;
 		        
 		        
@@ -247,6 +247,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
     objectData crocodile[N_CROCODILE];
     objectData time;
 
+    int start_dens[] = {6,17,28,39,50};
 
     // posizone di partenza della rana
     int frog_start_y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 2;
@@ -297,14 +298,14 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         // stampa dello sfondo di gioco
         gameField();
         // stampa tane
-        printDens((int[]){0, 0, 0, 0, 0}); //prova con tane tutte aperte
+        printDens(gamedata.dens); //prova con tane tutte aperte
 
         // stampa di una rana in tana
-        for(i = 0; i < N_DENS; i++){
+        /*for(i = 0; i < N_DENS; i++){
             if(!gamedata.available_dens[i]){
                 //stampa
             }
-        }
+        }*/
 
               
         //* LETTURA E ASSEGNAMENTO DATI ----------------------------------------
@@ -350,7 +351,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
         // stampa piante
         for (i = 0; i < N_PLANTS; i++){
-            //void plantBody(Plant p);
+            plantBody(plant[i]);
         }
         
         // stampa dei proiettili delle piante
@@ -380,60 +381,44 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 	
         refresh();
 
-        /*
         // COLLISIONI E MORTI --------------------------------------------------------------------------------------
 
         // RANA - TANA --------------------------------------------------------------------------------------
 
         // se la rana passa nella zona delle tane
-        if(frog.y < DENS_ZONE_HEIGHT){
-            
-            int i;
-            // carattere di partenza nell'asse delle x per le tane
-            int start_x_dens = 5;
-
-            frog_in_a_den = false;
+        if(frog.y < SCORE_ZONE_HEIGHT+2){
 
             // per ogni tana
-            for(i = 0; i < N_DENS; i++){
-                
+            for(int i = 0; i < N_DENS; i++){
                 // se la rana si trova in una tana
-                if((frog.frog_candie && frog.x >= start_x_dens && frog.x < start_x_dens + FROG_W) && (gamedata.available_dens[i])){
+                if(frog.frog_candie && frog.x >= start_dens[i] && frog.x < start_dens[i] + FROG_W){
+		    if (gamedata.dens[i] == false){
+		            // aumenta il punteggio
+		            if(gamedata.difficulty == EASY){
+		                //gamedata.player_score += DEN_SCORE_EASY;
+		            }
+		            else if(gamedata.difficulty == NORMAL){
+		                //gamedata.player_score += DEN_SCORE_NORMAL;
+		            }
+		            else{
+		                //gamedata.player_score += DEN_SCORE_HARD;
+		            }
 
-                    // aumenta il punteggio
-                    if(gamedata.difficulty == EASY){
-                        gamedata.player_score += DEN_SCORE_EASY;
+		            frog.frog_candie = false;
+		            // Chiudi la tana e setta win a true per il reload del game
+		            frog.frog_candie = false;
+		            gamedata.game_won = true;
+		            gamedata.dens[i] = true;
+		    }else{
+                    	    frog.frog_candie = false;
+                   	    gamedata.game_lost = true;
                     }
-                    else if(gamedata.difficulty == NORMAL){
-                        gamedata.player_score += DEN_SCORE_NORMAL;
-                    }
-                    else{
-                        gamedata.player_score += DEN_SCORE_HARD;
-                    }
-
-                    frog.frog_candie = false;
-                    // Chiudi la tana e setta win a true per il reload del game
-                    gamedata.available_dens[i] = false;
-                    // setta a true frog in a cave se la tana era libera
-                    frog_in_a_den = true;
-                    gamedata.game_won = true;
                 }
-
-                // ogni inizio tana dista 20 caratteri dall'inizio tana precedente
-                start_x_dens += 20;
-            }
-            // se frog in a cave non è stata settata a true nel for
-            if(frog.frog_candie && frog_in_a_den == false){
-
-                // perdi la manche
-                frog.frog_candie = false;
-                gamedata.game_lost = true; 
             }
         }
-        */
         // RANA NEL FIUME --------------------------------------------------------------------------------------
 
-        bool onCrocodile = false;
+        /*bool onCrocodile = false;
         //Se la rana si trova nel fiume
         if(frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2)){
             // per ogni coccodrillo
@@ -448,7 +433,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                 frog.frog_candie = false;
                 gamedata.game_lost = true;
             }
-        }
+        }*/
 
         // IMMERSIONE DI CROCODILE
         /*
@@ -668,7 +653,7 @@ void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]){
 
 
 // Function to generate a random boolean with a given probability 
-bool getRandomBoolean(float probability){ ; 
+bool getRandomBoolean(float probability){  
     if (probability < 0 || probability > 1) 
         return false; // Error 
     return rand() >  probability * ((float)RAND_MAX + 1.0); 

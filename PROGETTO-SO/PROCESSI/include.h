@@ -54,6 +54,11 @@
 #define RIVER_LANES_NUMBER 8    /* numero corsie fiume*/
 #define TOTAL_HEIGHT SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT /* altezza totale del campo di gioco */
 
+#define PLANT_0_START 10
+#define PLANT_1_START 24
+#define PLANT_2_START 44
+
+
 
 /*----------------------------------------------------------------------
    			   STRUTTURE
@@ -62,7 +67,7 @@
 typedef struct{
     _Bool game_lost;
     _Bool game_won;
-    _Bool available_dens[5];
+    _Bool dens[5];
     int player_score;
     int player_lives;
     int difficulty;
@@ -111,6 +116,9 @@ typedef struct{
 
 
 extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
+
+extern int start_dens[5];
+
 
 
 /*----------------------------------------------------------------------
@@ -198,7 +206,7 @@ extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
 #define PLANT_BULLET_ID_1 31
 #define PLANT_BULLET_ID_2 32
 
- #define TIME_ID 33
+#define TIME_ID 33
  
  
 /*----------------------------------------------------------------------
@@ -245,7 +253,7 @@ void endGameMenu(bool win);     // menu di fine partita in base a se si è vinto
 void gameField();   //disegna il terreno di gioco
 
 //graphic.c
-void printDens(int dens[]); 	//stampa delle tane 
+void printDens(bool dens[]); 	//stampa delle tane 
 
 //graphic.c
 void frogBody(int x, int y);   //disegna lo sprite della rana
