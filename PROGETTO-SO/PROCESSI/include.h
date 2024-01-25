@@ -161,10 +161,11 @@ extern int start_dens[5];
 #define N_FROG_BULLETS 3 //numero di proiettili per rana
 #define CROCODILES_PER_RIVER 3
 
-#define DEN_SCORE_EASY 100
-#define DEN_SCORE_NORMAL 200
-#define DEN_SCORE_HARD 300
-#define DEATH_SCORE 100
+#define DEN_SCORE_EASY 50
+#define DEN_SCORE_NORMAL 100
+#define DEN_SCORE_HARD 150
+#define DEATH_SCORE 50
+#define MAX_BONUS_SCORE 100  //punteggio bonus in base al tempo di completamento da aggiungere al punteggio di base
 
 /*----------------------------------------------------------------------
    			   ID OGGETTI

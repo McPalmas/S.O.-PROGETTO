@@ -166,6 +166,8 @@ void analyze_data(GameData gamedata){
 	int taken_dens = 0;
 	
 	erase();
+	bkgd(COLOR_PAIR(WHITE_WHITE)); /* Setta il background color dello schermo */
+	attron(COLOR_PAIR(BLACK_WHITE));
 	
 	// conta il numero di tane occupate
 	for(int i = 0; i < N_DENS; i++)
@@ -180,13 +182,13 @@ void analyze_data(GameData gamedata){
 		    endGameMenu(1);
 		}
 		else{	// altrimenti stampa relativa alle tane occupate e inizio manche successiva
-		    mvprintw(MAXY/2, MAXX/2-8, "Tane occupate: %d", taken_dens);
-		    mvprintw(MAXY/2 +1, MAXX/2-8, "Vite rimanenti: %d", gamedata.player_lives);
+		    mvprintw(MAXY/3, MAXX/2-8, "Tane occupate: %d", taken_dens);
+		    mvprintw(MAXY/3 +1, MAXX/2-8, "Vite rimanenti: %d", gamedata.player_lives);
 		    refresh();
 		    
 		    // tempo di attesa prima del caricamento della schermata successiva
 		    sleep(2);
-		
+		    
 		    initialize_game(gamedata);
 		} 
 
@@ -199,8 +201,8 @@ void analyze_data(GameData gamedata){
 		if(gamedata.player_lives <= 0) // se ha esaurito le vite si va al menu della sconfitta
             		endGameMenu(0);
             	else{      // altrimenti stampa relativa al numero di vite rimanenti         
-            		mvprintw(MAXY/2, MAXX/2-8, "Vite rimanenti: %d", gamedata.player_lives);
-            		mvprintw(MAXY/2 +1, MAXX/2-8, "Tane occupate: %d", taken_dens);
+            		mvprintw(MAXY/3, MAXX/2-8, "Vite rimanenti: %d", gamedata.player_lives);
+            		mvprintw(MAXY/3 +1, MAXX/2-8, "Tane occupate: %d", taken_dens);
             		refresh();
 		    
 		    	// tempo di attesa prima del caricamento della schermata successiva
@@ -393,15 +395,15 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                 // se la rana si trova in una tana
                 if(frog.frog_candie && frog.x >= start_dens[i] && frog.x < start_dens[i] + FROG_W){
 		    if (gamedata.dens[i] == false){
-		            // aumenta il punteggio
+		            // aumenta il punteggio in base a difficoltà e tempo traascorso
 		            if(gamedata.difficulty == EASY){
-		                //gamedata.player_score += DEN_SCORE_EASY;
+		                gamedata.player_score += DEN_SCORE_EASY + (MAX_BONUS_SCORE - ((MAX_BONUS_SCORE * (TIMELIMIT_EASY-time.time_left))/TIMELIMIT_EASY));
 		            }
 		            else if(gamedata.difficulty == NORMAL){
-		                //gamedata.player_score += DEN_SCORE_NORMAL;
+		                gamedata.player_score += DEN_SCORE_NORMAL + (MAX_BONUS_SCORE - ((MAX_BONUS_SCORE * (TIMELIMIT_EASY-time.time_left))/TIMELIMIT_NORMAL));
 		            }
 		            else{
-		                //gamedata.player_score += DEN_SCORE_HARD;
+		                gamedata.player_score += DEN_SCORE_HARD + (MAX_BONUS_SCORE - ((MAX_BONUS_SCORE * (TIMELIMIT_EASY-time.time_left))/TIMELIMIT_HARD));
 		            }
 
 		            frog.frog_candie = false;
@@ -412,6 +414,9 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 		    }else{
                     	    frog.frog_candie = false;
                    	    gamedata.game_lost = true;
+                   	    if(gamedata.player_score > DEATH_SCORE)  // sottrazzione del punteggio dopo la morte
+                   	    	gamedata.player_score -= DEATH_SCORE;
+                   	    else gamedata.player_score = 0;
                     }
                 }
             }
