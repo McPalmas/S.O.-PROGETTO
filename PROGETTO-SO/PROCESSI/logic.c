@@ -21,6 +21,10 @@ void initialize_game(GameData gamedata){
         	getch();
 	}*/
 
+
+
+    gamedata.game_won=false;
+    gamedata.game_lost=false;
 	//implementazione della funzione per definire gli oggetti a inizio di ogni manche incompleta e da rivedere
 	
     pid_t frog;
@@ -182,7 +186,7 @@ void analyze_data(GameData gamedata){
 		    endGameMenu(1);
 		}
 		else{	// altrimenti stampa relativa alle tane occupate e inizio manche successiva
-		    mvprintw(MAXY/3, MAXX/2-8, "Tane occupate: %d", taken_dens);
+		    mvprintw(MAXY/3, MAXX/2-8, "Tane raggiunte: %d", taken_dens);
 		    mvprintw(MAXY/3 +1, MAXX/2-8, "Vite rimanenti: %d", gamedata.player_lives);
 		    refresh();
 		    
@@ -201,8 +205,8 @@ void analyze_data(GameData gamedata){
 		if(gamedata.player_lives <= 0) // se ha esaurito le vite si va al menu della sconfitta
             		endGameMenu(0);
             	else{      // altrimenti stampa relativa al numero di vite rimanenti         
-            		mvprintw(MAXY/3, MAXX/2-8, "Vite rimanenti: %d", gamedata.player_lives);
-            		mvprintw(MAXY/3 +1, MAXX/2-8, "Tane occupate: %d", taken_dens);
+            		mvprintw(MAXY/3, MAXX/2-8, "Tane raggiunte: %d", taken_dens);
+            		mvprintw(MAXY/3 +1, MAXX/2-8, "Vite rimanenti: %d", gamedata.player_lives);
             		refresh();
 		    
 		    	// tempo di attesa prima del caricamento della schermata successiva
@@ -389,11 +393,10 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
         // se la rana passa nella zona delle tane
         if(frog.y < SCORE_ZONE_HEIGHT+2){
-
             // per ogni tana
             for(int i = 0; i < N_DENS; i++){
-                // se la rana si trova in una tana
-                if(frog.frog_candie && frog.x >= start_dens[i] && frog.x < start_dens[i] + FROG_W){
+                // se la rana tocca in una tana
+                if(frog.frog_candie && ((frog.x-2 >= start_dens[i] && frog.x-2 < start_dens[i] + FROG_W) || (frog.x+2 >= start_dens[i] && frog.x+2 < start_dens[i] + FROG_W))){
 		    if (gamedata.dens[i] == false){
 		            // aumenta il punteggio in base a difficoltà e tempo traascorso
 		            if(gamedata.difficulty == EASY){
@@ -422,8 +425,8 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             }
         }
         // RANA NEL FIUME --------------------------------------------------------------------------------------
-
-        /*bool onCrocodile = false;
+	/*
+        bool onCrocodile = false;
         //Se la rana si trova nel fiume
         if(frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2)){
             // per ogni coccodrillo
@@ -553,12 +556,6 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
     }
     
-    
-    
-    
-    if(gamedata.game_lost){
-        gamedata.player_score -= DEATH_SCORE; 
-    }
         
     if(gamedata.player_score <= 0){
         gamedata.player_score = 0;
