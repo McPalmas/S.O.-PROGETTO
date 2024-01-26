@@ -22,6 +22,7 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
     read(pipe_crocodile_position[0], &crocodile, sizeof(objectData));
 	
     crocodile.id = id;
+    crocodile.is_crocodile_immersed = false;
 
     // ogni crocodile viene inviato a display
     write(pipe[1], &crocodile, sizeof(objectData));

@@ -107,6 +107,7 @@ typedef struct{
     enum Direction direction;
     int crocodile_speed;
     bool crocodile_is_good;
+    bool is_crocodile_immersed;
     //int crocodile_vanish_time; Il solo dichiararla fa crashare il gioco con difficoltà medium e hard. Credo che il limite di dati in questa struttura sia 32 byte
     int flow_number;
 
@@ -268,7 +269,8 @@ void crocodileBody(objectData c);	//disegna lo sprite del coccodrillo
 //graphic.c
 void plantBody(objectData p);		//stampa della pianta
 
-
+//graphic.c
+void plantBullett(int y, int x);	//stampa il proiettile della pianta
 
 
 void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe_frogoncrocodile[2], int pipe_enemycanspawn[2], int difficulty);
