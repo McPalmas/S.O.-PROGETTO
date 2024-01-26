@@ -24,11 +24,17 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_
 
 
     plant.id = id;
-    plant.x = //...;
-    plant.y = 0; //Modificato solo per compilazione
     plant.plant_canshoot = true;
     plant_bullet_timer = plant_bullet_timer + rand() % 70; //Da rivedere
     plant.plant_isalive = true;
+    plant.y = SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT;
+    
+    if(plant.id == PLANT_ID_0)
+		plant.x = PLANT_0_START;
+    else if (plant.id == PLANT_ID_1)
+		plant.x = PLANT_1_START;
+    else if(plant.id == PLANT_ID_2)
+		plant.x = PLANT_2_START;
     
     while (1) {
         if(read(pipe_plant_is_dead[0], &plant_data, sizeof(objectData)) != -1){

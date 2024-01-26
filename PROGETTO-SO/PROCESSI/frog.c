@@ -55,7 +55,7 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
         switch(c){
             //Movimenti
             case KEY_UP: 
-                if(frog.y > FROG_H)
+                if(frog.y > SCORE_ZONE_HEIGHT+1)
                     frog.y -= 2; 
                 break;
             case KEY_DOWN:
@@ -67,7 +67,7 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
                     frog.x -= 1; 
                 break;
             case KEY_RIGHT:
-                if(frog.x < MAXX - FROG_W)
+                if(frog.x < MAXX - 1)
                     frog.x += 1;     
                 break;
             //Proiettile

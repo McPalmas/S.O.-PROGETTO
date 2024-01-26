@@ -260,6 +260,9 @@ void printDens(bool dens[]); 	//stampa delle tane
 void frogBody(int x, int y);   //disegna lo sprite della rana
 
 //graphic.c
+void frogBullett(int y, int x);	   //disegna il proiettile della rana
+
+//graphic.c
 void crocodileBody(objectData c);	//disegna lo sprite del coccodrillo
 
 //graphic.c

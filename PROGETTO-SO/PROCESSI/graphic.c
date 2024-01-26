@@ -198,6 +198,19 @@ void frogBody(int x, int y){
 
 
 /*----------------------------------------------------------------------
+   	    PROCEDURA CHE STAMPA IL PROIETTILE DELLA RANA
+   ----------------------------------------------------------------------*/
+void frogBullett(int y, int x){
+
+    attron(COLOR_PAIR(BLACK_RED));
+        mvaddch(y, x, '^');
+    attroff(COLOR_PAIR(BLACK_RED));
+}
+
+
+
+
+/*----------------------------------------------------------------------
    	    PROCEDURA CHE STAMPA LO SPRITE DEL COCCODRILLO 
    ----------------------------------------------------------------------*/
 void crocodileBody(objectData c){
@@ -222,25 +235,12 @@ void crocodileBody(objectData c){
    	    PROCEDURA CHE STAMPA LO SPRITE DELLA PIANTA
    ----------------------------------------------------------------------*/
 void plantBody(objectData p){
-	
-	p.y= SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT;
-	
-	if(p.id == PLANT_ID_0)
-		p.x = PLANT_0_START;
-	else if (p.id == PLANT_ID_1)
-		p.x = PLANT_1_START;
-	else if(p.id == PLANT_ID_2)
-		p.x = PLANT_2_START;
-
-	if(p.plant_isalive){
-		attron(COLOR_PAIR(GREEN_YELLOW));
-		    mvprintw(p.y, p.x+1, "0 ");
-		attroff(COLOR_PAIR(YELLOW_GREEN));
-		attron(COLOR_PAIR(GREEN_MAGENTA));
-		mvprintw(p.y+1, p.x, "_|_");
-		attroff(COLOR_PAIR(GREEN_MAGENTA));
-	}
-       
+	attron(COLOR_PAIR(GREEN_YELLOW));
+        mvprintw(p.y, p.x+1, "0 ");
+	attroff(COLOR_PAIR(YELLOW_GREEN));
+	attron(COLOR_PAIR(GREEN_MAGENTA));
+	mvprintw(p.y+1, p.x, "_|_");
+	attroff(COLOR_PAIR(GREEN_MAGENTA));
 }
 
 

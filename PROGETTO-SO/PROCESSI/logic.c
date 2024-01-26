@@ -357,7 +357,8 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
         // stampa piante
         for (i = 0; i < N_PLANTS; i++){
-            plantBody(plant[i]);
+            if(plant[i].plant_isalive)
+                plantBody(plant[i]);
         }
         
         // stampa dei proiettili delle piante
@@ -369,7 +370,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
         // stampa del proiettile della rana
         if(frog_bullet.frog_bulletisactive == true){    
-            //stampa
+            frogBullett(frog_bullet.x,frog_bullet.y);
         }
 
         // stampa della rana
@@ -389,6 +390,13 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
         // COLLISIONI E MORTI --------------------------------------------------------------------------------------
 
+	//se la rana oltrepassa il bordo
+	if(frog.x-2 < 0 || frog.x+2 > MAXX-1){
+		gamedata.player_score -= DEATH_SCORE;
+	        gamedata.game_lost = true;
+	}
+	
+	
         // RANA - TANA --------------------------------------------------------------------------------------
 
         // se la rana passa nella zona delle tane
@@ -480,18 +488,17 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                     write(pipe_destroy_plant_bullet[i][1], &plant_bullet, sizeof(objectData));         
                 }
             }
-        }
+        }*/
 
 
         // PROIETTILI RANA - PIANTE --------------------------------------------------------------------------------------
 
         // per ogni pianta
         for(i = 0; i < N_PLANTS; i++){
-
             // se è presente plant e la rana può sparare
             if(plant[i].plant_isalive){
                 // se il proiettile della rana collide con plant
-                if(frog_bullet.frog_bulletisactive && (frog_bullet.y == plant[i].y || frog_bullet.y == plant[i].y + 1) && (frog_bullet.x >= plant[i].x + 4 && frog_bullet.x <= plant[i].x + 6)) {  
+                if(frog_bullet.frog_bulletisactive && (frog_bullet.y <= plant[i].y || frog_bullet.y == plant[i].y + 1) && (frog_bullet.x >= plant[i].x + 4 && frog_bullet.x <= plant[i].x + 6)) {  
                     
                     // aumenta lo score
                     if(gamedata.difficulty == EASY){
@@ -514,10 +521,16 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                     // comunica al frog bullet di distruggere il proiettile
                     write(pipe_destroy_frog_bullet[1], &frog_bullet, sizeof(objectData));
                 }
+                // se la rana tocca una pianta
+                if((frog.y == plant[i].y+1 || frog.y == plant[i].y) && (frog.x-2 >= plant[i].x-(FROG_W-1) && frog.x+2 <= plant[i].x+(FROG_W+1))){
+                    frog.frog_candie = false;
+                    gamedata.game_lost = true;
+                    gamedata.player_score += DEATH_SCORE;
+                }
             }
         }
 
-
+/*
         // PROIETTILI RANA - PROIETTILI NEMICI --------------------------------------------------------------------------------------
 
         // per ogni proiettile dei nemici
@@ -545,7 +558,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         // se il tempo scende a zero perdi la manche
         if(time.time_left <= 0  && frog.frog_candie){
             frog.frog_candie = false;
-            gamedata.game_lost = true; //Va in game over anzichè perdere la manche
+            gamedata.game_lost = true; 
         }
 
 
