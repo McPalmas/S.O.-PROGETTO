@@ -50,7 +50,7 @@ void gameField(){
     // stampa spazio dello score
     for(i = 0; i < SCORE_ZONE_HEIGHT; i++){
         attron(COLOR_PAIR(BLUE_BLUE));
-            mvhline(y, 0, ' ', MAXX);
+            mvhline(y, MINX, ' ', MAXX-MINX);
         attroff(COLOR_PAIR(BLUE_BLUE));
         y++;
     }
@@ -59,7 +59,7 @@ void gameField(){
     // stampa zona tane
     for(i = 0; i < DENS_ZONE_HEIGHT; i++){
         attron(COLOR_PAIR(GREEN_GREEN));
-            mvhline(y, 0, ' ', MAXX);
+            mvhline(y, MINX, ' ', MAXX-MINX);
         attroff(COLOR_PAIR(GREEN_GREEN));
         y++;
     }
@@ -68,7 +68,7 @@ void gameField(){
     // stampa zona piante
     for(i = 0; i < PLANTS_ZONE_HEIGHT; i++){
         attron(COLOR_PAIR(MAGENTA_MAGENTA));
-            mvhline(y, 0, ' ', MAXX);
+            mvhline(y, MINX, ' ', MAXX-MINX);
         attroff(COLOR_PAIR(MAGENTA_MAGENTA));
         y++;
     }
@@ -77,7 +77,7 @@ void gameField(){
     // stampa zona piante
     for(i = 0; i < (2*RIVER_LANES_NUMBER); i++){
         attron(COLOR_PAIR(CYAN_CYAN));
-            mvhline(y, 0, ' ', MAXX);
+            mvhline(y, MINX, ' ', MAXX-MINX);
         attroff(COLOR_PAIR(CYAN_CYAN));
         y++;
     }
@@ -86,7 +86,7 @@ void gameField(){
     // stampa zona di partenza
     for(i = 0; i < START_ZONE_HEIGHT; i++){
         attron(COLOR_PAIR(MAGENTA_MAGENTA));
-            mvhline(y, 0, ' ', MAXX);
+            mvhline(y, MINX, ' ', MAXX-MINX);
         attroff(COLOR_PAIR(MAGENTA_MAGENTA));
         y++;
     }
@@ -95,13 +95,12 @@ void gameField(){
     // stampa spazio delle vite e del tempo di gioco
     for(i = 0; i < SCORE_ZONE_HEIGHT; i++){
         attron(COLOR_PAIR(BLUE_BLUE));
-            mvhline(y, 0, ' ', MAXX);
+            mvhline(y, MINX, ' ', MAXX-MINX);
         attroff(COLOR_PAIR(BLUE_BLUE));
         y++;
     }
     
     //refresh();
-
 }
 
 
@@ -112,7 +111,7 @@ void gameField(){
    	    PROCEDURA CHE STAMPA LE TANE
    ----------------------------------------------------------------------*/
 void printDens(bool dens[]){
-	int start_dens[] = {6,17,28,39,50};
+	int start_dens[] = {16,27,38,49,60};
 	for(int i=0; i < 5; i++)
 		if(dens[i]==false){
 			attron(COLOR_PAIR(WHITE_WHITE));
@@ -246,6 +245,7 @@ void crocodileBody(objectData c){
     if(c.crocodile_is_good)attroff(COLOR_PAIR(BLACK_GREEN));
     else attroff(COLOR_PAIR(BLACK_RED));
 }
+
 
 
 

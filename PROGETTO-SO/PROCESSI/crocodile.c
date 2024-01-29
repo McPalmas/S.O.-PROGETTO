@@ -23,24 +23,26 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
 	
     crocodile.id = id;
     crocodile.is_crocodile_immersed = false;
+    crocodile.is_crocodile_alive = true;
 
     // ogni crocodile viene inviato a display
     write(pipe[1], &crocodile, sizeof(objectData));
     
     while(1){
         // se il crocodile tocca il bordo sinistro o destro dell'area di gioco, il suo processo viene terminato
-        if(crocodile.x < 0 || crocodile.x >= MAXX - CROCODILE_W){
+        if(crocodile.x <= 0|| crocodile.x+CROCODILE_W >= MAXX +CROCODILE_W){
             // Termina il processo
-            exit(0);
+            crocodile.is_crocodile_alive = false;
+            //exit(0);
         }
 
-
-        // spostamento del crocodile
-        if (crocodile.direction == RIGHT)
-            crocodile.x += 1;
-        else
-            crocodile.x -= 1;
-
+	if(crocodile.is_crocodile_alive)
+		// spostamento del crocodile
+		if (crocodile.direction == RIGHT)
+		    crocodile.x += 1;
+		else
+		    crocodile.x -= 1;
+	
         
         // Comunica stato di crocodile
         write(pipe[1], &crocodile, sizeof(objectData));
@@ -49,3 +51,9 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
         usleep(crocodile.crocodile_speed);
     }
 }
+
+
+
+
+
+

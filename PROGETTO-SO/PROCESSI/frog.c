@@ -23,12 +23,11 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
 
     // Posizione Frog iniziale
     int frog_start_y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 3;
-    int frog_start_x = (MAXX / 2) - 3;
 
     // Parametri Frog
     frog.id = FROG_ID;
     frog.y = frog_start_y;
-    frog.x = frog_start_x;
+    frog.x = FROG_START;
     frog.frog_canshoot = true;
     frog.frog_candie = true;
 
@@ -55,7 +54,7 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
         switch(c){
             //Movimenti
             case KEY_UP: 
-                if(frog.y > SCORE_ZONE_HEIGHT+1)
+                //if(frog.y > SCORE_ZONE_HEIGHT+1)
                     frog.y -= 2; 
                 break;
             case KEY_DOWN:
@@ -63,11 +62,11 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
                     frog.y += 2; 
                 break;
             case KEY_LEFT: 
-                if(frog.x > 0)
+                //if(frog.x > 0)
                     frog.x -= 1; 
                 break;
             case KEY_RIGHT:
-                if(frog.x < MAXX - 1)
+                //if(frog.x < MAXX - 1)
                     frog.x += 1;     
                 break;
             //Proiettile
@@ -123,7 +122,7 @@ void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_des
 
     // Parametri Frog Bullet
     frog_bullet.id = FROG_BULLET_ID;
-    frog_bullet.x = frog.x + 2;
+    frog_bullet.x = frog.x;
     frog_bullet.y = frog.y;
     frog_bullet.frog_bulletisactive = false;
     
@@ -135,7 +134,7 @@ void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_des
 
         if(frog.frog_canshoot == false){
             // Posizione  Bullet
-            frog_bullet.x = frog.x + 2;
+            frog_bullet.x = frog.x;
             frog_bullet.y = frog.y;
             // Inizializzazione
             frog_bullet.frog_bulletisactive = true;
@@ -147,7 +146,7 @@ void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_des
                     frog_bullet.frog_bulletisactive = false;
                 }
 
-                if(frog_bullet.y <= DENS_ZONE_HEIGHT){
+                if(frog_bullet.y <= SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT){
                     frog_bullet.frog_bulletisactive = false;
                 }
                 else if(frog_bullet.frog_bulletisactive){

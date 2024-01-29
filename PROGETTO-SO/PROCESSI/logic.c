@@ -4,26 +4,7 @@
           LOGIC PARTITA E PROCESSI
    ----------------------------------------------*/
 void initialize_game(GameData gamedata){
-
-    /*int dens[5]={0,1,0,1,0};
-    Crocodile cr;			// righe di prova per le stampe da non prendere sul serio
-    cr.x=(MAXX)/2; cr.y=SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 5; cr.is_good=false; cr.direction=LEFT;
-    Position plnt;
-    plnt.x=(MAXX)/2; plnt.y=SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT;
-    
-	while(1){				// prova da non considerare
-	
-		gameField();
-    		crocodileBody(cr);
-    		frogBody((MAXX)/2, SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 2);
-		plantBody(plnt);
-		printDens(dens);
-        	getch();
-	}*/
-
-
-
-    gamedata.game_won=false;
+     gamedata.game_won=false;
     gamedata.game_lost=false;
 	//implementazione della funzione per definire gli oggetti a inizio di ogni manche incompleta e da rivedere
 	
@@ -253,11 +234,11 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
     objectData crocodile[N_CROCODILE];
     objectData time;
 
-    int start_dens[] = {6,17,28,39,50};
+    int start_dens[] = {16,27,38,49,60};
 
     // posizone di partenza della rana
     int frog_start_y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 2;
-    int frog_start_x = (MAXX / 2) - 3;
+    int frog_start_x = FROG_START;
     
     // bool ausiliaria per controllare se una tana è occupata o meno
     _Bool frog_in_a_den = false;
@@ -304,14 +285,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         // stampa dello sfondo di gioco
         gameField();
         // stampa tane
-        printDens(gamedata.dens); //prova con tane tutte aperte
-
-        // stampa di una rana in tana
-        /*for(i = 0; i < N_DENS; i++){
-            if(!gamedata.available_dens[i]){
-                //stampa
-            }
-        }*/
+        printDens(gamedata.dens);
 
               
         //* LETTURA E ASSEGNAMENTO DATI ----------------------------------------
@@ -352,9 +326,21 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
         // stampa dei coccodrilli
         for(i = 0; i < N_CROCODILE; i++){
-            crocodileBody(crocodile[i]);
+            if(crocodile[i].is_crocodile_alive)
+            	crocodileBody(crocodile[i]);
         }
-
+        
+        
+        //STAMPA DEL NERO SUI COCCODRILLI USCENTI DAL CAMPO DI GIOCO
+	attron(COLOR_PAIR(BLACK_BLACK));
+        for(int i = SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT+PLANTS_ZONE_HEIGHT; i < TOTAL_HEIGHT; i++){
+    	    mvprintw(i, MAXX,   "            ");	
+        }
+        for(int i = SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT+PLANTS_ZONE_HEIGHT; i < TOTAL_HEIGHT; i++){
+    	    mvprintw(i, 0,   "          ");	
+        }
+        attroff(COLOR_PAIR(BLACK_BLACK));
+	
         // stampa piante
         for (i = 0; i < N_PLANTS; i++){
             if(plant[i].plant_isalive)
@@ -379,11 +365,11 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
         // stampa dello score a schermo
         attron(COLOR_PAIR(WHITE_BLUE));
-        mvprintw(top_score_height, 4, "Score: %d", gamedata.player_score);
+        mvprintw(top_score_height, SCORE_X, "Score: %d", gamedata.player_score);
         // stampa delle vite a schermo
-        mvprintw(bottom_score_height, MAXX/4, "Lifes: %d", gamedata.player_lives);
+        mvprintw(bottom_score_height, LIFES_X, "Lifes: %d", gamedata.player_lives);
         // stampa del tempo a schermo
-        mvprintw(bottom_score_height, MAXX/3 + 15, "Time: %d", time.time_left);
+        mvprintw(bottom_score_height, TIME_X + 15, "Time: %d", time.time_left);
 	    attroff(COLOR_PAIR(WHITE_BLUE));
 	
         refresh();
@@ -391,7 +377,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         // COLLISIONI E MORTI --------------------------------------------------------------------------------------
 
 	//se la rana oltrepassa il bordo
-	if(frog.x-2 < 0 || frog.x+2 > MAXX-1){
+	if(frog.x-2 < MINX || frog.x+2 > MAXX-1 || frog.y < SCORE_ZONE_HEIGHT){
 		gamedata.player_score -= DEATH_SCORE;
 	        gamedata.game_lost = true;
 	}
@@ -470,7 +456,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
         /*
 
-        // PROIETTILI PIANTE - RANA --------------------------------------------------------------------------------------
+        // PROIETTILI PIANTE -> RANA --------------------------------------------------------------------------------------
 
         // per ogni proiettile
         for(i = 0; i < N_PLANT_BULLETS; i++){
@@ -491,7 +477,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         }*/
 
 
-        // PROIETTILI RANA - PIANTE --------------------------------------------------------------------------------------
+        // PROIETTILI RANA -> PIANTE --------------------------------------------------------------------------------------
 
         // per ogni pianta
         for(i = 0; i < N_PLANTS; i++){
@@ -653,7 +639,7 @@ void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]){
 	int maxRiverStartX = MAXX - (CROCODILES_PER_RIVER * CROCODILE_W) - minDistance * (CROCODILES_PER_RIVER - 1);
 
         // Calcola la posizione casuale del primo coccodrillo nella riga
-        int riverStartX = rand() % (maxRiverStartX + 1);
+        int riverStartX = MINX + rand() % (maxRiverStartX - MINX + 1);
 
         for (int i = 0; i < CROCODILES_PER_RIVER; i++) {
             // Calcola la posizione casuale del coccodrillo

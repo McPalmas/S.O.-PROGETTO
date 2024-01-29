@@ -32,7 +32,8 @@
 /*----------------------------------------------------------------------
    MACRO UTILIZZATE PER DEFINIRE LE DIMENSIONI MASSIME DELLO SCHERMO
    ----------------------------------------------------------------------*/
-#define MAXX    60    /* Dimensione dello schermo di output (colonne) */
+#define MINX    10  
+#define MAXX    MINX + 60    /* Dimensione dello schermo di output (colonne) */
 #define MAXY    40    /* Dimensione dello schermo di output (righe)   */
 
 /*----------------------------------------------------------------------
@@ -54,10 +55,16 @@
 #define RIVER_LANES_NUMBER 8    /* numero corsie fiume*/
 #define TOTAL_HEIGHT SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT /* altezza totale del campo di gioco */
 
-#define PLANT_0_START 10
-#define PLANT_1_START 24
-#define PLANT_2_START 44
 
+#define FROG_START 40
+
+#define PLANT_0_START 20
+#define PLANT_1_START 34
+#define PLANT_2_START 54
+
+#define SCORE_X 20
+#define LIFES_X 22
+#define TIME_X 33
 
 
 /*----------------------------------------------------------------------
@@ -108,6 +115,7 @@ typedef struct{
     int crocodile_speed;
     bool crocodile_is_good;
     bool is_crocodile_immersed;
+    bool is_crocodile_alive;
     //int crocodile_vanish_time; Il solo dichiararla fa crashare il gioco con difficoltà medium e hard. Credo che il limite di dati in questa struttura sia 32 byte
     int flow_number;
 
