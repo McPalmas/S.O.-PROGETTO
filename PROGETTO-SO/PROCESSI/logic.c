@@ -113,7 +113,7 @@ void initialize_game(GameData gamedata){
 
             // stampa e collisioni
             // la funzione restituisce il riepilogo della partita
-            gamedata = gameManche(pip, pipe_plant_is_dead, pipe_destroy_frog_bullet,pipe_destroy_plant_bullet, pipe_crocodile_position, gamedata);
+            gamedata = gameManche(pip, pipe_plant_is_dead, pipe_destroy_frog_bullet,pipe_destroy_plant_bullet, pipe_crocodile_position, pipe_frog_on_crocodile, crocodile[N_CROCODILE], gamedata);
             // se la manche è stata vinta
             if(gamedata.game_won){
                 gamedata.game_lost = false;
@@ -207,7 +207,7 @@ void analyze_data(GameData gamedata){
 /* ----------------------------------------------   
          GESTIONE MANCHE, STAMPE E COLLISIONI
    ----------------------------------------------*/
-GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[N_CROCODILE][2], GameData gamedata){
+GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[N_CROCODILE][2], int pipe_frog_on_crocodile[N_CROCODILE][2], pid_t crocodile_pid[N_CROCODILE], GameData gamedata){
 
     int i, j;
 
@@ -268,10 +268,9 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
     // time
     time.time_left = TIMELIMIT_EASY;
 
-    // inizializzazione dei coccodrilli
-    crocodiles_inizializer(gamedata, crocodile);
 
-    // l'inizializzazione dei coccodrilli viene comunicata a car
+    crocodiles_inizializer(gamedata, crocodile);
+    // l'inizializzazione dei coccodrilli viene comunicata a displlay
     for(i = 0; i < N_CROCODILE; i++){
         write(pipe_crocodile_position[i][1], &crocodile[i], sizeof(objectData));
     }
@@ -287,7 +286,6 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         // stampa tane
         printDens(gamedata.dens);
 
-              
         //* LETTURA E ASSEGNAMENTO DATI ----------------------------------------
         
         // lettura dei dati di tutti gli oggetti di gioco
@@ -317,9 +315,9 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 			for(i = 0; i < N_CROCODILE; i++){
 		        	if(receivedPacket.id == i + CROCODILE_ID_0){
 		            	    crocodile[i] = receivedPacket;
+                            }
 		       		}
 		    	}
-            }
 
 
         // STAMPA ELEMENTI ----------------------------------------
@@ -419,7 +417,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             }
         }
         // RANA NEL FIUME --------------------------------------------------------------------------------------
-	/*
+	
         bool onCrocodile = false;
         //Se la rana si trova nel fiume
         if(frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2)){
@@ -435,7 +433,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                 frog.frog_candie = false;
                 gamedata.game_lost = true;
             }
-        }*/
+        }
 
         // IMMERSIONE DI CROCODILE
         /*
@@ -539,6 +537,17 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             }
         }
         */
+       /*
+        // RESPAWN COCCODRILLI --------------------------------------------------------------------------------------
+        for(int i = 0; i++; i<N_CROCODILE){
+            if(!crocodile[i].is_crocodile_alive){
+                crocodile_pid[i] = fork();
+                if(crocodile_pid[i] == 0){
+		            crocodile_process(CROCODILE_ID_0+i, pip, pipe_crocodile_position[i], pipe_frog_on_crocodile, gamedata.difficulty);
+                    exit(0);
+                }
+            }
+        }*/       
         // MORTE RANA PER TEMPO --------------------------------------------------------------------------------------
 
         // se il tempo scende a zero perdi la manche
@@ -564,17 +573,14 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
     return gamedata;
 }
 
-
-
-
-
+RiverFlow river_flows[RIVER_LANES_NUMBER];
 /* ----------------------------------------------   
          INIZIALIZZAZIONE COCCODRILLI
    ----------------------------------------------*/
 void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]){
 
+
      // Inizializza i flussi del fiume con direzioni e velocità casuali
-    RiverFlow river_flows[RIVER_LANES_NUMBER];
     for (int i = 0; i < RIVER_LANES_NUMBER; ++i) {
         river_flows[i].direction = rand() % 2;
         switch (gamedata.difficulty)
@@ -590,26 +596,23 @@ void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]){
             break;
         default:
             break;
-        
         }
     }
     
     
     int crocodileIndex = 0;
-
     // Itera su ciascun fiume
+    
     for (int riverIndex = 0; riverIndex < RIVER_LANES_NUMBER; riverIndex++) {
         // Assegna 3 coccodrilli a ciascun fiume
         for (int i = 0; i < CROCODILES_PER_RIVER; i++) {
             // Assegna l'indice del fiume al coccodrillo
             crocodiles[crocodileIndex].flow_number = riverIndex;
-
             // Assegna speed e direction dal fiume corrispondente
             crocodiles[crocodileIndex].crocodile_speed = river_flows[riverIndex].speed;
             crocodiles[crocodileIndex].direction = river_flows[riverIndex].direction;
-	    
 	        crocodiles[crocodileIndex].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (riverIndex * 2);
-        
+            crocodiles[crocodileIndex].is_crocodile_alive = true;
             switch (gamedata.difficulty)
             {
             case EASY:
@@ -627,30 +630,25 @@ void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]){
             default:
                 break;
             }
-	    
             // Avanza all'elemento successivo nell'array di coccodrilli
             crocodileIndex++;
         }
     }
 
     int minDistance = 10;
-    
     for (int riverIndex = 0; riverIndex < RIVER_LANES_NUMBER; riverIndex++) {
 	int maxRiverStartX = MAXX - (CROCODILES_PER_RIVER * CROCODILE_W) - minDistance * (CROCODILES_PER_RIVER - 1);
-
         // Calcola la posizione casuale del primo coccodrillo nella riga
         int riverStartX = MINX + rand() % (maxRiverStartX - MINX + 1);
-
+        // Assegna la posizione a ciascun coccodrillo
         for (int i = 0; i < CROCODILES_PER_RIVER; i++) {
             // Calcola la posizione casuale del coccodrillo
             crocodiles[riverIndex * CROCODILES_PER_RIVER + i].x = riverStartX;
-
             // Avanza la posizione del prossimo coccodrillo garantendo una distanza minima
             riverStartX += CROCODILE_W + minDistance;
+            }
         }
     }
-    
-}
 
 
 // Function to generate a random boolean with a given probability 

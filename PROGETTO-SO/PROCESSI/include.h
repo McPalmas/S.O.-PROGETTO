@@ -124,10 +124,10 @@ typedef struct{
 } objectData;
 
 
-extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
+
 
 extern int start_dens[5];
-
+extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
 
 
 /*----------------------------------------------------------------------
@@ -147,13 +147,13 @@ extern int start_dens[5];
 #define CROCODILE_VANISH_TIME_NORMAL 4
 #define CROCODILE_VANISH_TIME_HARD 2
 
-#define MIN_RIVER_SPEED_EASY 200000
-#define MIN_RIVER_SPEED_NORMAL 150000
-#define MIN_RIVER_SPEED_HARD 300000
+#define MIN_RIVER_SPEED_EASY 600000
+#define MIN_RIVER_SPEED_NORMAL 300000
+#define MIN_RIVER_SPEED_HARD 400000
 
-#define MAX_RIVER_SPEED_EASY 30000
-#define MAX_RIVER_SPEED_NORMAL 200000
-#define MAX_RIVER_SPEED_HARD 500000
+#define MAX_RIVER_SPEED_EASY 12500
+#define MAX_RIVER_SPEED_NORMAL 10000
+#define MAX_RIVER_SPEED_HARD 1500
 
 #define TIMELIMIT_EASY 90
 #define TIMELIMIT_NORMAL 60
@@ -241,8 +241,6 @@ extern int start_dens[5];
 #define BLACK_WHITE 17
 #define WHITE_BLUE 18
 
-
-
 /*----------------------------------------------------------------------
    				FUNZIONI
    ----------------------------------------------------------------------*/
@@ -297,7 +295,7 @@ void time_process(int p[2], int difficulty);
 
 void initialize_game(GameData gamedata);    // creazione e comunicazione tra processi
 
-GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[N_CROCODILE][2], GameData gamedata);     // gestione della manche stampe e collsioni
+GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[N_CROCODILE][2], int pipe_frog_on_crocodile[N_CROCODILE][2], pid_t crocodile_pid[N_CROCODILE], GameData gamedata);     // gestione della manche stampe e collsioni
 
 void analyze_data(GameData gamedata);  // analizza i dati e in base a essi decide se la partita deve continuare o finire
 
