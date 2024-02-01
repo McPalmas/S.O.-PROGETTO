@@ -24,6 +24,7 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
     crocodile.is_crocodile_immersed = false;
     crocodile.is_crocodile_alive = true;
 
+
     // ogni crocodile viene inviato a display
     write(pipe[1], &crocodile, sizeof(objectData));
     
@@ -56,22 +57,19 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
             	crocodile.flow_number --;
             }
             
-            crocodile.crocodile_speed = river_flows[crocodile.flow_number].speed; // <-- Fa impazzire tutto
+            crocodile.crocodile_speed = river_flows[crocodile.flow_number].speed;
             crocodile.direction = river_flows[crocodile.flow_number].direction;
+            crocodile.crocodile_is_good = rand()%2;
+            //crocodile.crocodile_dive_timer = 25;
+            crocodile.is_crocodile_alive=true;
+            crocodile.is_crocodile_immersed = false;
+
             if(crocodile.direction == LEFT){
                 crocodile.x=MAXX-2;
             }else{
                 crocodile.x=2;
             }
-            
-            crocodile.is_crocodile_alive=true;
-            
-            // Vecchio test
-            //write(pipe[1], &crocodile, sizeof(objectData));
-            //write(pipe_frog_on_crocodile[1], &crocodile, sizeof(objectData));
-            //write(pipe_crocodile_position[1], &crocodile, sizeof(objectData));
-            // Termina il processo
-            //exit(0);
+
         }
         
         // Comunica stato di crocodile

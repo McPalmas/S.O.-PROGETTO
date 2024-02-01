@@ -116,8 +116,9 @@ typedef struct{
     bool crocodile_is_good;
     bool is_crocodile_immersed;
     bool is_crocodile_alive;
-    //int crocodile_vanish_time; Il solo dichiararla fa crashare il gioco con difficoltà medium e hard. Credo che il limite di dati in questa struttura sia 32 byte
+    int crocodile_dive_timer;
     int flow_number;
+
 
     int time_left;
 
