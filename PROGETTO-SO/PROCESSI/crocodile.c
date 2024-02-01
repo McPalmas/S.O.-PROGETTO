@@ -4,8 +4,7 @@
 /* ----------------------------------------------   
 		  CROCODILE
    ----------------------------------------------*/ 
-void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int pipe_frog_on_crocodile[2], int difficulty){
-
+void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int pipe_frog_on_crocodile[2], int difficulty,RiverFlow river_flows[]){
     // Gestione pipe
     close(pipe[0]);
     close(pipe_crocodile_position[1]);
@@ -31,32 +30,40 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
     while(1){
         // se il crocodile tocca il bordo sinistro o destro dell'area di gioco, il suo processo viene terminato
         if(crocodile.x <= 1 || crocodile.x+CROCODILE_W >= MAXX +CROCODILE_W){
-            // Termina il processo
             crocodile.is_crocodile_alive = false;
         }
 
-	    if(crocodile.is_crocodile_alive){
-		    // spostamento del crocodile
-		    if (crocodile.direction == RIGHT)
-		        crocodile.x += 1;
-		    else
-		        crocodile.x -= 1;
+	if(crocodile.is_crocodile_alive){
+		// spostamento del crocodile
+		if (crocodile.direction == RIGHT)
+		     crocodile.x += 1;
+		else
+		     crocodile.x -= 1;
         }else{
             // Il coccodrillo viene spostato nella corsia inferiore (o nella prima se si trova nell'ultima corsia)
-            crocodile.y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (crocodile.y - SCORE_ZONE_HEIGHT - DENS_ZONE_HEIGHT - PLANTS_ZONE_HEIGHT + 2)%(RIVER_LANES_NUMBER*2);
+            /*crocodile.y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (crocodile.y - SCORE_ZONE_HEIGHT - DENS_ZONE_HEIGHT - PLANTS_ZONE_HEIGHT + 2)%(RIVER_LANES_NUMBER*2);
             // Posizione relativa al fiume
             int crocodile_y_relative_to_river = crocodile.y - SCORE_ZONE_HEIGHT - DENS_ZONE_HEIGHT - PLANTS_ZONE_HEIGHT;
             // Indice della corsia del fiume
-            int crocodile_river_lane = ceil(crocodile_y_relative_to_river/2);
+            int crocodile_river_lane = ceil(crocodile_y_relative_to_river/2);*/
             
-            //crocodile.crocodile_speed = river_flows[crocodile_river_lane].speed; // <-- Fa impazzire tutto
-            crocodile.direction = river_flows[crocodile_river_lane].direction;
-            if(river_flows[crocodile_river_lane].direction == LEFT){
+            
+            if(crocodile.flow_number == 0 || crocodile.flow_number % 2 == 0){
+            	crocodile.y += 2;
+            	crocodile.flow_number ++;
+            }else  if(crocodile.flow_number % 2 == 1){
+            	crocodile.y -= 2;
+            	crocodile.flow_number --;
+            }
+            
+            crocodile.crocodile_speed = river_flows[crocodile.flow_number].speed; // <-- Fa impazzire tutto
+            crocodile.direction = river_flows[crocodile.flow_number].direction;
+            if(crocodile.direction == LEFT){
                 crocodile.x=MAXX-2;
             }else{
                 crocodile.x=2;
             }
-
+            
             crocodile.is_crocodile_alive=true;
             
             // Vecchio test
@@ -72,6 +79,7 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
         write(pipe_frog_on_crocodile[1], &crocodile, sizeof(objectData));
 
         usleep(crocodile.crocodile_speed);
+       
     }
 }
 

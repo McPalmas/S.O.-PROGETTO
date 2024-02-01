@@ -87,7 +87,7 @@ enum Direction {
 };
 
 typedef struct {
-    int direction; // Direzione del flusso: 0 per sinistra, 1 per destra
+    enum Direction direction; // Direzione del flusso: 0 per sinistra, 1 per destra
     int speed;     // Velocità del flusso
 } RiverFlow;
 
@@ -127,7 +127,7 @@ typedef struct{
 
 
 extern int start_dens[5];
-extern RiverFlow river_flows[]; // Dichiarazione della variabile esterna
+//extern RiverFlow river_flows[RIVER_LANES_NUMBER]; // Dichiarazione della variabile esterna
 
 
 /*----------------------------------------------------------------------
@@ -283,7 +283,7 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
 void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_destroy_frog_bullet[2]);
 int areFrogsEqual(objectData frog1, objectData frog2);
 
-void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int pipe_frog_on_crocodile[2], int difficulty);
+void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int pipe_frog_on_crocodile[2], int difficulty,RiverFlow river_flows[]);
 
 void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_plant_spawn[2], int pipe_plant_is_dead[2], int pipe_destroy_plant_bullet[2], int difficulty);
 void plant_bullet_process(int p[2], objectData plant, int p_destroy_plant_bullet[2], int difficulty);
@@ -294,8 +294,9 @@ void time_process(int p[2], int difficulty);
 
 
 void initialize_game(GameData gamedata);    // creazione e comunicazione tra processi
+void initialize_river_flows(RiverFlow river_flows[], GameData gamedata);
 
-GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[N_CROCODILE][2], int pipe_frog_on_crocodile[N_CROCODILE][2], pid_t crocodile_pid[N_CROCODILE], GameData gamedata);     // gestione della manche stampe e collsioni
+GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[N_CROCODILE][2], GameData gamedata);     // gestione della manche stampe e collsioni
 
 void analyze_data(GameData gamedata);  // analizza i dati e in base a essi decide se la partita deve continuare o finire
 
@@ -303,3 +304,7 @@ void analyze_data(GameData gamedata);  // analizza i dati e in base a essi decid
 void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]);   // inizializza i coccodrilli nei fiumi
 
 bool getRandomBoolean(float probability);
+
+
+
+

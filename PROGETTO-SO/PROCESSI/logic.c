@@ -1,5 +1,7 @@
 #include "include.h"
 
+RiverFlow river_flows[RIVER_LANES_NUMBER];
+
 /* ----------------------------------------------   
           LOGIC PARTITA E PROCESSI
    ----------------------------------------------*/
@@ -72,7 +74,7 @@ void initialize_game(GameData gamedata){
         fcntl(pipe_plant_is_dead[i][0], F_SETFL, fcntl(pipe_plant_is_dead[i][0], F_GETFL) | O_NONBLOCK);
     }
 
-    
+    initialize_river_flows(river_flows,gamedata);
     
     //  creazione processi  
     frog = fork();
@@ -97,7 +99,7 @@ void initialize_game(GameData gamedata){
 		    for (int i = 0; i < N_CROCODILE; i++) {
 		        crocodile[i] = fork();
 		        if (crocodile[i] == 0) {
-		            crocodile_process(CROCODILE_ID_0+i, pip, pipe_crocodile_position[i], pipe_frog_on_crocodile, gamedata.difficulty);
+		            crocodile_process(CROCODILE_ID_0+i, pip, pipe_crocodile_position[i], pipe_frog_on_crocodile, gamedata.difficulty,river_flows);
 		            exit(0);  // Importante per evitare che il processo figlio entri nel ciclo for successivo
 		        }
 		    }
@@ -113,7 +115,7 @@ void initialize_game(GameData gamedata){
 
             // stampa e collisioni
             // la funzione restituisce il riepilogo della partita
-            gamedata = gameManche(pip, pipe_plant_is_dead, pipe_destroy_frog_bullet,pipe_destroy_plant_bullet, pipe_crocodile_position, pipe_frog_on_crocodile, crocodile[N_CROCODILE], gamedata);
+            gamedata = gameManche(pip, pipe_plant_is_dead, pipe_destroy_frog_bullet,pipe_destroy_plant_bullet, pipe_crocodile_position, gamedata);
             // se la manche è stata vinta
             if(gamedata.game_won){
                 gamedata.game_lost = false;
@@ -207,7 +209,7 @@ void analyze_data(GameData gamedata){
 /* ----------------------------------------------   
          GESTIONE MANCHE, STAMPE E COLLISIONI
    ----------------------------------------------*/
-GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[N_CROCODILE][2], int pipe_frog_on_crocodile[N_CROCODILE][2], pid_t crocodile_pid[N_CROCODILE], GameData gamedata){
+GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[N_CROCODILE][2], GameData gamedata){
 
     int i, j;
 
@@ -368,6 +370,10 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         mvprintw(bottom_score_height, LIFES_X, "Lifes: %d", gamedata.player_lives);
         // stampa del tempo a schermo
         mvprintw(bottom_score_height, TIME_X + 15, "Time: %d", time.time_left);
+        mvprintw(bottom_score_height - 1, 15, "riverflow: %d + %d + %d + %d + %d + %d + %d + %d",
+    river_flows[0].direction, river_flows[1].direction, river_flows[2].direction,
+    river_flows[3].direction, river_flows[4].direction, river_flows[5].direction,
+    river_flows[6].direction, river_flows[7].direction);
 	    attroff(COLOR_PAIR(WHITE_BLUE));
 	
         refresh();
@@ -573,33 +579,11 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
     return gamedata;
 }
 
-RiverFlow river_flows[RIVER_LANES_NUMBER];
+
 /* ----------------------------------------------   
          INIZIALIZZAZIONE COCCODRILLI
    ----------------------------------------------*/
-void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]){
-
-
-     // Inizializza i flussi del fiume con direzioni e velocità casuali
-    for (int i = 0; i < RIVER_LANES_NUMBER; ++i) {
-        river_flows[i].direction = rand() % 2;
-        switch (gamedata.difficulty)
-        {
-        case EASY:
-            river_flows[i].speed = MIN_RIVER_SPEED_EASY + rand() % (MAX_RIVER_SPEED_EASY - MIN_RIVER_SPEED_EASY + 1);
-            break;
-        case NORMAL:
-            river_flows[i].speed = MIN_RIVER_SPEED_NORMAL + rand() % (MAX_RIVER_SPEED_NORMAL - MIN_RIVER_SPEED_NORMAL + 1);
-            break;
-        case HARD:
-            river_flows[i].speed = MIN_RIVER_SPEED_HARD + rand() % (MAX_RIVER_SPEED_HARD - MIN_RIVER_SPEED_HARD + 1);
-            break;
-        default:
-            break;
-        }
-    }
-    
-    
+void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]){ 
     int crocodileIndex = 0;
     // Itera su ciascun fiume
     
@@ -646,9 +630,9 @@ void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]){
             crocodiles[riverIndex * CROCODILES_PER_RIVER + i].x = riverStartX;
             // Avanza la posizione del prossimo coccodrillo garantendo una distanza minima
             riverStartX += CROCODILE_W + minDistance;
-            }
         }
     }
+}
 
 
 // Function to generate a random boolean with a given probability 
@@ -657,3 +641,34 @@ bool getRandomBoolean(float probability){
         return false; // Error 
     return rand() >  probability * ((float)RAND_MAX + 1.0); 
 } 
+
+
+
+
+void initialize_river_flows(RiverFlow river_flows[], GameData gamedata) {
+    // Inizializza i flussi del fiume con direzioni e velocità casuali
+    for (int i = 0; i < RIVER_LANES_NUMBER; ++i) {
+        river_flows[i].direction = rand() % 2;
+        switch (gamedata.difficulty)
+        {
+        case EASY:
+            river_flows[i].speed = MIN_RIVER_SPEED_EASY + rand() % (MAX_RIVER_SPEED_EASY - MIN_RIVER_SPEED_EASY + 1);
+            break;
+        case NORMAL:
+            river_flows[i].speed = MIN_RIVER_SPEED_NORMAL + rand() % (MAX_RIVER_SPEED_NORMAL - MIN_RIVER_SPEED_NORMAL + 1);
+            break;
+        case HARD:
+            river_flows[i].speed = MIN_RIVER_SPEED_HARD + rand() % (MAX_RIVER_SPEED_HARD - MIN_RIVER_SPEED_HARD + 1);
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+
+
+
+
+
+
