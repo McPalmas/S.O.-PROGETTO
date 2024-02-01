@@ -155,9 +155,9 @@ extern int start_dens[5];
 #define MAX_RIVER_SPEED_NORMAL 10000
 #define MAX_RIVER_SPEED_HARD 1500
 
-#define TIMELIMIT_EASY 90
-#define TIMELIMIT_NORMAL 60
-#define TIMELIMIT_HARD 40
+#define TIMELIMIT_EASY 200
+#define TIMELIMIT_NORMAL 150
+#define TIMELIMIT_HARD 100
 
 #define DIFFICULTIES 3 //possibili difficoltà di gioco
 

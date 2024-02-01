@@ -370,10 +370,6 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         mvprintw(bottom_score_height, LIFES_X, "Lifes: %d", gamedata.player_lives);
         // stampa del tempo a schermo
         mvprintw(bottom_score_height, TIME_X + 15, "Time: %d", time.time_left);
-        mvprintw(bottom_score_height - 1, 15, "riverflow: %d + %d + %d + %d + %d + %d + %d + %d",
-    river_flows[0].direction, river_flows[1].direction, river_flows[2].direction,
-    river_flows[3].direction, river_flows[4].direction, river_flows[5].direction,
-    river_flows[6].direction, river_flows[7].direction);
 	    attroff(COLOR_PAIR(WHITE_BLUE));
 	
         refresh();
@@ -644,7 +640,9 @@ bool getRandomBoolean(float probability){
 
 
 
-
+/* ----------------------------------------------   
+         INIZIALIZZAZIONE FIUMI
+   ----------------------------------------------*/
 void initialize_river_flows(RiverFlow river_flows[], GameData gamedata) {
     // Inizializza i flussi del fiume con direzioni e velocità casuali
     for (int i = 0; i < RIVER_LANES_NUMBER; ++i) {
