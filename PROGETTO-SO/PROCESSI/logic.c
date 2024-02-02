@@ -352,7 +352,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         // stampa dei proiettili delle piante
         for(i = 0; i < N_PLANT_BULLETS; i++){
             if(plant_bullet[i].plant_bulletisactive){
-                //stampa
+                plantBullett(plant_bullet[i].x, plant_bullet[i].y);
             }   
         }
 

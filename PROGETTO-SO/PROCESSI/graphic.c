@@ -211,7 +211,7 @@ void frogBullett(int y, int x){
    ----------------------------------------------------------------------*/
 void plantBullett(int y, int x){
     attron(COLOR_PAIR(BLACK_GREEN));
-        mvaddch(y, x, 'V');
+        mvaddch(x, y, 'V');
     attroff(COLOR_PAIR(BLACK_GREEN));
 }
 
