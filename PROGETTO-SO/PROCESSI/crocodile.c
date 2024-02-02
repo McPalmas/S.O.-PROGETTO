@@ -4,7 +4,7 @@
 /* ----------------------------------------------   
 		  CROCODILE
    ----------------------------------------------*/ 
-void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int pipe_frog_on_crocodile[2], int difficulty,RiverFlow river_flows[]){
+void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int pipe_frog_on_crocodile[2], int pipe_crocodile_is_shot[2], int difficulty,RiverFlow river_flows[]){
     // Gestione pipe
     close(pipe[0]);
     close(pipe_crocodile_position[1]);
@@ -29,12 +29,14 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
     write(pipe[1], &crocodile, sizeof(objectData));
     
     while(1){
+        
         // se il crocodile tocca il bordo sinistro o destro dell'area di gioco, il suo processo viene terminato
         if(crocodile.x <= 1 || crocodile.x+CROCODILE_W >= MAXX +CROCODILE_W){
             crocodile.is_crocodile_alive = false;
         }
 
 	if(crocodile.is_crocodile_alive){
+        if(read(pipe_crocodile_is_shot[0], &crocodile, sizeof(objectData)) != -1)crocodile.crocodile_is_good = true;
 		// spostamento del crocodile
 		if (crocodile.direction == RIGHT)
 		     crocodile.x += 1;
