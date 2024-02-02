@@ -30,6 +30,7 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_
 
     plant_bullet_timer = getRandomTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
     
+    //posizioni iniziali delle piante
     if(plant.id == PLANT_ID_0)
 		plant.x = PLANT_0_START;
     else if (plant.id == PLANT_ID_1)
@@ -50,25 +51,27 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_
             if(plant_bullet_timer <= 0){
                 // Se non ci sono proiettili attivi
                 plant_bullet_timer = getRandomTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
-                if(waitpid(-1, NULL, WNOHANG) != 0){ //wtf is this ?
+                //if(waitpid(-1, NULL, WNOHANG) != 0){ //wtf is this ?
                     // Crea un nuovo proiettile
                     plant_bullet = fork();
                     // Se è il processo figlio
                     if(plant_bullet == 0){
                         // Chiama la funzione per il proiettile
                         plant_bullet_process(pipe, plant, pipe_destroy_plant_bullet, difficulty);
+                        exit(0);
                     }
                     
-                }
+                //}
+                plant_bullet_timer = getRandomTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
             }
 
         // Comunicazione con display
         write(pipe[1], &plant, sizeof(objectData));
         // Comunicazione con frog
-        write(pipe_frog_on_plant[1], &plant, sizeof(objectData));
+        write(pipe_frog_on_plant[1], &plant, sizeof(objectData));// a che serve sta pipe ?? non la usiamo mai, per il contatto tra frog e piante controlliamo semplicemnete le coordinate e funge
 
-        usleep(1000); //Non so se 1000 va bene, ma è un valore che ho visto in altri processi
-    }
+        sleep(1); // 1 secondo
+        }
     }
 }
 

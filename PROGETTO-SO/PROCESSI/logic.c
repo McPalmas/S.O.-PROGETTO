@@ -557,13 +557,14 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 		if(frog_bullet.frog_bulletisactive && (crocodile[i].y+1 == frog_bullet.y) && (frog_bullet.x >= crocodile[i].x && frog_bullet.x <= crocodile[i].x+CROCODILE_W)){
 			if(!crocodile[i].crocodile_is_good){
 				 // se il coccodrillo è cattivo diventa buono
-                frog_bullet.frog_bulletisactive = false;
-                frog.frog_canshoot = true;
-                write(pipe_destroy_frog_bullet[1], &frog_bullet, sizeof(objectData));
-                write(pipe_crocodile_is_shot[i][1], &crocodile[i], sizeof(objectData));
-                break;
+				
+				write(pipe_crocodile_is_shot[i][1], &crocodile[i], sizeof(objectData));
+				break;
 			}
 			// comunica al frog bullet di distruggere il proiettile
+			frog_bullet.frog_bulletisactive = false;
+			frog.frog_canshoot = true;
+			write(pipe_destroy_frog_bullet[1], &frog_bullet, sizeof(objectData));
                         
 		}
 	}
