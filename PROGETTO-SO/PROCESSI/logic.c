@@ -6,7 +6,7 @@ RiverFlow river_flows[RIVER_LANES_NUMBER];
           LOGIC PARTITA E PROCESSI
    ----------------------------------------------*/
 void initialize_game(GameData gamedata){
-     gamedata.game_won=false;
+    gamedata.game_won=false;
     gamedata.game_lost=false;
 	//implementazione della funzione per definire gli oggetti a inizio di ogni manche incompleta e da rivedere
 	
@@ -236,6 +236,8 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
     objectData crocodile[N_CROCODILE];
     objectData time;
 
+    int crocodile_immersion_timer=getRandomInt(100, gamedata.difficulty); // = getRandomTimer (tempo minimo, difficoltà)
+
     int start_dens[] = {16,27,38,49,60};
 
     // posizone di partenza della rana
@@ -379,7 +381,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 	//se la rana oltrepassa il bordo
 	if(frog.x-2 < MINX || frog.x+2 > MAXX-1 || frog.y < SCORE_ZONE_HEIGHT){
 		gamedata.player_score -= DEATH_SCORE;
-	        gamedata.game_lost = true;
+	        mancheLost(gamedata, frog);
 	}
 	
 	
@@ -428,32 +430,35 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                 // se la rana si trova su almeno un coccodrillo, aggiorna la variabile ed esce dal ciclo
                 if(frog.frog_candie && frog.y==crocodile[i].y && (frog.x > crocodile[i].x+1 && frog.x < crocodile[i].x + CROCODILE_W-1)){
                     onCrocodile = true;
-                    break;
-                }else onCrocodile = false;
-            }
-            if(!onCrocodile){
-                frog.frog_candie = false;
-                gamedata.game_lost = true;
-            }
-        }
-
-        // IMMERSIONE DI CROCODILE
-        /*
-        if(frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2)){
-            // per ogni coccodrillo
-            for(i = 0; i < N_CROCODILE; i++){
-                // se la rana si trova su un coccodrillo cattivo,
-                if(frog.frog_candie && frog.y==crocodile[i].y && (frog.x > crocodile[i].x+1 && frog.x < crocodile[i].x + CROCODILE_W-1) && !crocodile[i].crocodile_is_good){
-                    crocodile[i].crocodile_dive_timer--;
-                    if(crocodile[i].crocodile_dive_timer <= 0)crocodile[i].is_crocodile_immersed = true;
-                    if(crocodile[i].is_crocodile_immersed){
-                        frog.frog_candie = false;
-                        gamedata.game_lost = true;
+                    if(!crocodile[i].crocodile_is_good){
+                        crocodile_immersion_timer--;
+                        switch(gamedata.difficulty){
+                            case EASY:
+                                if(crocodile_immersion_timer<=(CROCODILE_IMMERSION_TIME_EASY/2))crocodile[i].is_crocodile_immersing = true;
+                                break;
+                            case NORMAL:
+                                if(crocodile_immersion_timer<=(CROCODILE_IMMERSION_TIME_NORMAL/2))crocodile[i].is_crocodile_immersing = true;
+                                break;
+                            case HARD:
+                                if(crocodile_immersion_timer<=(CROCODILE_IMMERSION_TIME_HARD/2))crocodile[i].is_crocodile_immersing = true;
+                                break;
+                        }
+                        
+                        if(crocodile_immersion_timer<=0){
+                            mancheLost(gamedata, frog);
+                        }
+                    }else{
+                        crocodile_immersion_timer=getRandomInt(100, gamedata.difficulty);
                     }
                     break;
-                }
+                }else{
+                    onCrocodile = false;
+                    }
             }
-        }*/
+            if(!onCrocodile){
+                //mancheLost(gamedata, frog);
+            }
+        }
         /*
 
         // PROIETTILI PIANTE -> RANA --------------------------------------------------------------------------------------
@@ -584,21 +589,17 @@ void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]){
             crocodiles[crocodileIndex].direction = river_flows[riverIndex].direction;
 	        crocodiles[crocodileIndex].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (riverIndex * 2);
             crocodiles[crocodileIndex].is_crocodile_alive = true;
-            crocodiles[crocodileIndex].is_crocodile_immersed = false;
-            //crocodiles[crocodileIndex].crocodile_dive_timer = 25;
+            crocodiles[crocodileIndex].is_crocodile_immersing = false;
             switch (gamedata.difficulty)
             {
             case EASY:
                 crocodiles[crocodileIndex].crocodile_is_good = getRandomBoolean(CROCODILE_IS_BAD_PROBABILITY_EASY);
-                //crocodiles[crocodileIndex].crocodile_vanish_time = 1 + rand() % CROCODILE_VANISH_TIME_EASY; //Commentate -> vedi struttura crocodile in include.h
                 break;
             case NORMAL:
                 crocodiles[crocodileIndex].crocodile_is_good = getRandomBoolean(CROCODILE_IS_BAD_PROBABILITY_NORMAL);
-                //crocodiles[crocodileIndex].crocodile_vanish_time = 1 + rand() % CROCODILE_VANISH_TIME_NORMAL;
                 break;
             case HARD:
                 crocodiles[crocodileIndex].crocodile_is_good = getRandomBoolean(CROCODILE_IS_BAD_PROBABILITY_HARD);
-                //crocodiles[crocodileIndex].crocodile_vanish_time = 1 + rand() % CROCODILE_VANISH_TIME_HARD;
                 break;
             default:
                 break;
@@ -622,15 +623,6 @@ void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]){
         }
     }
 }
-
-
-// Function to generate a random boolean with a given probability 
-bool getRandomBoolean(float probability){  
-    if (probability < 0 || probability > 1) 
-        return false; // Error 
-    return rand() >  probability * ((float)RAND_MAX + 1.0); 
-} 
-
 
 
 /* ----------------------------------------------   
@@ -657,6 +649,39 @@ void initialize_river_flows(RiverFlow river_flows[], GameData gamedata) {
     }
 }
 
+void mancheLost(GameData gamedata, objectData frog){
+    frog.frog_candie = false;
+    gamedata.game_lost = true;
+}
+
+
+// Function to generate a random boolean with a given probability 
+bool getRandomBoolean(float probability){  
+    if (probability < 0 || probability > 1) 
+        return false; // Error 
+    return rand() >  probability * ((float)RAND_MAX + 1.0); 
+} 
+
+int getRandomInt(int min, int difficulty){
+    int randomTimer;
+
+    switch (difficulty)
+    {
+    case (EASY):
+        randomTimer = rand() % (CROCODILE_IMMERSION_TIME_EASY + 1) + min;
+        break;
+    case (NORMAL):
+        randomTimer = rand() % (CROCODILE_IMMERSION_TIME_NORMAL + 1) + min;
+        break;
+    case(HARD):
+        randomTimer = rand() % (CROCODILE_IMMERSION_TIME_HARD + 1) + min;
+        break;
+    default:
+        break;
+    }
+    
+    return randomTimer;
+}
 
 
 

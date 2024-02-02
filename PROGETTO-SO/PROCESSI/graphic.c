@@ -226,7 +226,7 @@ void crocodileBody(objectData c){
     if(c.crocodile_is_good)attron(COLOR_PAIR(BLACK_GREEN));
     else attron(COLOR_PAIR(BLACK_RED));
     
-    if(c.is_crocodile_immersed){
+    if(c.is_crocodile_immersing){
             if(c.direction == RIGHT){  /* stampa del coccodrillo in base alla direzione */
                 mvprintw(c.y+1, c.x,   "       0__");
             }else{

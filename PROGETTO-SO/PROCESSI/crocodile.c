@@ -21,7 +21,7 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
     read(pipe_crocodile_position[0], &crocodile, sizeof(objectData));
 	
     crocodile.id = id;
-    crocodile.is_crocodile_immersed = false;
+    crocodile.is_crocodile_immersing = false;
     crocodile.is_crocodile_alive = true;
 
 
@@ -41,14 +41,6 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
 		else
 		     crocodile.x -= 1;
         }else{
-            // Il coccodrillo viene spostato nella corsia inferiore (o nella prima se si trova nell'ultima corsia)
-            /*crocodile.y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (crocodile.y - SCORE_ZONE_HEIGHT - DENS_ZONE_HEIGHT - PLANTS_ZONE_HEIGHT + 2)%(RIVER_LANES_NUMBER*2);
-            // Posizione relativa al fiume
-            int crocodile_y_relative_to_river = crocodile.y - SCORE_ZONE_HEIGHT - DENS_ZONE_HEIGHT - PLANTS_ZONE_HEIGHT;
-            // Indice della corsia del fiume
-            int crocodile_river_lane = ceil(crocodile_y_relative_to_river/2);*/
-            
-            
             if(crocodile.flow_number == 0 || crocodile.flow_number % 2 == 0){
             	crocodile.y += 2;
             	crocodile.flow_number ++;
@@ -60,9 +52,8 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
             crocodile.crocodile_speed = river_flows[crocodile.flow_number].speed;
             crocodile.direction = river_flows[crocodile.flow_number].direction;
             crocodile.crocodile_is_good = rand()%2;
-            //crocodile.crocodile_dive_timer = 25;
             crocodile.is_crocodile_alive=true;
-            crocodile.is_crocodile_immersed = false;
+            crocodile.is_crocodile_immersing = false;
 
             if(crocodile.direction == LEFT){
                 crocodile.x=MAXX-2;

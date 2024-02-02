@@ -114,9 +114,8 @@ typedef struct{
     enum Direction direction;
     int crocodile_speed;
     bool crocodile_is_good;
-    bool is_crocodile_immersed;
+    bool is_crocodile_immersing;
     bool is_crocodile_alive;
-    int crocodile_dive_timer;
     int flow_number;
 
 
@@ -144,9 +143,9 @@ extern int start_dens[5];
 #define CROCODILE_IS_BAD_PROBABILITY_NORMAL 0.35
 #define CROCODILE_IS_BAD_PROBABILITY_HARD 0.5
 
-#define CROCODILE_VANISH_TIME_EASY 6
-#define CROCODILE_VANISH_TIME_NORMAL 4
-#define CROCODILE_VANISH_TIME_HARD 2
+#define CROCODILE_IMMERSION_TIME_EASY 240
+#define CROCODILE_IMMERSION_TIME_NORMAL 180
+#define CROCODILE_IMMERSION_TIME_HARD 120
 
 #define MIN_RIVER_SPEED_EASY 600000
 #define MIN_RIVER_SPEED_NORMAL 300000
