@@ -151,6 +151,11 @@ extern int start_dens[5];
 #define PLANT_BULLET_DELAY_NORMAL 80000
 #define PLANT_BULLET_DELAY_HARD 60000
 
+#define PLANT_BULLET_RELOAD_MIN 100
+#define PLANT_BULLET_RELOAD_EASY 100
+#define PLANT_BULLET_RELOAD_NORMAL 60
+#define PLANT_BULLET_RELOAD_HARD 30
+
 #define MIN_RIVER_SPEED_EASY 600000
 #define MIN_RIVER_SPEED_NORMAL 300000
 #define MIN_RIVER_SPEED_HARD 400000
@@ -305,7 +310,6 @@ void analyze_data(GameData gamedata);  // analizza i dati e in base a essi decid
 void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]);   // inizializza i coccodrilli nei fiumi
 
 bool getRandomBoolean(float probability);
-
 
 
 

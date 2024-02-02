@@ -25,9 +25,10 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_
 
     plant.id = id;
     plant.plant_canshoot = true;
-    plant_bullet_timer = plant_bullet_timer + rand() % 70; //Da rivedere
     plant.plant_isalive = true;
     plant.y = SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT;
+
+    plant_bullet_timer = getRandomTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
     
     if(plant.id == PLANT_ID_0)
 		plant.x = PLANT_0_START;
@@ -40,16 +41,15 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_
         if(read(pipe_plant_is_dead[0], &plant_data, sizeof(objectData)) != -1){
             plant = plant_data;     
         }
-
         if(read(pipe_can_plant_spawn[0], &frog_data, sizeof(objectData)) != -1){        
             frog = frog_data;
         }
-
         if(plant.plant_isalive){
             plant_bullet_timer--;
             // Se il timer è scaduto
             if(plant_bullet_timer <= 0){
                 // Se non ci sono proiettili attivi
+                plant_bullet_timer = getRandomTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
                 if(waitpid(-1, NULL, WNOHANG) != 0){
                     // Crea un nuovo proiettile
                     plant_bullet = fork();
@@ -58,8 +58,7 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_
                         // Chiama la funzione per il proiettile
                         plant_bullet_process(pipe, plant, pipe_destroy_plant_bullet, difficulty);
                     }
-                    // Resetta il timer
-                    plant_bullet_timer = plant_bullet_timer + rand() % 70;
+                    
                 }
             }
 
@@ -107,33 +106,52 @@ void plant_bullet_process(int p[2], objectData plant, int pipe_destroy_plant_bul
     write(p[1], &plant_bullet, sizeof(objectData));
 
     // Finché il proiettile è attivo e non è uscito dall'area di gioco
-    while(plant_bullet.plant_bulletisactive && plant_bullet.y < TOTAL_HEIGHT - 1){
+    while(plant_bullet.plant_bulletisactive){
         // Aggiorna lo stato
         if(read(pipe_destroy_plant_bullet[0], &plant_bullet_data, sizeof(objectData)) != -1)plant_bullet.plant_bulletisactive = false;
     
         // Sposta il proiettile
         plant_bullet.y += 1;
+
+        // se il proiettile esce dall'area di gioco
+        if(plant_bullet.y >= MAXY-12){
+            plant_bullet.plant_bulletisactive = false;
+        }
+
         // comunica con display per la stampa e le collisioni
         write(p[1], &plant_bullet, sizeof(objectData));
         // delay di avanzamento del proiettile
         usleep(plant_bullet_delay);
+
+        if(!plant_bullet.plant_bulletisactive)_exit(0);
     }
 
-    // disattiva il bullet quando supera l'area di gioco
-    plant_bullet.plant_bulletisactive = false;
+
     // comunica con display per la stampa e le collisioni
     write(p[1], &plant_bullet, sizeof(objectData));
     
-    // distruzione del processo
-    _exit(0);
 }
 
+int getRandomTimer(int min, int difficulty){
+    int randomTimer;
 
-
-
-
-
-
+    switch (difficulty)
+    {
+    case (EASY):
+        randomTimer = rand() % (PLANT_BULLET_RELOAD_EASY + 1) + min;
+        break;
+    case (NORMAL):
+        randomTimer = rand() % (PLANT_BULLET_RELOAD_NORMAL + 1) + min;
+        break;
+    case(HARD):
+        randomTimer = rand() % (PLANT_BULLET_RELOAD_HARD + 1) + min;
+        break;
+    default:
+        break;
+    }
+    
+    return randomTimer;
+}
 
 
 

@@ -469,6 +469,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                 if(plant_bullet[i].plant_bulletisactive && (plant_bullet[i].y == frog.y || plant_bullet[i].y == frog.y + 1) && (plant_bullet[i].x >= frog.x - 2 && plant_bullet[i].x <= frog.x + 2)) {
                     frog.frog_candie = false;
                     gamedata.game_lost = true;
+                    plant_bullet[i].plant_bulletisactive = false;
                     // comunica a plant bullet che il proiettile deve essere disattivato
                     write(pipe_destroy_plant_bullet[i][1], &plant_bullet, sizeof(objectData));         
                 }
@@ -536,6 +537,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                 }
             }
         }
+
        
 
         // MORTE RANA PER TEMPO --------------------------------------------------------------------------------------
