@@ -54,19 +54,19 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
         switch(c){
             //Movimenti
             case KEY_UP: 
-                //if(frog.y > SCORE_ZONE_HEIGHT+1)
                     frog.y -= 2; 
+                    system("aplay ../SUONI/jump.wav > /dev/null 2>&1 &");
                 break;
             case KEY_DOWN:
-                if(frog.y < frog_start_y)
+                if(frog.y < frog_start_y){
                     frog.y += 2; 
+                    system("aplay ../SUONI/jump.wav > /dev/null 2>&1 &");
+                }
                 break;
-            case KEY_LEFT: 
-                //if(frog.x > 0)
+            case KEY_LEFT:
                     frog.x -= 1; 
                 break;
             case KEY_RIGHT:
-                //if(frog.x < MAXX - 1)
                     frog.x += 1;     
                 break;
             //Proiettile
@@ -76,6 +76,7 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
                     frog.frog_canshoot = false;
                     //Trasmette lo stato alla pipe
                     write(pipe_shoot[1], &frog, sizeof(objectData));
+                    system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
                 }
                 break;
         }

@@ -166,13 +166,14 @@ void analyze_data(GameData gamedata){
 	if(gamedata.game_won){
 		// se ha occupato tutte le tane si va al menu della vittoria
 		if(taken_dens >= N_DENS){
+		    system("aplay ../SUONI/victory.wav > /dev/null 2>&1 &");
 		    endGameMenu(1);
 		}
 		else{	// altrimenti stampa relativa alle tane occupate e inizio manche successiva
 		    mvprintw(MAXY/3, MAXX/2-8, "Tane raggiunte: %d", taken_dens);
 		    mvprintw(MAXY/3 +1, MAXX/2-8, "Vite rimanenti: %d", gamedata.player_lives);
 		    refresh();
-		    
+		    system("aplay ../SUONI/tanaRaggiunta.wav > /dev/null 2>&1");
 		    // tempo di attesa prima del caricamento della schermata successiva
 		    sleep(2);
 		    
@@ -185,13 +186,14 @@ void analyze_data(GameData gamedata){
 	
 		gamedata.player_lives--;
 		
-		if(gamedata.player_lives <= 0) // se ha esaurito le vite si va al menu della sconfitta
+		if(gamedata.player_lives <= 0){ // se ha esaurito le vite si va al menu della sconfitta
+            		system("aplay ../SUONI/gameover.wav > /dev/null 2>&1 &");
             		endGameMenu(0);
-            	else{      // altrimenti stampa relativa al numero di vite rimanenti         
+            	}else{      // altrimenti stampa relativa al numero di vite rimanenti         
             		mvprintw(MAXY/3, MAXX/2-8, "Tane raggiunte: %d", taken_dens);
             		mvprintw(MAXY/3 +1, MAXX/2-8, "Vite rimanenti: %d", gamedata.player_lives);
             		refresh();
-		    
+		    	system("aplay ../SUONI/death.wav > /dev/null 2>&1");
 		    	// tempo di attesa prima del caricamento della schermata successiva
 		    	sleep(2);
 		
@@ -425,7 +427,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 	
         bool onCrocodile = false;
         //Se la rana si trova nel fiume
-        if(frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2)){
+        if(frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT){
             // per ogni coccodrillo
             for(i = 0; i < N_CROCODILE; i++){
                 // se la rana si trova su almeno un coccodrillo, aggiorna la variabile ed esce dal ciclo

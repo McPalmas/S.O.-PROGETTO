@@ -192,7 +192,7 @@ void endGameMenu(bool win){
     int selection = 0;
     int c; 
     bool exitMenu = false;
-    
+        
     if(win){ 	/* in base alla vatiabile win si sceglie la scritta e il colore */
 	    bkgd(COLOR_PAIR(BLACK_GREEN)); /* Setta il background color dello schermo */
 	    
