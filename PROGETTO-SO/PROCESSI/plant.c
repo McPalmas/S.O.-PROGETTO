@@ -50,7 +50,7 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_
             if(plant_bullet_timer <= 0){
                 // Se non ci sono proiettili attivi
                 plant_bullet_timer = getRandomTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
-                if(waitpid(-1, NULL, WNOHANG) != 0){
+                if(waitpid(-1, NULL, WNOHANG) != 0){ //wtf is this ?
                     // Crea un nuovo proiettile
                     plant_bullet = fork();
                     // Se è il processo figlio

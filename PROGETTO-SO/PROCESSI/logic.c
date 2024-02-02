@@ -319,9 +319,9 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 			for(i = 0; i < N_CROCODILE; i++){
 		        	if(receivedPacket.id == i + CROCODILE_ID_0){
 		            	    crocodile[i] = receivedPacket;
-                            }
-		       		}
-		    	}
+                            	}
+		       	}
+		 }
 
 
         // STAMPA ELEMENTI ----------------------------------------
@@ -435,13 +435,13 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                         crocodile_immersion_timer--;
                         switch(gamedata.difficulty){
                             case EASY:
-                                if(crocodile_immersion_timer<=(CROCODILE_IMMERSION_TIME_EASY/2))crocodile[i].is_crocodile_immersing = true;
+                                if(crocodile_immersion_timer<=(CROCODILE_IMMERSION_TIME_EASY/2)) crocodile[i].is_crocodile_immersing = true;
                                 break;
                             case NORMAL:
-                                if(crocodile_immersion_timer<=(CROCODILE_IMMERSION_TIME_NORMAL/2))crocodile[i].is_crocodile_immersing = true;
+                                if(crocodile_immersion_timer<=(CROCODILE_IMMERSION_TIME_NORMAL/2)) crocodile[i].is_crocodile_immersing = true;
                                 break;
                             case HARD:
-                                if(crocodile_immersion_timer<=(CROCODILE_IMMERSION_TIME_HARD/2))crocodile[i].is_crocodile_immersing = true;
+                                if(crocodile_immersion_timer<=(CROCODILE_IMMERSION_TIME_HARD/2)) crocodile[i].is_crocodile_immersing = true;
                                 break;
                         }
                         if(crocodile_immersion_timer<=0){
@@ -451,6 +451,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                     }else crocodile_immersion_timer=getRandomInt(100, gamedata.difficulty);
                     break;
                 }else onCrocodile = false;
+                
             }
             if(!onCrocodile){
                 frog.frog_candie = false;
@@ -538,7 +539,26 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             }
         }
 
-       
+
+	// PROIETTILI RANA -> COCCODRILLI --------------------------------------------------------------------------------------
+
+        // per ogni coccodrillo 
+        for(i = 0; i < N_CROCODILE; i++){
+        	//se il proiettile sta sul coccodrillo corrente
+		if(frog_bullet.frog_bulletisactive && (crocodile[i].y+1 == frog_bullet.y) && (frog_bullet.x >= crocodile[i].x && frog_bullet.x <= crocodile[i].x+CROCODILE_W)){
+			if(!crocodile[i].crocodile_is_good){
+				 // se il coccodrillo è cattivo diventa buono
+				 crocodile[i].crocodile_is_good = true;
+			}
+			// disattiva il proiettile
+                    	frog_bullet.frog_bulletisactive = false;
+                    	frog.frog_canshoot = true;
+			// comunica al frog bullet di distruggere il proiettile
+                        write(pipe_destroy_frog_bullet[1], &frog_bullet, sizeof(objectData));
+		}
+	}
+
+
 
         // MORTE RANA PER TEMPO --------------------------------------------------------------------------------------
 

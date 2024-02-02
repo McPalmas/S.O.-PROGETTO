@@ -311,5 +311,7 @@ void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]);   // in
 
 bool getRandomBoolean(float probability);
 
+int getRandomInt(int min, int difficulty);
 
+int getRandomTimer(int min, int difficulty);
 
