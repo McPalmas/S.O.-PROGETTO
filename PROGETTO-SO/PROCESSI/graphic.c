@@ -202,7 +202,7 @@ void frogBody(int x, int y){
 void frogBullett(int y, int x){
 
     attron(COLOR_PAIR(BLACK_RED));
-        mvaddch(y, x, '^');
+        mvaddch(x, y, '^');
     attroff(COLOR_PAIR(BLACK_RED));
 }
 
@@ -210,7 +210,6 @@ void frogBullett(int y, int x){
    	    PROCEDURA CHE STAMPA IL PROIETTILE DELLA PIANTA
    ----------------------------------------------------------------------*/
 void plantBullett(int y, int x){
-
     attron(COLOR_PAIR(BLACK_GREEN));
         mvaddch(y, x, 'V');
     attroff(COLOR_PAIR(BLACK_GREEN));

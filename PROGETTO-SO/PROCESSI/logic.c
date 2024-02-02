@@ -489,7 +489,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             // se è presente plant e la rana può sparare
             if(plant[i].plant_isalive){
                 // se il proiettile della rana collide con plant
-                if(frog_bullet.frog_bulletisactive && (frog_bullet.y <= plant[i].y || frog_bullet.y == plant[i].y + 1) && (frog_bullet.x >= plant[i].x + 4 && frog_bullet.x <= plant[i].x + 6)) {  
+                if(frog_bullet.frog_bulletisactive && (frog_bullet.y <= plant[i].y + 1) && (frog_bullet.x >= plant[i].x && frog_bullet.x <= plant[i].x + 2)) {  
                     
                     // aumenta lo score
                     if(gamedata.difficulty == EASY){
