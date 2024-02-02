@@ -466,11 +466,9 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             // se il proeittile è attivo e la rana può morire
             if(frog.frog_candie && plant_bullet[i].plant_bulletisactive){
                 // se un proiettile delle collide con la rana, perdi la manche
-                if(plant_bullet[i].plant_bulletisactive && (plant_bullet[i].y == frog.y || plant_bullet[i].y == frog.y + 1) && (plant_bullet[i].x >= frog.x && plant_bullet[i].x <= frog.x + 4)) {
-
+                if(plant_bullet[i].plant_bulletisactive && (plant_bullet[i].y == frog.y || plant_bullet[i].y == frog.y + 1) && (plant_bullet[i].x >= frog.x - 2 && plant_bullet[i].x <= frog.x + 2)) {
                     frog.frog_candie = false;
                     gamedata.game_lost = true;
-
                     // comunica a plant bullet che il proiettile deve essere disattivato
                     write(pipe_destroy_plant_bullet[i][1], &plant_bullet, sizeof(objectData));         
                 }
@@ -486,7 +484,6 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             if(plant[i].plant_isalive){
                 // se il proiettile della rana collide con plant
                 if(frog_bullet.frog_bulletisactive && (frog_bullet.y <= plant[i].y + 1) && (frog_bullet.x >= plant[i].x && frog_bullet.x <= plant[i].x + 2)) {  
-                    
                     // aumenta lo score
                     if(gamedata.difficulty == EASY){
                         gamedata.player_score += DEN_SCORE_EASY;
@@ -517,7 +514,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             }
         }
 
-/*
+
         // PROIETTILI RANA - PROIETTILI NEMICI --------------------------------------------------------------------------------------
 
         // per ogni proiettile dei nemici
@@ -539,7 +536,6 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                 }
             }
         }
-        */
        
 
         // MORTE RANA PER TEMPO --------------------------------------------------------------------------------------
