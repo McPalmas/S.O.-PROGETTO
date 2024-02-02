@@ -147,6 +147,10 @@ extern int start_dens[5];
 #define CROCODILE_IMMERSION_TIME_NORMAL 180
 #define CROCODILE_IMMERSION_TIME_HARD 120
 
+#define PLANT_BULLET_DELAY_EASY 100000
+#define PLANT_BULLET_DELAY_NORMAL 80000
+#define PLANT_BULLET_DELAY_HARD 60000
+
 #define MIN_RIVER_SPEED_EASY 600000
 #define MIN_RIVER_SPEED_NORMAL 300000
 #define MIN_RIVER_SPEED_HARD 400000
@@ -289,9 +293,6 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_
 void plant_bullet_process(int p[2], objectData plant, int p_destroy_plant_bullet[2], int difficulty);
 
 void time_process(int p[2], int difficulty);
-
-
-
 
 void initialize_game(GameData gamedata);    // creazione e comunicazione tra processi
 void initialize_river_flows(RiverFlow river_flows[], GameData gamedata);

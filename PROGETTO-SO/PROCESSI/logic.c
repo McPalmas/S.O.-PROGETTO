@@ -381,7 +381,8 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 	//se la rana oltrepassa il bordo
 	if(frog.x-2 < MINX || frog.x+2 > MAXX-1 || frog.y < SCORE_ZONE_HEIGHT){
 		gamedata.player_score -= DEATH_SCORE;
-	        mancheLost(gamedata, frog);
+	        frog.frog_candie = false;
+            gamedata.game_lost = true;
 	}
 	
 	
@@ -443,32 +444,27 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                                 if(crocodile_immersion_timer<=(CROCODILE_IMMERSION_TIME_HARD/2))crocodile[i].is_crocodile_immersing = true;
                                 break;
                         }
-                        
                         if(crocodile_immersion_timer<=0){
-                            mancheLost(gamedata, frog);
-                        }
-                    }else{
-                        crocodile_immersion_timer=getRandomInt(100, gamedata.difficulty);
-                    }
+                            frog.frog_candie = false;
+                            gamedata.game_lost = true;
+                        };
+                    }else crocodile_immersion_timer=getRandomInt(100, gamedata.difficulty);
                     break;
-                }else{
-                    onCrocodile = false;
-                    }
+                }else onCrocodile = false;
             }
             if(!onCrocodile){
-                //mancheLost(gamedata, frog);
-            }
+                frog.frog_candie = false;
+                gamedata.game_lost = true;
+            };
         }
-        /*
+        
 
         // PROIETTILI PIANTE -> RANA --------------------------------------------------------------------------------------
 
         // per ogni proiettile
         for(i = 0; i < N_PLANT_BULLETS; i++){
-
             // se il proeittile è attivo e la rana può morire
             if(frog.frog_candie && plant_bullet[i].plant_bulletisactive){
-
                 // se un proiettile delle collide con la rana, perdi la manche
                 if(plant_bullet[i].plant_bulletisactive && (plant_bullet[i].y == frog.y || plant_bullet[i].y == frog.y + 1) && (plant_bullet[i].x >= frog.x && plant_bullet[i].x <= frog.x + 4)) {
 
@@ -479,7 +475,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                     write(pipe_destroy_plant_bullet[i][1], &plant_bullet, sizeof(objectData));         
                 }
             }
-        }*/
+        }
 
 
         // PROIETTILI RANA -> PIANTE --------------------------------------------------------------------------------------
@@ -648,12 +644,6 @@ void initialize_river_flows(RiverFlow river_flows[], GameData gamedata) {
         }
     }
 }
-
-void mancheLost(GameData gamedata, objectData frog){
-    frog.frog_candie = false;
-    gamedata.game_lost = true;
-}
-
 
 // Function to generate a random boolean with a given probability 
 bool getRandomBoolean(float probability){  

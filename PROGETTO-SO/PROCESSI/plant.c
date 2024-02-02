@@ -83,10 +83,25 @@ void plant_bullet_process(int p[2], objectData plant, int pipe_destroy_plant_bul
     int plant_bullet_delay;
 
     // Inizializzazione proiettile
-    plant_bullet.id = plant.id + 5;
-    plant_bullet.x = plant.x + 5;
+    plant_bullet.id = plant.id + 3;
+    plant_bullet.x = plant.x + 1;
     plant_bullet.y = plant.y + 1;
     plant_bullet.plant_bulletisactive = true;
+
+    switch (difficulty)
+    {
+    case EASY:
+        plant_bullet_delay = PLANT_BULLET_DELAY_EASY;
+        break;
+    case NORMAL:
+        plant_bullet_delay = PLANT_BULLET_DELAY_NORMAL;
+        break;
+    case HARD:
+        plant_bullet_delay = PLANT_BULLET_DELAY_HARD;
+        break;
+    default:
+        break;
+    }
 
     // comunica con display per la stampa e le collisioni
     write(p[1], &plant_bullet, sizeof(objectData));
@@ -94,10 +109,8 @@ void plant_bullet_process(int p[2], objectData plant, int pipe_destroy_plant_bul
     // Finché il proiettile è attivo e non è uscito dall'area di gioco
     while(plant_bullet.plant_bulletisactive && plant_bullet.y < TOTAL_HEIGHT - 1){
         // Aggiorna lo stato
-        if(read(pipe_destroy_plant_bullet[0], &plant_bullet_data, sizeof(objectData)) != -1){
-            plant_bullet.plant_bulletisactive = false;
-        }
-
+        if(read(pipe_destroy_plant_bullet[0], &plant_bullet_data, sizeof(objectData)) != -1)plant_bullet.plant_bulletisactive = false;
+    
         // Sposta il proiettile
         plant_bullet.y += 1;
         // comunica con display per la stampa e le collisioni
