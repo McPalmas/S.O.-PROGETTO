@@ -432,7 +432,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         }
         // RANA NEL FIUME --------------------------------------------------------------------------------------
 	
-        bool onCrocodile = false;
+        /*bool onCrocodile = false;
         //Se la rana si trova nel fiume
         if(frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT){
             // per ogni coccodrillo
@@ -466,7 +466,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                 frog.frog_candie = false;
                 gamedata.game_lost = true;
             };
-        }
+        }*/
         
 
         // PROIETTILI PIANTE -> RANA --------------------------------------------------------------------------------------

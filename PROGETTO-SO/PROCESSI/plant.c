@@ -20,6 +20,7 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_
     objectData frog_data;
     pid_t plant_bullet;
     int plant_bullet_timer;
+    int plant_respawn_timer;
     int i;
 
 
@@ -29,6 +30,8 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_
     plant.y = SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT;
 
     plant_bullet_timer = getRandomTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
+    plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1);
+
     
     //posizioni iniziali delle piante
     if(plant.id == PLANT_ID_0)
@@ -39,17 +42,16 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_
 		plant.x = PLANT_2_START;
     
     while (1) {
-        if(read(pipe_plant_is_dead[0], &plant_data, sizeof(objectData)) != -1){
+        if(read(pipe_plant_is_dead[0], &plant_data, sizeof(objectData)) != -1){ //nonn so se serve
             plant = plant_data;     
         }
-        if(read(pipe_can_plant_spawn[0], &frog_data, sizeof(objectData)) != -1){        
+        if(read(pipe_can_plant_spawn[0], &frog_data, sizeof(objectData)) != -1){    //nonn so se serve  
             frog = frog_data;
         }
         if(plant.plant_isalive){
             plant_bullet_timer--;
             // Se il timer è scaduto
             if(plant_bullet_timer <= 0){
-                // Se non ci sono proiettili attivi
                 plant_bullet_timer = getRandomTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
                 //if(waitpid(-1, NULL, WNOHANG) != 0){ //wtf is this ?
                     // Crea un nuovo proiettile
@@ -58,7 +60,7 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_
                     if(plant_bullet == 0){
                         // Chiama la funzione per il proiettile
                         plant_bullet_process(pipe, plant, pipe_destroy_plant_bullet, difficulty);
-                        exit(0);
+                        //exit(0);
                     }
                     
                 //}
@@ -70,8 +72,16 @@ void plant_process(int id, int pipe[2], int pipe_frog_on_plant[2], int pipe_can_
         // Comunicazione con frog
         write(pipe_frog_on_plant[1], &plant, sizeof(objectData));// a che serve sta pipe ?? non la usiamo mai, per il contatto tra frog e piante controlliamo semplicemnete le coordinate e funge
 
-        sleep(1); // 1 secondo
+        
+        }else{
+            plant_respawn_timer --;
+            if(plant_respawn_timer <= 0){   // la pianta deve respawnare
+            	plant.plant_isalive = true;
+            	plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1);
+      	    }
         }
+        sleep(1); // 1 secondo
+        
     }
 }
 
