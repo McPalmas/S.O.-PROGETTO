@@ -5,11 +5,12 @@ RiverFlow river_flows[RIVER_LANES_NUMBER];
 /* ----------------------------------------------   
           LOGIC PARTITA E PROCESSI
    ----------------------------------------------*/
+// Funzione per inizializzare la partita
 void initialize_game(GameData gamedata){
+    // Inizializza la struttura di gioco
     gamedata.game_won=false;
     gamedata.game_lost=false;
-	//implementazione della funzione per definire gli oggetti a inizio di ogni manche incompleta e da rivedere
-	
+	// Definizione variabili per i processi
     pid_t frog;
     pid_t frog_bullet;
     pid_t plant[N_PLANTS];
@@ -43,7 +44,7 @@ void initialize_game(GameData gamedata){
     pipe(pipe_frog_on_plant);
     fcntl(pipe_frog_on_plant[0], F_SETFL, fcntl(pipe_frog_on_plant[0], F_GETFL) | O_NONBLOCK);
 
-    // Comunicazione fra frog e bullet (Bullet ha avuto una collisione)
+    // Comunicazione fra oggetti e bullet (Bullet ha avuto una collisione)
     int pipe_destroy_frog_bullet[2];
     pipe(pipe_destroy_frog_bullet);
     fcntl(pipe_destroy_frog_bullet[0], F_SETFL, fcntl(pipe_destroy_frog_bullet[0], F_GETFL) | O_NONBLOCK);
@@ -54,38 +55,38 @@ void initialize_game(GameData gamedata){
     pipe(pipe_can_plant_spawn);
     fcntl(pipe_can_plant_spawn[0], F_SETFL, fcntl(pipe_can_plant_spawn[0], F_GETFL) | O_NONBLOCK);
 
-    // Comunicazione fra plant e plant_bullet (Bullet ha avuto una collisione)
+    // Comunicazione fra oggetti e plant_bullet (Plant Bullet ha avuto una collisione)
     int pipe_destroy_plant_bullet[3][2];
     for(int i = 0; i < 3; i++){
         pipe(pipe_destroy_plant_bullet[i]);
         fcntl(pipe_destroy_plant_bullet[i][0], F_SETFL, fcntl(pipe_destroy_plant_bullet[i][0], F_GETFL) | O_NONBLOCK);
     }
 
-    // display comunica a crocodile la posizione iniziale dei coccodrilli
+    // Comunicazione della posizione dei coccodrilli
     int pipe_crocodile_position[N_CROCODILE][2];
     for(int i = 0; i < N_CROCODILE; i++){
         pipe(pipe_crocodile_position[i]);
     }
 
-    // display comunica alla pianta quando è morta
+    // Comunicazione della morte delle piante
     int pipe_plant_is_dead[N_PLANTS][2];
     for(int i = 0; i < N_PLANTS; i++){
         pipe(pipe_plant_is_dead[i]);
         fcntl(pipe_plant_is_dead[i][0], F_SETFL, fcntl(pipe_plant_is_dead[i][0], F_GETFL) | O_NONBLOCK);
     }
 
-    // coccodrillo - proiettile
+    // Comunicazione della collisione fra Bullet e coccodrilli
     int pipe_crocodile_is_shot[N_CROCODILE][2];
     for(int i = 0; i < N_CROCODILE; i++){
         pipe(pipe_crocodile_is_shot[i]);
         fcntl(pipe_crocodile_is_shot[i][0], F_SETFL, fcntl(pipe_crocodile_is_shot[i][0], F_GETFL) | O_NONBLOCK);
     }
 
+    // Inizializzazione dei flussi del fiume
     initialize_river_flows(river_flows,gamedata);
     
-    //  creazione processi  
+    // Creazione processi  
     frog = fork();
-    
     if (frog == 0){
         frog_process(pip, pipe_shoot, pipe_canshoot, pipe_frog_on_crocodile, pipe_can_plant_spawn, gamedata.difficulty);    
     }
@@ -132,7 +133,6 @@ void initialize_game(GameData gamedata){
                 gamedata.game_won = false;
                 gamedata.game_lost = true;
             }
-            // Qua ci va la parte delle tane
 
             // kill dei processi
             kill(frog, 1);
@@ -270,7 +270,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
     // Plant
     for(i = 0; i < N_PLANTS; i++){
-        plant[i].y = SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT; //Da rivedere dipende da quante piante ho in vita per poi gestire la x e lo spazio tra di loro
+        plant[i].y = SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT;
     }
 
     // Plant bullet
@@ -432,7 +432,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
         }
         // RANA NEL FIUME --------------------------------------------------------------------------------------
 	
-        /*bool onCrocodile = false;
+        bool onCrocodile = false;
         //Se la rana si trova nel fiume
         if(frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT){
             // per ogni coccodrillo
@@ -466,7 +466,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                 frog.frog_candie = false;
                 gamedata.game_lost = true;
             };
-        }*/
+        }
         
 
         // PROIETTILI PIANTE -> RANA --------------------------------------------------------------------------------------
