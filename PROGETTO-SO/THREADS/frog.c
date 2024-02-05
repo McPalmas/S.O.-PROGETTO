@@ -8,7 +8,7 @@
 void* frog_thread(void *a){
 
     // posizione di partenza della rana
-    int frog_start_y = CAVE_HEIGHT + STREET_HEIGHT + RIVER_HEIGHT + (2 * SIDEWALK_HEIGHT) - 2;
+    int frog_start_y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 3;
     int frog_start_x = (MAXX / 2) - 3;
 
     // inizializzazione posizione e possibilità di sparare e morire della rana
@@ -56,7 +56,7 @@ void* frog_thread(void *a){
             case SPACE:
                 if(frog.frog_canshoot){
                     frog.frog_canshoot = false;
-                    frog_bullet.is_active = true;
+                    frog_bullet.bulletisactive = true;
                     system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
                 }
                 break;
@@ -79,7 +79,7 @@ void* frog_bullet_thread(void *a){
 
         // inizialmente il proiettile non è attivo
     pthread_mutex_lock(&mutex);
-        frog_bullet.is_active = false;
+        frog_bullet.bulletisactive = false;
     pthread_mutex_unlock(&mutex);
     
     // Ciclo di esecuzione di Frog Bullet
@@ -108,7 +108,7 @@ void* frog_bullet_thread(void *a){
 
             // quando esce dal while disattiva il proiettile e permette alla rana di sparare 
             pthread_mutex_lock(&mutex);
-                frog_bullet.is_active = false;
+                frog_bullet.bulletisactive = false;
                 frog.canshoot = true;
             pthread_mutex_unlock(&mutex);
         

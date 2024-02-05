@@ -69,6 +69,87 @@
 #define TOTAL_HEIGHT SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT /* altezza totale del campo di gioco */
 
 /*----------------------------------------------------------------------
+   			   COPPIE DI COLORI
+   ----------------------------------------------------------------------*/
+#define WHITE_GREEN 1          
+#define WHITE_RED 2            
+#define BLACK_BLACK 3    	
+#define WHITE_WHITE 4    	
+#define GREEN_GREEN 5    	
+#define CYAN_CYAN 6    	
+#define MAGENTA_MAGENTA 7    	
+#define BLUE_BLUE 8    	
+#define GREEN_BLACK 9     	
+#define GREEN_YELLOW 10            
+#define RED_YELLOW 11 
+#define BLACK_RED 12 	
+#define BLACK_GREEN 13 	
+#define RED_GREEN 14	
+#define YELLOW_GREEN 15	
+#define GREEN_MAGENTA 16
+#define BLACK_WHITE 17
+#define WHITE_BLUE 18
+
+/*----------------------------------------------------------------------
+   			   PARAMETRI DI GIOCO
+   ----------------------------------------------------------------------*/
+// Velocità proiettile rana
+#define FROG_BULLET_DELAY 50000
+
+// Velocità movimento crocodile (inversamente proporzionale)
+#define CROCODILE_DELAY_EASY 80000000
+#define CROCODILE_DELAY_NORMAL 60000000
+#define CROCODILE_DELAY_HARD 40000000
+// Probabilità che un crocodile nasca cattivo
+#define CROCODILE_IS_BAD_PROBABILITY_EASY 0.2
+#define CROCODILE_IS_BAD_PROBABILITY_NORMAL 0.35
+#define CROCODILE_IS_BAD_PROBABILITY_HARD 0.5
+// Tempo di immersione del coccodrillo
+#define CROCODILE_IMMERSION_TIME_EASY 240
+#define CROCODILE_IMMERSION_TIME_NORMAL 180
+#define CROCODILE_IMMERSION_TIME_HARD 120
+// Velocità dei proiettili delle piante
+#define PLANT_BULLET_DELAY_EASY 100000
+#define PLANT_BULLET_DELAY_NORMAL 80000
+#define PLANT_BULLET_DELAY_HARD 60000
+// Tempo di ricarica dei proiettili delle piante
+#define PLANT_BULLET_RELOAD_MIN 5
+#define PLANT_BULLET_RELOAD_EASY 20
+#define PLANT_BULLET_RELOAD_NORMAL 15
+#define PLANT_BULLET_RELOAD_HARD 10
+// Tempo di respawn delle piante
+#define PLANT_RESPAWN_MIN 10
+#define PLANT_RESPAWN_MAX 20
+// Velocità del fiume
+#define MIN_RIVER_SPEED_EASY 600000
+#define MIN_RIVER_SPEED_NORMAL 300000
+#define MIN_RIVER_SPEED_HARD 400000
+#define MAX_RIVER_SPEED_EASY 12500
+#define MAX_RIVER_SPEED_NORMAL 10000
+#define MAX_RIVER_SPEED_HARD 1500
+// Tempo di gioco
+#define TIMELIMIT_EASY 200
+#define TIMELIMIT_NORMAL 150
+#define TIMELIMIT_HARD 100
+// Difficoltà
+#define DIFFICULTIES 3 //possibili difficoltà di gioco
+// Numero di oggetti
+#define N_DENS 5 //numero di tane
+#define N_PLANTS 3 //numero di vite
+#define N_LIVES 3 //numero di vite
+#define N_CROCODILE 24 //numero di coccodrilli 
+#define N_PLANT_BULLETS 3 //numero di proiettili per pianta
+#define N_FROG_BULLETS 3 //numero di proiettili per rana
+#define CROCODILES_PER_RIVER 3
+// Punteggi
+#define DEN_SCORE_EASY 50
+#define DEN_SCORE_NORMAL 100
+#define DEN_SCORE_HARD 150
+#define DEATH_SCORE 50
+#define MAX_BONUS_SCORE 100  //punteggio bonus in base al tempo di completamento da aggiungere al punteggio di base
+ 
+ 
+/*----------------------------------------------------------------------
    			   STRUTTURE
    ----------------------------------------------------------------------*/
 // Struttura dati del gioco
@@ -133,92 +214,8 @@ typedef struct{
    int flow_number;
 } Crocodile;
 
-
 extern int time_left;
 extern int start_dens[5];
-
-
-/*----------------------------------------------------------------------
-   			   PARAMETRI DI GIOCO
-   ----------------------------------------------------------------------*/
-// Velocità proiettile rana
-#define FROG_BULLET_DELAY 50000
-
-// Velocità movimento crocodile (inversamente proporzionale)
-#define CROCODILE_DELAY_EASY 80000000
-#define CROCODILE_DELAY_NORMAL 60000000
-#define CROCODILE_DELAY_HARD 40000000
-// Probabilità che un crocodile nasca cattivo
-#define CROCODILE_IS_BAD_PROBABILITY_EASY 0.2
-#define CROCODILE_IS_BAD_PROBABILITY_NORMAL 0.35
-#define CROCODILE_IS_BAD_PROBABILITY_HARD 0.5
-// Tempo di immersione del coccodrillo
-#define CROCODILE_IMMERSION_TIME_EASY 240
-#define CROCODILE_IMMERSION_TIME_NORMAL 180
-#define CROCODILE_IMMERSION_TIME_HARD 120
-// Velocità dei proiettili delle piante
-#define PLANT_BULLET_DELAY_EASY 100000
-#define PLANT_BULLET_DELAY_NORMAL 80000
-#define PLANT_BULLET_DELAY_HARD 60000
-// Tempo di ricarica dei proiettili delle piante
-#define PLANT_BULLET_RELOAD_MIN 5
-#define PLANT_BULLET_RELOAD_EASY 20
-#define PLANT_BULLET_RELOAD_NORMAL 15
-#define PLANT_BULLET_RELOAD_HARD 10
-// Tempo di respawn delle piante
-#define PLANT_RESPAWN_MIN 10
-#define PLANT_RESPAWN_MAX 20
-// Velocità del fiume
-#define MIN_RIVER_SPEED_EASY 600000
-#define MIN_RIVER_SPEED_NORMAL 300000
-#define MIN_RIVER_SPEED_HARD 400000
-#define MAX_RIVER_SPEED_EASY 12500
-#define MAX_RIVER_SPEED_NORMAL 10000
-#define MAX_RIVER_SPEED_HARD 1500
-// Tempo di gioco
-#define TIMELIMIT_EASY 200
-#define TIMELIMIT_NORMAL 150
-#define TIMELIMIT_HARD 100
-// Difficoltà
-#define DIFFICULTIES 3 //possibili difficoltà di gioco
-// Numero di oggetti
-#define N_DENS 5 //numero di tane
-#define N_PLANTS 3 //numero di vite
-#define N_LIVES 3 //numero di vite
-#define N_CROCODILE 24 //numero di coccodrilli 
-#define N_PLANT_BULLETS 3 //numero di proiettili per pianta
-#define N_FROG_BULLETS 3 //numero di proiettili per rana
-#define CROCODILES_PER_RIVER 3
-// Punteggi
-#define DEN_SCORE_EASY 50
-#define DEN_SCORE_NORMAL 100
-#define DEN_SCORE_HARD 150
-#define DEATH_SCORE 50
-#define MAX_BONUS_SCORE 100  //punteggio bonus in base al tempo di completamento da aggiungere al punteggio di base
- 
- 
-/*----------------------------------------------------------------------
-   			   COPPIE DI COLORI
-   ----------------------------------------------------------------------*/
-#define WHITE_GREEN 1          
-#define WHITE_RED 2            
-#define BLACK_BLACK 3    	
-#define WHITE_WHITE 4    	
-#define GREEN_GREEN 5    	
-#define CYAN_CYAN 6    	
-#define MAGENTA_MAGENTA 7    	
-#define BLUE_BLUE 8    	
-#define GREEN_BLACK 9     	
-#define GREEN_YELLOW 10            
-#define RED_YELLOW 11 
-#define BLACK_RED 12 	
-#define BLACK_GREEN 13 	
-#define RED_GREEN 14	
-#define YELLOW_GREEN 15	
-#define GREEN_MAGENTA 16
-#define BLACK_WHITE 17
-#define WHITE_BLUE 18
-
 
 
 
