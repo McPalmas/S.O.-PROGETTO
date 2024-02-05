@@ -1,6 +1,6 @@
 #include "include.h"
 
-RiverFlow river_flows[RIVER_LANES_NUMBER];
+
 
 /* ----------------------------------------------   
           LOGIC PARTITA E PROCESSI
@@ -10,147 +10,79 @@ void initialize_game(GameData gamedata){
     // Inizializza la struttura di gioco
     gamedata.game_won=false;
     gamedata.game_lost=false;
-	// Definizione variabili per i processi
-    pid_t frog;
-    pid_t frog_bullet;
-    pid_t plant[N_PLANTS];
-    pid_t crocodile[N_CROCODILE];
-    pid_t time;
-
+	
     
-    /***
-     * Gestione pipes
-    */
-    // Comunicazione con il display
-    int pip[2];
-    pipe(pip);
-
-    // Comunicazione fra frog e frog_bullet (sparo)
-    int pipe_shoot[2];
-    pipe(pipe_shoot);
-
-    // Comunicazione fra frog e frog_bullet (può sparare nuovamente)
-    int pipe_canshoot[2];
-    pipe(pipe_canshoot);
-    fcntl(pipe_canshoot[0], F_SETFL, fcntl(pipe_canshoot[0], F_GETFL) | O_NONBLOCK);
-
-    // Comunicazione fra frog e crocodile
-    int pipe_frog_on_crocodile[2];
-    pipe(pipe_frog_on_crocodile);
-    fcntl(pipe_frog_on_crocodile[0], F_SETFL, fcntl(pipe_frog_on_crocodile[0], F_GETFL) | O_NONBLOCK);
-
-    // Comunicazione fra oggetti e bullet (Bullet ha avuto una collisione)
-    int pipe_destroy_frog_bullet[2];
-    pipe(pipe_destroy_frog_bullet);
-    fcntl(pipe_destroy_frog_bullet[0], F_SETFL, fcntl(pipe_destroy_frog_bullet[0], F_GETFL) | O_NONBLOCK);
-
-
-    // Comunicazione fra frog e plant (Plant può spawnare)
-    int pipe_can_plant_spawn[2];
-    pipe(pipe_can_plant_spawn);
-    fcntl(pipe_can_plant_spawn[0], F_SETFL, fcntl(pipe_can_plant_spawn[0], F_GETFL) | O_NONBLOCK);
-
-    // Comunicazione fra oggetti e plant_bullet (Plant Bullet ha avuto una collisione)
-    int pipe_destroy_plant_bullet[3][2];
-    for(int i = 0; i < 3; i++){
-        pipe(pipe_destroy_plant_bullet[i]);
-        fcntl(pipe_destroy_plant_bullet[i][0], F_SETFL, fcntl(pipe_destroy_plant_bullet[i][0], F_GETFL) | O_NONBLOCK);
-    }
-
-    // Comunicazione della posizione dei coccodrilli
-    int pipe_crocodile_position[N_CROCODILE][2];
-    for(int i = 0; i < N_CROCODILE; i++){
-        pipe(pipe_crocodile_position[i]);
-    }
-
-    // Comunicazione della morte delle piante
-    int pipe_plant_is_dead[N_PLANTS][2];
-    for(int i = 0; i < N_PLANTS; i++){
-        pipe(pipe_plant_is_dead[i]);
-        fcntl(pipe_plant_is_dead[i][0], F_SETFL, fcntl(pipe_plant_is_dead[i][0], F_GETFL) | O_NONBLOCK);
-    }
-
-    // Comunicazione della collisione fra Bullet e coccodrilli
-    int pipe_crocodile_is_shot[N_CROCODILE][2];
-    for(int i = 0; i < N_CROCODILE; i++){
-        pipe(pipe_crocodile_is_shot[i]);
-        fcntl(pipe_crocodile_is_shot[i][0], F_SETFL, fcntl(pipe_crocodile_is_shot[i][0], F_GETFL) | O_NONBLOCK);
+    // dichiarazione threads
+    pthread_t frog_t;
+    pthread_t frog_bullet_t;
+    pthread_t time_t;
+    pthread_t plant_t[N_PLANTS];
+    pthread_t plantBullet_t[N_PLANT_BULLETS];
+    pthread_t crocodile_t[N_CROCODILE];
+    pthread_t gameManche_t;
+    
+    // definizione degli id dei coccodrilli
+    for (i = 0; i < N_PLANTS; i++)
+    {
+        pthread_mutex_lock(&mutex);
+            plants[i].id = i;
+            plant_bullets[i].id = i;
+        pthread_mutex_unlock(&mutex);    
     }
 
     // Inizializzazione dei flussi del fiume
-    initialize_river_flows(river_flows,gamedata);
+    initialize_river_flows();
     
-    // Creazione processi  
-    frog = fork();
-    if (frog == 0){
-        frog_process(pip, pipe_shoot, pipe_canshoot, pipe_frog_on_crocodile, pipe_can_plant_spawn, gamedata.difficulty);    
+     // i threads, quando verranno creati, potranno avviare il loro ciclo, che terminerà quando verrà modificato il valore di questa variabile
+    should_not_exit = true;
+    
+
+    //* CREAZIONE THREADS -------------------
+
+    pthread_create(&frog_t, NULL, &frog_thread, NULL);
+    pthread_create(&frog_bullet_t, NULL, &frog_bullet_thread, NULL);
+    pthread_create(&time_t, NULL, &time_thread, NULL);
+
+    for (i = 0; i < N_PLANTS; i++)
+    {
+        pthread_create(&plan_t[i], NULL, &plant_thread, (void*)&plants[i].id);
+        pthread_create(&plantBullet_t[i], NULL, &plant_bullet_thread, (void*)&plant_bullets[i].id);
     }
-    else{
-        frog_bullet = fork();
 
-        if(frog_bullet == 0){
-            frog_bullet_process(pip, pipe_shoot, pipe_canshoot, pipe_destroy_frog_bullet);
-        }
-        else{
-            time = fork();
-
-            if(time == 0){
-                time_process(pip, gamedata.difficulty);
-            }
-            else{
-            	// Creazione processi crocodile con un ciclo for
-		    for (int i = 0; i < N_CROCODILE; i++) {
-		        crocodile[i] = fork();
-		        if (crocodile[i] == 0) {
-		            crocodile_process(CROCODILE_ID_0+i, pip, pipe_crocodile_position[i], pipe_frog_on_crocodile, pipe_crocodile_is_shot[i], gamedata.difficulty,river_flows);
-		            exit(0);  // Importante per evitare che il processo figlio entri nel ciclo for successivo
-		        }
-		    }
-
-		    // Creazione processi plant con un ciclo for
-		    for (int i = 0; i < N_PLANTS; i++) {
-		        plant[i] = fork();
-		        if (plant[i] == 0) {
-		            plant_process(PLANT_ID_0+i, pip, pipe_can_plant_spawn, pipe_plant_is_dead[i], pipe_destroy_plant_bullet[i], gamedata.difficulty);
-		            exit(0);  // Importante per evitare che il processo figlio entri nel ciclo for successivo
-		        }
-		    }
-
-            // stampa e collisioni
-            // la funzione restituisce il riepilogo della partita
-            gamedata = gameManche(pip, pipe_plant_is_dead, pipe_destroy_frog_bullet,pipe_destroy_plant_bullet, pipe_crocodile_position, pipe_crocodile_is_shot, gamedata);
-            // se la manche è stata vinta
-            if(gamedata.game_won){
-                gamedata.game_lost = false;
-            }   
-            // se la manche è stata persa
-            else{
-                gamedata.game_won = false;
-                gamedata.game_lost = true;
-            }
-
-            // kill dei processi
-            kill(frog, 1);
-            kill(frog_bullet, 1);
-            kill(time, 1);
-            for(int i = 0; i < N_CROCODILE; i++){
-                kill(crocodile[i], 1);
-            }
-            for(int i = 0; i < N_PLANTS; i++){
-                kill(plant[i], 1);
-            }
-                                                
-            // se il player vince oppure perde la partita oppure continua alla manche successiva
-            analyze_data(gamedata);
-            }
-        }
+    for (i = 0; i < N_CROCODILE; i++)
+    {
+        pthread_create(&crocodile_t[i], NULL, &crocodile_thread, (void*)&crocodiles[i].id);
     }
+    
+    pthread_create(&gameManhce_t, NULL, &gameManhce_thread, NULL);
+    
+    //* TERMINAZIONE THREADS -------------------
+
+    pthread_join(frog_t, NULL);
+    pthread_join(frog_bullet_t, NULL);
+    pthread_join(time_t, NULL);
+
+    for (i = 0; i < N_PLANTS; i++)
+    {
+        pthread_join(plan_t[i], NULL);
+        pthread_join(plantBullet_t[i], NULL);
+    }
+
+    for (i = 0; i < N_CROCODILE; i++)
+    {
+        pthread_join(crocodile_t[i], NULL);
+    }
+       
+    pthread_join(gameManhce_t, NULL);
+    
+    analyze_data();
+      
 }
 
 /* ----------------------------------------------   
           CONTINUA O TERMINA LA PARTITA 
    ----------------------------------------------*/
-void analyze_data(GameData gamedata){
+void analyze_data(){ // da modificare
 
 	int taken_dens = 0;
 	
@@ -213,7 +145,7 @@ void analyze_data(GameData gamedata){
 /* ----------------------------------------------   
          GESTIONE MANCHE, STAMPE E COLLISIONI
    ----------------------------------------------*/
-GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[N_CROCODILE][2], int pipe_crocodile_is_shot[N_CROCODILE][2], GameData gamedata){
+void* gameManche_thread(void *id){
 
     int i, j;
 

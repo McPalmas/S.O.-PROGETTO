@@ -214,9 +214,26 @@ typedef struct{
    int flow_number;
 } Crocodile;
 
+
 extern int time_left;
+
 extern int start_dens[5];
 
+// rana
+extern Frog frog;
+// proiettile della rana
+extern FrogBullet frog_bullet;
+// tronchi
+extern Plant plants[N_PLANTS];
+// proiettili dei tronchi
+extern PlantBullet plant_bullets[N_PLANT_BULLETS];
+// macchine
+extern Crocodile crocodiles[N_CROCODILE];
+
+extern RiverFlow river_flows[RIVER_LANES_NUMBER];
+
+// semaforo
+extern pthread_mutex_t mutex;
 
 
 /*----------------------------------------------------------------------
@@ -240,7 +257,7 @@ void plantBullett(int y, int x);	//stampa il proiettile della pianta
 
 
 //time.c
-void time_thread(int difficulty);
+void* time_thread(void *a,int difficulty);
 
 
 
