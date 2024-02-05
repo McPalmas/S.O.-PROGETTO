@@ -91,7 +91,7 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
         }
         
         // Aggiorna la posizione di Frog in funzione dell'input
-        if(!areFrogsEqual(frog, frog_temp)){
+        if(!areFrogsEqual(frog, frog_temp)){ // è necessario sto controllo ???
             // Comunica il nuovo stato della rana
             write(pipe[1],&frog, sizeof(objectData));
         }
