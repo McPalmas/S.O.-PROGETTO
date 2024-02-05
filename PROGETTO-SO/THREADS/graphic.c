@@ -220,7 +220,7 @@ void plantBullett(int y, int x){
 /*----------------------------------------------------------------------
    	    PROCEDURA CHE STAMPA LO SPRITE DEL COCCODRILLO 
    ----------------------------------------------------------------------*/
-void crocodileBody(objectData c){
+void crocodileBody(Crocodile c){
     /* se il coccodrillo è buono è verde senno è rosso*/
     if(c.crocodile_is_good)attron(COLOR_PAIR(BLACK_GREEN));
     else attron(COLOR_PAIR(BLACK_RED));
@@ -253,7 +253,7 @@ void crocodileBody(objectData c){
 /*----------------------------------------------------------------------
    	    PROCEDURA CHE STAMPA LO SPRITE DELLA PIANTA
    ----------------------------------------------------------------------*/
-void plantBody(objectData p){
+void plantBody(Plant p){
 	attron(COLOR_PAIR(GREEN_YELLOW));
         mvprintw(p.y, p.x+1, "0 ");
 	attroff(COLOR_PAIR(YELLOW_GREEN));
