@@ -1,15 +1,12 @@
 #include "include.h"
 
 
-
 /* ----------------------------------------------   
           LOGIC PARTITA E PROCESSI
    ----------------------------------------------*/
 // Funzione per inizializzare la partita
-void initialize_game(GameData gamedata){
-    // Inizializza la struttura di gioco
-    gamedata.game_won=false;
-    gamedata.game_lost=false;
+void initialize_game(){
+
 	
     
     // dichiarazione threads
@@ -21,8 +18,8 @@ void initialize_game(GameData gamedata){
     pthread_t crocodile_t[N_CROCODILE];
     pthread_t gameManche_t;
     
-    // definizione degli id dei coccodrilli
-    for (i = 0; i < N_PLANTS; i++)
+    // definizione degli id delle piante
+    for (int i = 0; i < N_PLANTS; i++)
     {
         pthread_mutex_lock(&mutex);
             plants[i].id = i;
@@ -30,8 +27,16 @@ void initialize_game(GameData gamedata){
         pthread_mutex_unlock(&mutex);    
     }
 
+    // definizione degli id dei coccodrilli
+    for (int i = 0; i < N_CROCODILE; i++)
+    {
+        pthread_mutex_lock(&mutex);
+            crocodiles[i].id = i;
+        pthread_mutex_unlock(&mutex);    
+    }
+
     // Inizializzazione dei flussi del fiume
-    initialize_river_flows();
+    //initialize_river_flows();
     
      // i threads, quando verranno creati, potranno avviare il loro ciclo, che terminerà quando verrà modificato il valore di questa variabile
     should_not_exit = true;
@@ -39,22 +44,18 @@ void initialize_game(GameData gamedata){
 
     //* CREAZIONE THREADS -------------------
 
-    pthread_create(&frog_t, NULL, &frog_thread, NULL);
-    pthread_create(&frog_bullet_t, NULL, &frog_bullet_thread, NULL);
-    pthread_create(&time_t, NULL, &time_thread, NULL);
-
-    for (i = 0; i < N_PLANTS; i++)
+    for (int i = 0; i < N_PLANTS; i++)
     {
-        pthread_create(&plan_t[i], NULL, &plant_thread, (void*)&plants[i].id);
+        pthread_create(&plant_t[i], NULL, &plant_thread, (void*)&plants[i].id);
         pthread_create(&plantBullet_t[i], NULL, &plant_bullet_thread, (void*)&plant_bullets[i].id);
     }
 
-    for (i = 0; i < N_CROCODILE; i++)
+    for (int i = 0; i < N_CROCODILE; i++)
     {
         pthread_create(&crocodile_t[i], NULL, &crocodile_thread, (void*)&crocodiles[i].id);
     }
     
-    pthread_create(&gameManhce_t, NULL, &gameManhce_thread, NULL);
+    pthread_create(&gameManche_t, NULL, &gameManche_thread, NULL);
     
     //* TERMINAZIONE THREADS -------------------
 
@@ -62,18 +63,18 @@ void initialize_game(GameData gamedata){
     pthread_join(frog_bullet_t, NULL);
     pthread_join(time_t, NULL);
 
-    for (i = 0; i < N_PLANTS; i++)
+    for (int i = 0; i < N_PLANTS; i++)
     {
-        pthread_join(plan_t[i], NULL);
+        pthread_join(plant_t[i], NULL);
         pthread_join(plantBullet_t[i], NULL);
     }
 
-    for (i = 0; i < N_CROCODILE; i++)
+    for (int i = 0; i < N_CROCODILE; i++)
     {
         pthread_join(crocodile_t[i], NULL);
     }
        
-    pthread_join(gameManhce_t, NULL);
+    pthread_join(gameManche_t, NULL);
     
     analyze_data();
       

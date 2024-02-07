@@ -152,15 +152,17 @@
 /*----------------------------------------------------------------------
    			   STRUTTURE
    ----------------------------------------------------------------------*/
-// Struttura dati del gioco
-typedef struct{
-    _Bool game_lost;
-    _Bool game_won;
-    _Bool dens[5];
-    int player_score;
-    int player_lives;
-    int difficulty;
-} GameData;
+
+// Struttura dati del gioco 
+typedef struct{ 
+    _Bool game_lost; 
+    _Bool game_won; 
+    _Bool dens[5]; 
+    int player_score; 
+    int player_lives; 
+    int difficulty; 
+} GameData; 
+
 
 // enumerazione dati della direzione
 enum Direction {
@@ -200,6 +202,7 @@ typedef struct{
 
 // Struttura dati pianta
 typedef struct{
+   int id;
    int x;
    int y;
    bool plant_isalive;
@@ -208,6 +211,7 @@ typedef struct{
  }Plant;
 
 typedef struct{
+   int id;
    int x;
    int y;
    bool bulletisactive;
@@ -215,6 +219,7 @@ typedef struct{
 
 // Struttura dati coccodrillo
 typedef struct{
+   int id;
    int x;
    int y;
    enum Direction direction;
@@ -268,9 +273,22 @@ void crocodileBody(Crocodile c);	//disegna lo sprite del coccodrillo
 void plantBody(Plant p);		//stampa della pianta
 void plantBullett(int y, int x);	//stampa il proiettile della pianta
 
+//frog.c
+void* frog_thread(void *a);	//thread per la gestione della rana
+void* frog_bullet_thread(void *a);	//thread per la gestione del proiettile della rana
+
+//crocodile.c
+void* crocodile_thread(void *a);	//thread per la gestione del coccodrillo
+
+//plant.c
+void* plant_thread(void *a);	//thread per la gestione della pianta
+void* plant_bullet_thread(void *a);	//thread per la gestione del proiettile della pianta
+
+
 
 //time.c
 void* time_thread(void *a,int difficulty);
+
 
 
 
