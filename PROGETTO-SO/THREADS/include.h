@@ -161,6 +161,7 @@ typedef struct{
     int player_score; 
     int player_lives; 
     int difficulty; 
+    int score;
 } GameData; 
 
 
@@ -235,6 +236,9 @@ extern int time_left;
 
 extern int start_dens[5];
 
+//variabili di gioco
+extern GameData gamedata;
+
 // rana
 extern Frog frog;
 // proiettile della rana
@@ -273,6 +277,10 @@ void crocodileBody(Crocodile c);	//disegna lo sprite del coccodrillo
 void plantBody(Plant p);		//stampa della pianta
 void plantBullett(int y, int x);	//stampa il proiettile della pianta
 
+
+void initialize_game();
+void analyze_data();
+
 //frog.c
 void* frog_thread(void *a);	//thread per la gestione della rana
 void* frog_bullet_thread(void *a);	//thread per la gestione del proiettile della rana
@@ -284,11 +292,16 @@ void* crocodile_thread(void *a);	//thread per la gestione del coccodrillo
 void* plant_thread(void *a);	//thread per la gestione della pianta
 void* plant_bullet_thread(void *a);	//thread per la gestione del proiettile della pianta
 
-
-
 //time.c
-void* time_thread(void *a,int difficulty);
+void* time_thread(void *a);
+
+void* gameManche_thread(void *id);
 
 
 
+void crocodiles_inizializer();
+void initialize_river_flows(); 
+int getRandomInt(int min);
+bool getRandomBoolean(float probability);
+int getRandomTimer(int min);
 

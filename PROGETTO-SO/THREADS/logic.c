@@ -112,7 +112,7 @@ void analyze_data(){ // da modificare
 		    // tempo di attesa prima del caricamento della schermata successiva
 		    sleep(2);
 		    
-		    initialize_game(gamedata);
+		    initialize_game();
 		} 
 
 	       
@@ -132,7 +132,7 @@ void analyze_data(){ // da modificare
 		    	// tempo di attesa prima del caricamento della schermata successiva
 		    	sleep(2);
 		
-		    	initialize_game(gamedata);
+		    	initialize_game();
         	}
         }
 	
@@ -147,31 +147,12 @@ void analyze_data(){ // da modificare
          GESTIONE MANCHE, STAMPE E COLLISIONI
    ----------------------------------------------*/
 void* gameManche_thread(void *id){
-
-    int i, j;
+/*
 
     _Bool should_not_exit = true;
 
-    // Gestione pipe
-    close(pip[1]);
-    close(pipe_destroy_frog_bullet[0]);
-    for (i = 0; i < N_PLANTS; i++) {
-        close(pipe_plant_is_dead[i][0]);
-    }
-    for(i = 0; i < N_CROCODILE; i++){
-        close(pipe_crocodile_position[i][0]);
-    }
-
-    srand(getpid());
 
 
-    objectData receivedPacket; // dove ricevo i dati letti
-    objectData frog;
-    objectData frog_bullet;
-    objectData plant[N_PLANTS];
-    objectData plant_bullet[N_PLANT_BULLETS];
-    objectData crocodile[N_CROCODILE];
-    objectData time;
 
     int crocodile_immersion_timer=getRandomInt(100, gamedata.difficulty); // = getRandomTimer (tempo minimo, difficoltà)
 
@@ -206,15 +187,9 @@ void* gameManche_thread(void *id){
         plant_bullet[i].plant_bulletisactive = false;
     }
 
-    // time
-    time.time_left = TIMELIMIT_EASY;
 
 
     crocodiles_inizializer(gamedata, crocodile);
-    // l'inizializzazione dei coccodrilli viene comunicata a displlay
-    for(i = 0; i < N_CROCODILE; i++){
-        write(pipe_crocodile_position[i][1], &crocodile[i], sizeof(objectData));
-    }
 
     
     while (should_not_exit) {
@@ -226,40 +201,6 @@ void* gameManche_thread(void *id){
         gameField();
         // stampa tane
         printDens(gamedata.dens);
-
-        //* LETTURA E ASSEGNAMENTO DATI ----------------------------------------
-        
-        // lettura dei dati di tutti gli oggetti di gioco
-        read(pip[0], &receivedPacket, sizeof(objectData));
-
-        // assegnamento del dato al rispettivo elemento    
-		if(receivedPacket.id == FROG_ID){
-		    frog = receivedPacket;    
-		}
-		else if(receivedPacket.id == FROG_BULLET_ID){
-		    frog_bullet = receivedPacket;
-		}else if(receivedPacket.id == TIME_ID){
-		    time = receivedPacket;
-		}else if(receivedPacket.id >= PLANT_BULLET_ID_0 && receivedPacket.id <= PLANT_BULLET_ID_2){
-		    for(i = 0; i < N_PLANT_BULLETS; i++){
-		        if(receivedPacket.id == i + PLANT_BULLET_ID_0){
-		            plant_bullet[i] = receivedPacket;
-		        }
-		    }
-		}else if (receivedPacket.id >= PLANT_ID_0 && receivedPacket.id <= PLANT_ID_2){
-		    for(i = 0; i < N_PLANTS; i++){
-		        if(receivedPacket.id == i + PLANT_ID_0){
-		            plant[i] = receivedPacket;
-		       	}
-		    }
-		}else if (receivedPacket.id >= CROCODILE_ID_0 && receivedPacket.id <= CROCODILE_ID_23){
-			for(i = 0; i < N_CROCODILE; i++){
-		        	if(receivedPacket.id == i + CROCODILE_ID_0){
-		            	    crocodile[i] = receivedPacket;
-                            	}
-		       	}
-		 }
-
 
         // STAMPA ELEMENTI ----------------------------------------
 
@@ -519,16 +460,14 @@ void* gameManche_thread(void *id){
     if(gamedata.player_score <= 0){
         gamedata.player_score = 0;
     }
-
-    // restituisce la condizione alla fine della manche
-    return gamedata;
+*/
 }
     
 
 /* ----------------------------------------------   
          INIZIALIZZAZIONE COCCODRILLI
    ----------------------------------------------*/
-void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]){ 
+void crocodiles_inizializer(){ 
     int crocodileIndex = 0;
     // Itera su ciascun fiume
 
@@ -581,7 +520,7 @@ void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]){
 /* ----------------------------------------------   
          INIZIALIZZAZIONE FIUMI
    ----------------------------------------------*/
-void initialize_river_flows(RiverFlow river_flows[], GameData gamedata) {
+void initialize_river_flows() {
     // Inizializza i flussi del fiume con direzioni e velocità casuali
     for (int i = 0; i < RIVER_LANES_NUMBER; ++i) {
         river_flows[i].direction = rand() % 2;
@@ -609,10 +548,10 @@ bool getRandomBoolean(float probability){
     return rand() >  probability * ((float)RAND_MAX + 1.0); 
 } 
 
-int getRandomInt(int min, int difficulty){
+int getRandomInt(int min){
     int randomTimer;
 
-    switch (difficulty)
+    switch (gamedata.difficulty)
     {
     case (EASY):
         randomTimer = rand() % (CROCODILE_IMMERSION_TIME_EASY + 1) + min;

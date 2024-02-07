@@ -31,6 +31,21 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
           INIZIALIZZAZIONE VARIABILI
  ----------------------------------------------*/
 
+int time_left = 0;
+
+RiverFlow river_flows[RIVER_LANES_NUMBER];
+
 bool should_not_exit = true;
 
- // Da creare
+GameData gamedata = {
+    .game_lost = 0,
+    .game_won = 0,
+    .dens = {0, 0, 0, 0, 0},
+    .player_score = 0,
+    .player_lives = 3,
+    .difficulty = 0,
+    .score = 0
+};
+
+// è necessario sto file non si possono inizializzare a inizio game ??
+

@@ -22,9 +22,9 @@ void* frog_thread(void *a){
     // Ciclo di esecuzione di Frog
     while(should_not_exit){
         // stampa di tutto lo schermo di gioco    
-        pthread_mutex_lock(&mutex);
+        /*pthread_mutex_lock(&mutex);
             display_all_screen();        
-        pthread_mutex_unlock(&mutex);
+        pthread_mutex_unlock(&mutex);*/
 
         // Attende l'input, altrimenti continua senza bloccare il gioco
         timeout(1);

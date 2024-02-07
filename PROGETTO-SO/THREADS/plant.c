@@ -22,7 +22,7 @@ void* plant_thread(void *id){
     plants[plantIndex].plant_canshoot = true;
     plants[plantIndex].plant_isalive = true;
     plants[plantIndex].y = SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT;
-    plant_bullet_timer = getRandomTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
+    plant_bullet_timer = getRandomTimer(PLANT_BULLET_RELOAD_MIN);
     plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1);
     //posizioni iniziali delle piante
     pthread_mutex_unlock(&mutex);
@@ -36,7 +36,7 @@ void* plant_thread(void *id){
             pthread_mutex_lock(&mutex);
             if(plant_bullet_timer <= 0){
                 plant_bullets[plantIndex].bulletisactive = true;
-                plant_bullet_timer = getRandomTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
+                plant_bullet_timer = getRandomTimer(PLANT_BULLET_RELOAD_MIN);
             }
             pthread_mutex_unlock(&mutex);
         }else{ // se la rana è morta 
@@ -68,7 +68,7 @@ void* plant_bullet_thread(void *id){
     plant_bullets[plantBulletIndex].y = plants[plantBulletIndex].y + 1;
     plant_bullets[plantBulletIndex].bulletisactive = true;
 
-    switch (difficulty)
+    switch (gamedata.difficulty)
     {
     case EASY:
         plant_bullet_delay = PLANT_BULLET_DELAY_EASY;
@@ -102,7 +102,7 @@ void* plant_bullet_thread(void *id){
                 plant_bullets[plantBulletIndex].y += 1;
             pthread_mutex_unlock(&mutex);
 
-            delay(plant_bullet_delay);
+            usleep(plant_bullet_delay);
         }
 
         pthread_mutex_lock(&mutex);
@@ -112,10 +112,10 @@ void* plant_bullet_thread(void *id){
     
 }
 
-int getRandomTimer(int min, int difficulty){
+int getRandomTimer(int min){
     int randomTimer;
 
-    switch (difficulty)
+    switch (gamedata.difficulty)
     {
     case (EASY):
         randomTimer = rand() % (PLANT_BULLET_RELOAD_EASY + 1) + min;

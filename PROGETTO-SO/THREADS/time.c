@@ -4,18 +4,18 @@
 /* ----------------------------------------------   
 		  TIMER PARTITA 
    ----------------------------------------------*/ 
-void* time_thread(void *a, int difficulty){
+void* time_thread(void *a){
 
     // Tempo massimo in base alla difficoltà
     pthread_mutex_lock(&mutex);
-    if (difficulty == EASY) {
-        time_limit = TIMELIMIT_EASY;
+    if (gamedata.difficulty == EASY) {
+        time_left = TIMELIMIT_EASY;
     }
-    else if (difficulty == NORMAL){
-        time_limit = TIMELIMIT_NORMAL;
+    else if (gamedata.difficulty == NORMAL){
+        time_left = TIMELIMIT_NORMAL;
     }
     else{
-        time_limit = TIMELIMIT_HARD;     
+        time_left = TIMELIMIT_HARD;     
     }
     pthread_mutex_unlock(&mutex);
 
@@ -23,7 +23,7 @@ void* time_thread(void *a, int difficulty){
     while(1){
         // Aggiorna lo stato
         pthread_mutex_lock(&mutex);
-        time_limit--;
+        time_left--;
         pthread_mutex_unlock(&mutex);
         
         sleep(1);
