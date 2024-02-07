@@ -4,70 +4,71 @@
 /* ----------------------------------------------   
 		  CROCODILE
    ----------------------------------------------*/ 
-void+ crocodile_thread(void* id){
+void* crocodile_thread(void* id){
     
     // estrazione dell'id passato alla funzione
-    int index = *((int *) id);
+    int crocodileIndex = *((int *) id);
 
+    // srand sulla base del thread
+    unsigned int thread_id = (unsigned int)(size_t)pthread_self();
+    srand(thread_id);
 
-    // Inizializzazione oggetto crocodile
-    crocodile.id = id;
-    crocodile.is_crocodile_immersing = false;
-    crocodile.is_crocodile_alive = true;
+    pthread_mutex_lock(&mutex);
+        // Inizializzazione oggetto crocodile (Da completare)
+        crocodiles[crocodileIndex].is_crocodile_immersing = false;
+        crocodiles[crocodileIndex].is_crocodile_alive = true;
+    pthread_mutex_unlock(&mutex);
 
-
-    // Comunica stato di crocodile dopo l'inizializzazione
-    write(pipe[1], &crocodile, sizeof(objectData));
-    
     // Ciclo di esecuzione di crocodile
-    while(1){
-        
+    while(should_not_exit){
+
         // Se crocodile supera i margini dello schermo, muore
-        if(crocodile.x <= 1 || crocodile.x+CROCODILE_W >= MAXX +CROCODILE_W){
-            crocodile.is_crocodile_alive = false;
+        if(crocodiles[crocodileIndex].x <= 1 || crocodiles[crocodileIndex].x+CROCODILE_W >= MAXX +CROCODILE_W){
+            crocodiles[crocodileIndex].is_crocodile_alive = false;
         }
 
         // Se crocodile è vivo
-	    if(crocodile.is_crocodile_alive){
-            // Se crocodile è stato colpito, diventa buono
-            if(read(pipe_crocodile_is_shot[0], &crocodile, sizeof(objectData)) != -1)crocodile.crocodile_is_good = true;
+	    if(crocodiles[crocodileIndex].is_crocodile_alive){
+            // Se crocodile è stato colpito, diventa buono -> prima era gestito da pipe.
+            pthread_mutex_lock(&mutex);
+		        // Aggiornamento posizione di crocodile
+		        if (crocodiles[crocodileIndex].direction == RIGHT) crocodiles[crocodileIndex].x += 1;
+		        else crocodiles[crocodileIndex].x -= 1;
+            pthread_mutex_unlock(&mutex);
+        }
+        else{
+            pthread_mutex_lock(&mutex);
+                // Aggiornamento posizione di crocodile
+                if (crocodiles[crocodileIndex].direction == RIGHT) crocodiles[crocodileIndex].x += 1;
+                else crocodiles[crocodileIndex].x -= 1;
+            pthread_mutex_unlock(&mutex);
 
-		    // Aggiornamento posizione di crocodile
-		    if (crocodile.direction == RIGHT)
-		        crocodile.x += 1;
-		    else
-		        crocodile.x -= 1;
-            }else{
+            pthread_mutex_lock(&mutex);
                 // Se crocodile è morto, viene inizializzato a una nuova corsia
-                if(crocodile.flow_number == 0 || crocodile.flow_number % 2 == 0){
-            	    crocodile.y += 2;
-            	    crocodile.flow_number ++;
-                }else if(crocodile.flow_number % 2 == 1){
-            	    crocodile.y -= 2;
-            	    crocodile.flow_number --;
+                if(crocodiles[crocodileIndex].flow_number == 0 || crocodiles[crocodileIndex].flow_number % 2 == 0){
+                    crocodiles[crocodileIndex].y += 2;
+                    crocodiles[crocodileIndex].flow_number ++;
+                }else if(crocodiles[crocodileIndex].flow_number % 2 == 1){
+                    crocodiles[crocodileIndex].y -= 2;
+                    crocodiles[crocodileIndex].flow_number --;
                 }
-            // Inizializzazione delle nuove variabili di crocodile
-            crocodile.crocodile_speed = river_flows[crocodile.flow_number].speed;
-            crocodile.direction = river_flows[crocodile.flow_number].direction;
-            crocodile.crocodile_is_good = rand()%2;
-            crocodile.is_crocodile_alive=true;
-            crocodile.is_crocodile_immersing = false;
-            if(crocodile.direction == LEFT){
-                crocodile.x=MAXX-2;
-            }else{
-                crocodile.x=2;
-            }
+            pthread_mutex_unlock(&mutex);
+
+            pthread_mutex_lock(&mutex);
+                // Inizializzazione delle nuove variabili di crocodile
+                crocodiles[crocodileIndex].crocodile_speed = river_flows[crocodiles[crocodileIndex].flow_number].speed;
+                crocodiles[crocodileIndex].direction = river_flows[crocodiles[crocodileIndex].flow_number].direction;
+                crocodiles[crocodileIndex].crocodile_is_good = rand()%2;
+                crocodiles[crocodileIndex].is_crocodile_alive=true;
+                crocodiles[crocodileIndex].is_crocodile_immersing = false;
+                if(crocodiles[crocodileIndex].direction == LEFT)crocodiles[crocodileIndex].x=MAXX-2;
+                else crocodiles[crocodileIndex].x=2;
+            pthread_mutex_unlock(&mutex);
         }
         
-        // Comunica stato di crocodile dopo l'esecuzione del ciclo
-        write(pipe[1], &crocodile, sizeof(objectData));
-        write(pipe_frog_on_crocodile[1], &crocodile, sizeof(objectData));
-        usleep(crocodile.crocodile_speed);
-       
+        usleep(crocodiles[crocodileIndex].crocodile_speed);       
     }
 }
-
-
 
 
 

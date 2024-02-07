@@ -7,9 +7,9 @@
 void* plant_thread(void *id){
 
     srand(getpid());
-    // estrazione dell'id passato alla funzione
-    int index = *((int *) id);
 
+    // estrazione dell'id passato alla funzione
+    int plantIndex = *((int *) id);
     // srand sulla base del thread
     unsigned int thread_id = (unsigned int)(size_t)pthread_self();
     srand(thread_id);

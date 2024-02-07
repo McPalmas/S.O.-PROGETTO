@@ -6,7 +6,7 @@
    ----------------------------------------------*/ 
 // Funzione per la gestione del processo frog
 void* frog_thread(void *a){
-
+    
     // posizione di partenza della rana
     int frog_start_y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 3;
     int frog_start_x = (MAXX / 2) - 3;
@@ -15,8 +15,8 @@ void* frog_thread(void *a){
     pthread_mutex_lock(&mutex);
         frog.y = frog_start_y;
         frog.x = frog_start_x;
-        frog.can_shot = true;
-        frog.can_die = true;
+        frog.frog_canshoot = true;
+        frog.frog_candie = true;
     pthread_mutex_unlock(&mutex);
 
     // Ciclo di esecuzione di Frog
@@ -86,7 +86,7 @@ void* frog_bullet_thread(void *a){
     while(should_not_exit){ 
 
         // se il proiettile è attivo
-        if(frog_bullet.is_active == true){
+        if(frog_bullet.bulletisactive == true){
 
             // posizione di partenza del proiettile
             pthread_mutex_lock(&mutex);
@@ -95,7 +95,7 @@ void* frog_bullet_thread(void *a){
             pthread_mutex_unlock(&mutex);
         
             // fino a che il proiettile non supera il limite dell'area di gioco o fino a che non viene disattivato
-            while(frog_bullet.is_active == true && frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT){
+            while(frog_bullet.bulletisactive == true && frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT){
 
                 // sposta il proiettile verso l'alto
                 pthread_mutex_lock(&mutex);
@@ -109,7 +109,7 @@ void* frog_bullet_thread(void *a){
             // quando esce dal while disattiva il proiettile e permette alla rana di sparare 
             pthread_mutex_lock(&mutex);
                 frog_bullet.bulletisactive = false;
-                frog.canshoot = true;
+                frog.frog_canshoot = true;
             pthread_mutex_unlock(&mutex);
         
         }

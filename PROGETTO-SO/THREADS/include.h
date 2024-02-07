@@ -191,6 +191,12 @@ typedef struct{
    bool frog_bulletisactive;
 }Frog;
 
+typedef struct{
+   int x;
+   int y;
+   bool bulletisactive;
+}FrogBullet;
+
 
 // Struttura dati pianta
 typedef struct{
@@ -200,7 +206,12 @@ typedef struct{
    bool plant_canshoot;
    bool plant_bulletisactive;
  }Plant;
-   
+
+typedef struct{
+   int x;
+   int y;
+   bool bulletisactive;
+}PlantBullet;
 
 // Struttura dati coccodrillo
 typedef struct{
@@ -234,6 +245,8 @@ extern RiverFlow river_flows[RIVER_LANES_NUMBER];
 
 // semaforo
 extern pthread_mutex_t mutex;
+
+extern bool should_not_exit;
 
 
 /*----------------------------------------------------------------------
