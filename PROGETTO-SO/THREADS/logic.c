@@ -7,7 +7,10 @@
 // Funzione per inizializzare la partita
 void initialize_game(){
 
-	
+    srand(time(NULL));
+    
+    gamedata.game_lost = false;
+    gamedata.game_won = false;
     
     // dichiarazione threads
     pthread_t frog_t;

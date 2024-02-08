@@ -90,14 +90,9 @@ void menuDifficulty(){
     int c; /* Carattere della Getch, per le varie opzioni del menù */
     bool exitMenu = false;
     
-    int i;
-    GameData game_data;
-    game_data.game_lost = false;
-    game_data.game_won = false;
-    game_data.player_score = 0;
-    game_data.player_lives = N_LIVES;
-    for(i = 0; i < N_DENS; i++){
-        game_data.dens[i] = false;
+    gamedata.player_score = 0;
+    for(int i = 0; i < N_DENS; i++){
+        gamedata.dens[i] = false;
     }
 
 
@@ -159,18 +154,18 @@ void menuDifficulty(){
 		system("killall aplay");
                 if(selection == 0) { /* Play: Avvia il gioco in modalita easy */
                     exitMenu = true;
-                    game_data.difficulty = EASY;
-                    game_data.player_lives = 3;
+                    gamedata.difficulty = EASY;
+                    gamedata.player_lives = 3;
                 }
                 if(selection == 1) { /* Play: Avvia il gioco in modalita medium  */
                     exitMenu = true;
-                    game_data.difficulty = NORMAL;
-                    game_data.player_lives = 2;
+                    gamedata.difficulty = NORMAL;
+                    gamedata.player_lives = 2;
                 }
                 if(selection == 2) { /* Play: Avvia il gioco in modalita hard  */
                     exitMenu = true;
-                    game_data.difficulty = HARD;
-                    game_data.player_lives = 1;
+                    gamedata.difficulty = HARD;
+                    gamedata.player_lives = 1;
                 }
                 break;
             default:
@@ -180,7 +175,7 @@ void menuDifficulty(){
     
     refresh();
     
-    initialize_game(game_data);
+    initialize_game();
 }
 
 

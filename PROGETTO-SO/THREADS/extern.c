@@ -11,14 +11,14 @@ FrogBullet frog_bullet;
 /* ----------------------------------------------   
           PLANT
  ----------------------------------------------*/
-Plant plant[N_PLANTS];
-PlantBullet plant_bullet[N_PLANTS];
+Plant plants[N_PLANTS];
+PlantBullet plant_bullets[N_PLANTS];
 
 
 /* ----------------------------------------------   
           CROCODILE
  ----------------------------------------------*/
-Crocodile crocodile[N_CROCODILE];
+Crocodile crocodiles[N_CROCODILE];
 
 
 /* ----------------------------------------------   
