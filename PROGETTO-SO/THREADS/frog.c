@@ -1,29 +1,30 @@
 #include "include.h"
 
-
-/* ----------------------------------------------   
-		  FROG
-   ----------------------------------------------*/ 
+/* ----------------------------------------------
+          FROG
+   ----------------------------------------------*/
 // Funzione per la gestione del processo frog
-void* frog_thread(void *a){
-    
+void *frog_thread(void *a)
+{
+
     // posizione di partenza della rana
-    int frog_start_y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 2;
+    int frog_start_y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 3;
     int frog_start_x = FROG_START;
 
     // inizializzazione posizione e possibilità di sparare e morire della rana
     pthread_mutex_lock(&mutex);
-        frog.y = frog_start_y;
-        frog.x = frog_start_x;
-        frog.frog_canshoot = true;
-        frog.frog_candie = true;
+    frog.y = frog_start_y;
+    frog.x = frog_start_x;
+    frog.frog_canshoot = true;
+    frog.frog_candie = true;
     pthread_mutex_unlock(&mutex);
 
     // Ciclo di esecuzione di Frog
-    while(1){
-        // stampa di tutto lo schermo di gioco    
+    while (1)
+    {
+        // stampa di tutto lo schermo di gioco
         pthread_mutex_lock(&mutex);
-            printAll();        
+        printAll();
         pthread_mutex_unlock(&mutex);
 
         // Attende l'input, altrimenti continua senza bloccare il gioco
@@ -32,152 +33,184 @@ void* frog_thread(void *a){
         int c = getch();
 
         pthread_mutex_lock(&mutex);
-        
+
         // Comandi Frog
-        switch(c){
-            //Movimenti
-            case KEY_UP: 
-                    frog.y -= 2; 
-                    system("aplay ../SUONI/jump.wav > /dev/null 2>&1 &");
-                break;
-            case KEY_DOWN:
-                if(frog.y < frog_start_y){
-                    frog.y += 2; 
-                    system("aplay ../SUONI/jump.wav > /dev/null 2>&1 &");
-                }
-                break;
-            case KEY_LEFT:
-                    frog.x -= 1; 
-                break;
-            case KEY_RIGHT:
-                    frog.x += 1;     
-                break;
-            //Proiettile
-            case SPACE:
-                if(frog.frog_canshoot){
-                    frog.frog_canshoot = false;
-                    frog_bullet.bulletisactive = true;
-                    system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
-                }
-                break;
+        switch (c)
+        {
+        // Movimenti
+        case KEY_UP:
+            frog.y -= 2;
+            system("aplay ../SUONI/jump.wav > /dev/null 2>&1 &");
+            break;
+        case KEY_DOWN:
+            if (frog.y < frog_start_y)
+            {
+                frog.y += 2;
+                system("aplay ../SUONI/jump.wav > /dev/null 2>&1 &");
+            }
+            break;
+        case KEY_LEFT:
+            frog.x -= 1;
+            break;
+        case KEY_RIGHT:
+            frog.x += 1;
+            break;
+        // Proiettile
+        case SPACE:
+            if (frog.frog_canshoot)
+            {
+                frog.frog_canshoot = false;
+                frog_bullet.bulletisactive = true;
+                system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
+            }
+            break;
         }
+        pthread_mutex_unlock(&mutex);
+        bool on_crocodile = false;
+        pthread_mutex_lock(&mutex);
 
-        
-        // Rimossa la parte relativa al movimento della rana sopra il coccodrillo.
+        if (frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT && frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + RIVER_LANES_NUMBER * 2)
+        {
+            for (int i = 0; i < N_CROCODILE; i++)
+            {
+                if (frog.y == crocodiles[i].y && (frog.x > crocodiles[i].x + 2 && frog.x < crocodiles[i].x + CROCODILE_W - 1))
+                {
+                    on_crocodile = true;
+                    // la posizione di Frog è aggiornata
+                    if (crocodiles[i].direction == LEFT)
+                        frog.x -= 1;
+                    else
+                        frog.x += 1;
+                    break;
+                }
+                else
+                {
+                    on_crocodile = false;
+                }
+            }
 
+            if (!on_crocodile)
+            {
+                frog.frog_candie = false;
+                gamedata.game_lost = true;
+            }
+        }
         pthread_mutex_unlock(&mutex);
 
         // Rimosso usleep
         usleep(1000);
     }
-}   
-
+}
 
 //* FROG BULLET ----------------------------------------------
 
 // Funzione per la gestione del processo frog_bullet
-void* frog_bullet_thread(void *a){
+void *frog_bullet_thread(void *a)
+{
 
-        // inizialmente il proiettile non è attivo
+    // inizialmente il proiettile non è attivo
     pthread_mutex_lock(&mutex);
-        frog_bullet.bulletisactive = false;
+    frog_bullet.bulletisactive = false;
     pthread_mutex_unlock(&mutex);
-    
+
     // Ciclo di esecuzione di Frog Bullet
-    while(1){ 
+    while (1)
+    {
 
         // se il proiettile è attivo
-        if(frog_bullet.bulletisactive == true){
+        if (frog_bullet.bulletisactive == true)
+        {
 
             // posizione di partenza del proiettile
             pthread_mutex_lock(&mutex);
-                frog_bullet.x = frog.x;
-                frog_bullet.y = frog.y;
+            frog_bullet.x = frog.x;
+            frog_bullet.y = frog.y;
             pthread_mutex_unlock(&mutex);
-        
+
             // fino a che il proiettile non supera il limite dell'area di gioco o fino a che non viene disattivato
-            while(frog_bullet.bulletisactive == true && frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT){
+            while (frog_bullet.bulletisactive == true && frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT)
+            {
 
                 // sposta il proiettile verso l'alto
                 pthread_mutex_lock(&mutex);
-                    frog_bullet.y -= 1;
+                frog_bullet.y -= 1;
                 pthread_mutex_unlock(&mutex);
 
                 // velocità del proiettile (più è bassa, più è veloce)
                 usleep(FROG_BULLET_DELAY);
             }
 
-            // quando esce dal while disattiva il proiettile e permette alla rana di sparare 
+            // quando esce dal while disattiva il proiettile e permette alla rana di sparare
             pthread_mutex_lock(&mutex);
-                frog_bullet.bulletisactive = false;
-                frog.frog_canshoot = true;
+            frog_bullet.bulletisactive = false;
+            frog.frog_canshoot = true;
             pthread_mutex_unlock(&mutex);
-        
         }
-    }   
-
+    }
 }
 
+void printAll()
+{
+    erase();
+    // stampa dello sfondo di gioco
+    gameField();
+    // stampa tane
+    printDens(gamedata.dens);
 
+    // STAMPA ELEMENTI ----------------------------------------
 
+    // stampa dei coccodrilli
+    for (int i = 0; i < N_CROCODILE; i++)
+    {
+        if (crocodiles[i].is_crocodile_alive)
+            crocodileBody(crocodiles[i]);
+    }
 
-void printAll(){
-        erase();
-        // stampa dello sfondo di gioco
-        gameField();
-        // stampa tane
-        printDens(gamedata.dens);
+    // STAMPA DEL NERO SUI COCCODRILLI USCENTI DAL CAMPO DI GIOCO
+    attron(COLOR_PAIR(BLACK_BLACK));
+    for (int i = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT; i < TOTAL_HEIGHT; i++)
+    {
+        mvprintw(i, MAXX, "            ");
+    }
+    for (int i = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT; i < TOTAL_HEIGHT; i++)
+    {
+        mvprintw(i, 0, "          ");
+    }
+    attroff(COLOR_PAIR(BLACK_BLACK));
 
-        // STAMPA ELEMENTI ----------------------------------------
+    // stampa piante
+    for (int i = 0; i < N_PLANTS; i++)
+    {
+        if (plants[i].plant_isalive)
+            plantBody(plants[i]);
+    }
 
-        // stampa dei coccodrilli
-        for(int i = 0; i < N_CROCODILE; i++){
-            if(crocodiles[i].is_crocodile_alive)
-            	crocodileBody(crocodiles[i]);
+    // stampa dei proiettili delle piante
+    for (int i = 0; i < N_PLANT_BULLETS; i++)
+    {
+        if (plant_bullets[i].bulletisactive)
+        {
+            plantBullett(plant_bullets[i].x, plant_bullets[i].y);
         }
-        
-        
-        //STAMPA DEL NERO SUI COCCODRILLI USCENTI DAL CAMPO DI GIOCO
-	attron(COLOR_PAIR(BLACK_BLACK));
-        for(int i = SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT+PLANTS_ZONE_HEIGHT; i < TOTAL_HEIGHT; i++){
-    	    mvprintw(i, MAXX,   "            ");	
-        }
-        for(int i = SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT+PLANTS_ZONE_HEIGHT; i < TOTAL_HEIGHT; i++){
-    	    mvprintw(i, 0,   "          ");	
-        }
-        attroff(COLOR_PAIR(BLACK_BLACK));
-	
-        // stampa piante
-        for (int i = 0; i < N_PLANTS; i++){
-            if(plants[i].plant_isalive)
-                plantBody(plants[i]);
-        }
-        
-        // stampa dei proiettili delle piante
-        for(int i = 0; i < N_PLANT_BULLETS; i++){
-            if(plant_bullets[i].bulletisactive){
-                plantBullett(plant_bullets[i].x, plant_bullets[i].y);
-            }   
-        }
+    }
 
-        // stampa del proiettile della rana
-        if(frog_bullet.bulletisactive == true){    
-            frogBullett(frog_bullet.x,frog_bullet.y);
-        }
+    // stampa del proiettile della rana
+    if (frog_bullet.bulletisactive == true)
+    {
+        frogBullett(frog_bullet.x, frog_bullet.y);
+    }
 
-        // stampa della rana
-        frogBody(frog.x, frog.y);
+    // stampa della rana
+    frogBody(frog.x, frog.y);
 
+    // stampa dello score a schermo
+    attron(COLOR_PAIR(WHITE_BLUE));
+    mvprintw(1, SCORE_X, "Score: %d", gamedata.player_score);
+    // stampa delle vite a schermo
+    mvprintw(TOTAL_HEIGHT + 1, LIFES_X, "Lifes: %d", gamedata.player_lives);
+    // stampa del tempo a schermo
+    mvprintw(TOTAL_HEIGHT + 1, TIME_X + 15, "Time: %d", time_left);
+    attroff(COLOR_PAIR(WHITE_BLUE));
 
-        // stampa dello score a schermo
-        attron(COLOR_PAIR(WHITE_BLUE));
-        mvprintw(1, SCORE_X, "Score: %d", gamedata.player_score);
-        // stampa delle vite a schermo
-        mvprintw(TOTAL_HEIGHT+1, LIFES_X, "Lifes: %d", gamedata.player_lives);
-        // stampa del tempo a schermo
-        mvprintw(TOTAL_HEIGHT+1, TIME_X + 15, "Time: %d", time_left);
-	    attroff(COLOR_PAIR(WHITE_BLUE));
-	
-        refresh();
-
+    refresh();
 }
