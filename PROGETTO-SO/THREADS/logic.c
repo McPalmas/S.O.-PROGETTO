@@ -47,6 +47,7 @@ void initialize_game(){
     
 
     //* CREAZIONE THREADS -------------------
+
     pthread_create(&frog_t, NULL, &frog_thread, NULL);
     
     for (int i = 0; i < N_PLANTS; i++)
@@ -60,6 +61,7 @@ void initialize_game(){
         pthread_create(&crocodile_t[i], NULL, &crocodile_thread, (void*)&crocodiles[i].id);
     }
     
+    pthread_create(&time_t, NULL, &time_thread, NULL);
     
     pthread_create(&gameManche_t, NULL, &gameManche_thread, NULL);
     

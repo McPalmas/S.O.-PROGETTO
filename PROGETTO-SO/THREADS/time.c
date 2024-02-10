@@ -21,12 +21,13 @@ void* time_thread(void *a){
 
     // Invio del dato
     while(1){
+        sleep(1);
         // Aggiorna lo stato
         pthread_mutex_lock(&mutex);
         time_left--;
         pthread_mutex_unlock(&mutex);
         
-        sleep(1);
+        
     }
 
 }
