@@ -20,7 +20,7 @@ void* crocodile_thread(void* id){
     pthread_mutex_unlock(&mutex);
 
     // Ciclo di esecuzione di crocodile
-    while(should_not_exit){
+    while(1){
 
         // Se crocodile supera i margini dello schermo, muore
         if(crocodiles[crocodileIndex].x <= 1 || crocodiles[crocodileIndex].x+CROCODILE_W >= MAXX +CROCODILE_W){

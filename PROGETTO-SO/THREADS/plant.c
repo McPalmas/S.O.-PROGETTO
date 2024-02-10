@@ -19,6 +19,13 @@ void* plant_thread(void *id){
     int i;
 
     pthread_mutex_lock(&mutex);
+    if(plants[plantIndex].id == 0)
+		plants[plantIndex].x = PLANT_0_START;
+    else if (plants[plantIndex].id  == 1)
+		plants[plantIndex].x = PLANT_1_START;
+    else if(plants[plantIndex].id  == 2)
+		plants[plantIndex].x = PLANT_2_START;
+    
     plants[plantIndex].plant_canshoot = true;
     plants[plantIndex].plant_isalive = true;
     plants[plantIndex].y = SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT;
@@ -29,7 +36,7 @@ void* plant_thread(void *id){
     
 
     
-    while (should_not_exit) {
+    while (1) {
         if(plants[plantIndex].plant_isalive){
             plant_bullet_timer--;
             // Se il timer è scaduto
@@ -87,7 +94,7 @@ void* plant_bullet_thread(void *id){
     system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
     
     // Finché il proiettile è attivo e non è uscito dall'area di gioco
-    while(should_not_exit){
+    while(1){
         if(plant_bullets[plantBulletIndex].bulletisactive){
             pthread_mutex_lock(&mutex);
                 plant_bullets[plantBulletIndex].x = plants[plantBulletIndex].x + 1;

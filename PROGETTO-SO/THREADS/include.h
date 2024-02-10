@@ -255,7 +255,7 @@ extern RiverFlow river_flows[RIVER_LANES_NUMBER];
 // semaforo
 extern pthread_mutex_t mutex;
 
-extern bool should_not_exit;
+//extern bool should_not_exit;
 
 
 /*----------------------------------------------------------------------
@@ -276,6 +276,7 @@ void frogBullett(int y, int x);	   //disegna il proiettile della rana
 void crocodileBody(Crocodile c);	//disegna lo sprite del coccodrillo
 void plantBody(Plant p);		//stampa della pianta
 void plantBullett(int y, int x);	//stampa il proiettile della pianta
+void printAll();
 
 
 void initialize_game();

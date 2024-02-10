@@ -39,14 +39,16 @@ void initialize_game(){
     }
 
     // Inizializzazione dei flussi del fiume
-    //initialize_river_flows();
+    initialize_river_flows();
+    crocodiles_inizializer();
     
      // i threads, quando verranno creati, potranno avviare il loro ciclo, che terminerà quando verrà modificato il valore di questa variabile
-    should_not_exit = true;
+    //should_not_exit = true;
     
 
     //* CREAZIONE THREADS -------------------
-
+    pthread_create(&frog_t, NULL, &frog_thread, NULL);
+    
     for (int i = 0; i < N_PLANTS; i++)
     {
         pthread_create(&plant_t[i], NULL, &plant_thread, (void*)&plants[i].id);
@@ -57,6 +59,7 @@ void initialize_game(){
     {
         pthread_create(&crocodile_t[i], NULL, &crocodile_thread, (void*)&crocodiles[i].id);
     }
+    
     
     pthread_create(&gameManche_t, NULL, &gameManche_thread, NULL);
     
@@ -121,8 +124,9 @@ void analyze_data(){ // da modificare
 	       
 		
 	}else if (gamedata.game_lost){
-	
+	        pthread_mutex_lock(&mutex);
 		gamedata.player_lives--;
+		pthread_mutex_lock(&mutex);
 		
 		if(gamedata.player_lives <= 0){ // se ha esaurito le vite si va al menu della sconfitta
             		system("aplay ../SUONI/gameover.wav > /dev/null 2>&1 &");
@@ -150,19 +154,15 @@ void analyze_data(){ // da modificare
          GESTIONE MANCHE, STAMPE E COLLISIONI
    ----------------------------------------------*/
 void* gameManche_thread(void *id){
-/*
 
     _Bool should_not_exit = true;
 
-
-
-
-    int crocodile_immersion_timer=getRandomInt(100, gamedata.difficulty); // = getRandomTimer (tempo minimo, difficoltà)
+    int crocodile_immersion_timer=getRandomInt(100); // = getRandomTimer (tempo minimo, difficoltà)
 
     int start_dens[] = {16,27,38,49,60};
 
     // posizone di partenza della rana
-    int frog_start_y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 2;
+   /* int frog_start_y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 2;
     int frog_start_x = FROG_START;
     
     // bool ausiliaria per controllare se una tana è occupata o meno
@@ -178,93 +178,35 @@ void* gameManche_thread(void *id){
     frog.y = frog_start_y;
 
     // frog bullet
-    frog_bullet.frog_bulletisactive = false;
+    frog_bullet.bulletisactive = false;*/
 
     // Plant
-    for(i = 0; i < N_PLANTS; i++){
-        plant[i].y = SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT;
+    for(int i = 0; i < N_PLANTS; i++){
+        plants[i].y = SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT;
     }
 
     // Plant bullet
-    for(i = 0; i < N_PLANT_BULLETS; i++){
-        plant_bullet[i].plant_bulletisactive = false;
+    for(int i = 0; i < N_PLANT_BULLETS; i++){
+        plant_bullets[i].bulletisactive = false;
     }
 
 
 
-    crocodiles_inizializer(gamedata, crocodile);
+    //crocodiles_inizializer();
 
     
     while (should_not_exit) {
 
-        //* STAMPA SFONDO DI GIOCO ----------------------------------------
-
-        erase();
-        // stampa dello sfondo di gioco
-        gameField();
-        // stampa tane
-        printDens(gamedata.dens);
-
-        // STAMPA ELEMENTI ----------------------------------------
-
-        // stampa dei coccodrilli
-        for(i = 0; i < N_CROCODILE; i++){
-            if(crocodile[i].is_crocodile_alive)
-            	crocodileBody(crocodile[i]);
-        }
-        
-        
-        //STAMPA DEL NERO SUI COCCODRILLI USCENTI DAL CAMPO DI GIOCO
-	attron(COLOR_PAIR(BLACK_BLACK));
-        for(int i = SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT+PLANTS_ZONE_HEIGHT; i < TOTAL_HEIGHT; i++){
-    	    mvprintw(i, MAXX,   "            ");	
-        }
-        for(int i = SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT+PLANTS_ZONE_HEIGHT; i < TOTAL_HEIGHT; i++){
-    	    mvprintw(i, 0,   "          ");	
-        }
-        attroff(COLOR_PAIR(BLACK_BLACK));
-	
-        // stampa piante
-        for (i = 0; i < N_PLANTS; i++){
-            if(plant[i].plant_isalive)
-                plantBody(plant[i]);
-        }
-        
-        // stampa dei proiettili delle piante
-        for(i = 0; i < N_PLANT_BULLETS; i++){
-            if(plant_bullet[i].plant_bulletisactive){
-                plantBullett(plant_bullet[i].x, plant_bullet[i].y);
-            }   
-        }
-
-        // stampa del proiettile della rana
-        if(frog_bullet.frog_bulletisactive == true){    
-            frogBullett(frog_bullet.x,frog_bullet.y);
-        }
-
-        // stampa della rana
-        frogBody(frog.x, frog.y);
-
-
-        // stampa dello score a schermo
-        attron(COLOR_PAIR(WHITE_BLUE));
-        mvprintw(top_score_height, SCORE_X, "Score: %d", gamedata.player_score);
-        // stampa delle vite a schermo
-        mvprintw(bottom_score_height, LIFES_X, "Lifes: %d", gamedata.player_lives);
-        // stampa del tempo a schermo
-        mvprintw(bottom_score_height, TIME_X + 15, "Time: %d", time.time_left);
-	    attroff(COLOR_PAIR(WHITE_BLUE));
-	
-        refresh();
-
         // COLLISIONI E MORTI --------------------------------------------------------------------------------------
-
+/*
 	//se la rana oltrepassa il bordo
+	pthread_mutex_lock(&mutex);
 	if(frog.x-2 < MINX || frog.x+2 > MAXX-1 || frog.y < SCORE_ZONE_HEIGHT){
 		gamedata.player_score -= DEATH_SCORE;
 	        frog.frog_candie = false;
             gamedata.game_lost = true;
 	}
+	pthread_mutex_unlock(&mutex);
 	
 	
         // RANA - TANA --------------------------------------------------------------------------------------
@@ -440,22 +382,26 @@ void* gameManche_thread(void *id){
                         
 		}
 	}
-
+*/
 
 
         // MORTE RANA PER TEMPO --------------------------------------------------------------------------------------
 
         // se il tempo scende a zero perdi la manche
-        if(time.time_left <= 0  && frog.frog_candie){
+        pthread_mutex_lock(&mutex);
+        if(time_left <= 0  && frog.frog_candie){
             frog.frog_candie = false;
             gamedata.game_lost = true; 
         }
+        pthread_mutex_unlock(&mutex);
 
 
         // se la manche è stata vinta o persa, fai terminare tutti i processi cambiando il valore di questa variabile
+        pthread_mutex_lock(&mutex);
         if(gamedata.game_lost || gamedata.game_won){
             should_not_exit = false;
         }
+        pthread_mutex_unlock(&mutex);
 
     }
     
@@ -463,7 +409,7 @@ void* gameManche_thread(void *id){
     if(gamedata.player_score <= 0){
         gamedata.player_score = 0;
     }
-*/
+
 }
     
 
