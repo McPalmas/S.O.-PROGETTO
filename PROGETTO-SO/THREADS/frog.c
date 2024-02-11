@@ -33,7 +33,6 @@ void *frog_thread(void *a)
         int c = getch();
 
         pthread_mutex_lock(&mutex);
-
         // Comandi Frog
         switch (c)
         {
@@ -60,41 +59,14 @@ void *frog_thread(void *a)
             if (frog.frog_canshoot)
             {
                 frog.frog_canshoot = false;
+                frog_bullet.x = frog.x + 1;
+                frog_bullet.y = frog.y - 1;
                 frog_bullet.bulletisactive = true;
                 system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
             }
             break;
         }
-        pthread_mutex_unlock(&mutex);
-        bool on_crocodile = false;
-        pthread_mutex_lock(&mutex);
 
-        if (frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT && frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + RIVER_LANES_NUMBER * 2)
-        {
-            for (int i = 0; i < N_CROCODILE; i++)
-            {
-                if (frog.y == crocodiles[i].y && (frog.x > crocodiles[i].x + 2 && frog.x < crocodiles[i].x + CROCODILE_W - 1))
-                {
-                    on_crocodile = true;
-                    // la posizione di Frog è aggiornata
-                    if (crocodiles[i].direction == LEFT)
-                        frog.x -= 1;
-                    else
-                        frog.x += 1;
-                    break;
-                }
-                else
-                {
-                    on_crocodile = false;
-                }
-            }
-
-            if (!on_crocodile)
-            {
-                frog.frog_candie = false;
-                gamedata.game_lost = true;
-            }
-        }
         pthread_mutex_unlock(&mutex);
 
         // Rimosso usleep
@@ -120,13 +92,6 @@ void *frog_bullet_thread(void *a)
         // se il proiettile è attivo
         if (frog_bullet.bulletisactive == true)
         {
-
-            // posizione di partenza del proiettile
-            pthread_mutex_lock(&mutex);
-            frog_bullet.x = frog.x;
-            frog_bullet.y = frog.y;
-            pthread_mutex_unlock(&mutex);
-
             // fino a che il proiettile non supera il limite dell'area di gioco o fino a che non viene disattivato
             while (frog_bullet.bulletisactive == true && frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT)
             {

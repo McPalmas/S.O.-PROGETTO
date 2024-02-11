@@ -1,15 +1,15 @@
 #include "include.h"
 
-
-/* ----------------------------------------------   
-		  PLANT
-   ----------------------------------------------*/ 
-void* plant_thread(void *id){
+/* ----------------------------------------------
+          PLANT
+   ----------------------------------------------*/
+void *plant_thread(void *id)
+{
 
     srand(getpid());
 
     // estrazione dell'id passato alla funzione
-    int plantIndex = *((int *) id);
+    int plantIndex = *((int *)id);
     // srand sulla base del thread
     unsigned int thread_id = (unsigned int)(size_t)pthread_self();
     srand(thread_id);
@@ -19,49 +19,64 @@ void* plant_thread(void *id){
     int i;
 
     pthread_mutex_lock(&mutex);
-    if(plants[plantIndex].id == 0)
-		plants[plantIndex].x = PLANT_0_START;
-    else if (plants[plantIndex].id  == 1)
-		plants[plantIndex].x = PLANT_1_START;
-    else if(plants[plantIndex].id  == 2)
-		plants[plantIndex].x = PLANT_2_START;
-    
+    if (plants[plantIndex].id == 0)
+        plants[plantIndex].x = PLANT_0_START;
+    else if (plants[plantIndex].id == 1)
+        plants[plantIndex].x = PLANT_1_START;
+    else if (plants[plantIndex].id == 2)
+        plants[plantIndex].x = PLANT_2_START;
+
     plants[plantIndex].plant_canshoot = true;
     plants[plantIndex].plant_isalive = true;
-    plants[plantIndex].y = SCORE_ZONE_HEIGHT+DENS_ZONE_HEIGHT;
+    plants[plantIndex].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT;
     plant_bullet_timer = getRandomTimer(PLANT_BULLET_RELOAD_MIN);
     plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1);
-    //posizioni iniziali delle piante
+    // posizioni iniziali delle piante
     pthread_mutex_unlock(&mutex);
-    
 
-    
-    while (1) {
-        if(plants[plantIndex].plant_isalive){
+    while (1)
+    {
+        if (plants[plantIndex].plant_isalive)
+        {
             plant_bullet_timer--;
             // Se il timer è scaduto
             pthread_mutex_lock(&mutex);
-            if(plant_bullet_timer <= 0){
+            if (plant_bullet_timer <= 0)
+            {
                 plant_bullets[plantIndex].bulletisactive = true;
                 plant_bullet_timer = getRandomTimer(PLANT_BULLET_RELOAD_MIN);
             }
             pthread_mutex_unlock(&mutex);
-        }else{ // se la rana è morta 
-            plant_respawn_timer --;
-            if(plant_respawn_timer <= 0){   // a timer scaduto la pianta deve rinascere
-            	plants[plantIndex].plant_isalive = true;
-            	plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1);
-      	    }
+
+            pthread_mutex_lock(&mutex);
+            // Se la rana è sulla pianta
+            if (frog.y == plants[plantIndex].y && (frog.x >= plants[plantIndex].x && frog.x < plants[plantIndex].x + 2))
+            {
+                // La rana muore
+                frog.frog_candie = false;
+                gamedata.game_lost = true;
+            }
+            pthread_mutex_unlock(&mutex);
+        }
+        else
+        { // se la rana è morta
+            plant_respawn_timer--;
+            if (plant_respawn_timer <= 0)
+            { // a timer scaduto la pianta deve rinascere
+                plants[plantIndex].plant_isalive = true;
+                plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1);
+            }
         }
         sleep(1); // 1 secondo
     }
 }
 
-void* plant_bullet_thread(void *id){
+void *plant_bullet_thread(void *id)
+{
 
     // estrazione dell'id passato alla funzione
-    int plantBulletIndex = *((int *) id); 
-    
+    int plantBulletIndex = *((int *)id);
+
     // srand sulla base del thread
     unsigned int thread_id = (unsigned int)(size_t)pthread_self();
     srand(thread_id);
@@ -90,36 +105,57 @@ void* plant_bullet_thread(void *id){
         break;
     }
 
-
     system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
-    
+
     // Finché il proiettile è attivo e non è uscito dall'area di gioco
-    while(1){
-        if(plant_bullets[plantBulletIndex].bulletisactive){
+    while (1)
+    {
+        if (plant_bullets[plantBulletIndex].bulletisactive)
+        {
             pthread_mutex_lock(&mutex);
-                plant_bullets[plantBulletIndex].x = plants[plantBulletIndex].x + 1;
-                plant_bullets[plantBulletIndex].y = plants[plantBulletIndex].y + 1;
+            plant_bullets[plantBulletIndex].x = plants[plantBulletIndex].x + 1;
+            plant_bullets[plantBulletIndex].y = plants[plantBulletIndex].y + 1;
             pthread_mutex_unlock(&mutex);
         }
         // Sposta il proiettile
         plant_bullets[plantBulletIndex].y += 1;
 
-        while(plant_bullets[plantBulletIndex].y < MAXY-12){
+        while (plant_bullets[plantBulletIndex].y < MAXY - 12)
+        {
             pthread_mutex_lock(&mutex);
-                plant_bullets[plantBulletIndex].y += 1;
+            plant_bullets[plantBulletIndex].y += 1;
+            pthread_mutex_unlock(&mutex);
+
+            pthread_mutex_lock(&mutex);
+            // Se il proiettile colpisce la rana
+            if (frog.y == plant_bullets[plantBulletIndex].y && (frog.x >= plant_bullets[plantBulletIndex].x && frog.x <= plant_bullets[plantBulletIndex].x + 1))
+            {
+                // Il proiettile viene disattivato
+                plant_bullets[plantBulletIndex].bulletisactive = false;
+                // La rana muore
+                frog.frog_candie = false;
+                gamedata.game_lost = true;
+
+            }else
+            // Se il proiettile colpisce un proiettile della rana
+            if(frog_bullet.bulletisactive && frog_bullet.y == plant_bullets[plantBulletIndex].y && (frog_bullet.x >= plant_bullets[plantBulletIndex].x && frog_bullet.x < plant_bullets[plantBulletIndex].x + 1)){
+                // Disattiva entrambi i proiettili
+                frog_bullet.bulletisactive = false;
+                plant_bullets[plantBulletIndex].bulletisactive = false;
+            }
             pthread_mutex_unlock(&mutex);
 
             usleep(plant_bullet_delay);
         }
 
         pthread_mutex_lock(&mutex);
-            plant_bullets[plantBulletIndex].bulletisactive = false;
+        plant_bullets[plantBulletIndex].bulletisactive = false;
         pthread_mutex_unlock(&mutex);
     }
-    
 }
 
-int getRandomTimer(int min){
+int getRandomTimer(int min)
+{
     int randomTimer;
 
     switch (gamedata.difficulty)
@@ -130,15 +166,12 @@ int getRandomTimer(int min){
     case (NORMAL):
         randomTimer = rand() % (PLANT_BULLET_RELOAD_NORMAL + 1) + min;
         break;
-    case(HARD):
+    case (HARD):
         randomTimer = rand() % (PLANT_BULLET_RELOAD_HARD + 1) + min;
         break;
     default:
         break;
     }
-    
+
     return randomTimer;
 }
-
-
-

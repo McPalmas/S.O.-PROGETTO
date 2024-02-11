@@ -42,9 +42,16 @@ void *crocodile_thread(void *id)
                 crocodiles[crocodileIndex].x -= 1;
             pthread_mutex_unlock(&mutex);
 
+            pthread_mutex_lock(&mutex);
+            bool onCrocodile = false;
             // Se la rana si trova sul coccodrillo
             if (frog.y == crocodiles[crocodileIndex].y && (frog.x > crocodiles[crocodileIndex].x + 2 && frog.x < crocodiles[crocodileIndex].x + CROCODILE_W - 1))
             {
+                onCrocodile = true;
+                if (crocodiles[crocodileIndex].direction == RIGHT)
+                    frog.x += 1;
+                else
+                    frog.x -= 1;
                 if (!crocodiles[crocodileIndex].crocodile_is_good)
                 {
                     crocodiles[crocodileIndex].crocodile_immersion_timer--;
@@ -69,9 +76,16 @@ void *crocodile_thread(void *id)
                         gamedata.game_lost = true;
                     };
                 }
-                else
-                    crocodiles[crocodileIndex].crocodile_immersion_timer = getRandomInt(100); // da vedere per la difficoltà
             }
+            else if (frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT && frog.y < MAXY - START_ZONE_HEIGHT - 1)
+            {
+                onCrocodile = false;
+            }
+            if(!onCrocodile){
+                frog.frog_candie = false;
+                gamedata.game_lost = true;
+            }
+            pthread_mutex_unlock(&mutex);
         }
         else
         {
@@ -104,6 +118,7 @@ void *crocodile_thread(void *id)
             crocodiles[crocodileIndex].crocodile_is_good = rand() % 2;
             crocodiles[crocodileIndex].is_crocodile_alive = true;
             crocodiles[crocodileIndex].is_crocodile_immersing = false;
+            crocodiles[crocodileIndex].crocodile_immersion_timer = getRandomInt(100);
             if (crocodiles[crocodileIndex].direction == LEFT)
                 crocodiles[crocodileIndex].x = MAXX - 2;
             else
