@@ -66,7 +66,21 @@ void *frog_thread(void *a)
             }
             break;
         }
+        pthread_mutex_unlock(&mutex);
 
+        pthread_mutex_lock(&mutex);
+        for (int i = 0; i < N_PLANT_BULLETS; i++)
+        {
+            // Se il proiettile colpisce la rana
+            if (frog.y == plant_bullets[i].y && (frog.x >= plant_bullets[i].x - 2 && frog.x <= plant_bullets[i].x + 2))
+            {
+                // Il proiettile viene disattivato
+                plant_bullets[i].bulletisactive = false;
+                // La rana muore
+                frog.frog_candie = false;
+                gamedata.game_lost = true;
+            }
+        }
         pthread_mutex_unlock(&mutex);
 
         // Rimosso usleep
@@ -80,6 +94,10 @@ void *frog_thread(void *a)
 void *frog_bullet_thread(void *a)
 {
 
+    unsigned int thread_id = (unsigned int)(size_t)pthread_self();
+    srand(thread_id);
+    
+
     // inizialmente il proiettile non è attivo
     pthread_mutex_lock(&mutex);
     frog_bullet.bulletisactive = false;
@@ -89,28 +107,32 @@ void *frog_bullet_thread(void *a)
     while (1)
     {
 
-        // se il proiettile è attivo
+        // se il proiettile è attivo e non è uscito dall'area di gioco
         if (frog_bullet.bulletisactive == true)
         {
-            // fino a che il proiettile non supera il limite dell'area di gioco o fino a che non viene disattivato
-            while (frog_bullet.bulletisactive == true && frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT)
-            {
-
-                // sposta il proiettile verso l'alto
-                pthread_mutex_lock(&mutex);
-                frog_bullet.y -= 1;
-                pthread_mutex_unlock(&mutex);
-
-                // velocità del proiettile (più è bassa, più è veloce)
-                usleep(FROG_BULLET_DELAY);
-            }
-
-            // quando esce dal while disattiva il proiettile e permette alla rana di sparare
-            pthread_mutex_lock(&mutex);
-            frog_bullet.bulletisactive = false;
-            frog.frog_canshoot = true;
-            pthread_mutex_unlock(&mutex);
+            // posizione
+            ;
         }
+
+        frog_bullet.y -= 1;
+
+        // fino a che il proiettile non supera il limite dell'area di gioco o fino a che non viene disattivato
+        while (frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT)
+        {
+            // sposta il proiettile verso l'alto
+            pthread_mutex_lock(&mutex);
+            frog_bullet.y -= 1;
+            pthread_mutex_unlock(&mutex);
+
+            // velocità del proiettile (più è bassa, più è veloce)
+            usleep(FROG_BULLET_DELAY);
+        }
+
+        // quando esce dal while disattiva il proiettile e permette alla rana di sparare
+        pthread_mutex_lock(&mutex);
+        frog_bullet.bulletisactive = false;
+        frog.frog_canshoot = true;
+        pthread_mutex_unlock(&mutex);
     }
 }
 

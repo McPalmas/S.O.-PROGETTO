@@ -126,25 +126,6 @@ void *plant_bullet_thread(void *id)
             plant_bullets[plantBulletIndex].y += 1;
             pthread_mutex_unlock(&mutex);
 
-            pthread_mutex_lock(&mutex);
-            // Se il proiettile colpisce la rana
-            if (frog.y == plant_bullets[plantBulletIndex].y && (frog.x >= plant_bullets[plantBulletIndex].x && frog.x <= plant_bullets[plantBulletIndex].x + 1))
-            {
-                // Il proiettile viene disattivato
-                plant_bullets[plantBulletIndex].bulletisactive = false;
-                // La rana muore
-                frog.frog_candie = false;
-                gamedata.game_lost = true;
-
-            }else
-            // Se il proiettile colpisce un proiettile della rana
-            if(frog_bullet.bulletisactive && frog_bullet.y == plant_bullets[plantBulletIndex].y && (frog_bullet.x >= plant_bullets[plantBulletIndex].x && frog_bullet.x < plant_bullets[plantBulletIndex].x + 1)){
-                // Disattiva entrambi i proiettili
-                frog_bullet.bulletisactive = false;
-                plant_bullets[plantBulletIndex].bulletisactive = false;
-            }
-            pthread_mutex_unlock(&mutex);
-
             usleep(plant_bullet_delay);
         }
 
