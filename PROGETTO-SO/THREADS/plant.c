@@ -34,7 +34,7 @@ void *plant_thread(void *id)
     // posizioni iniziali delle piante
     pthread_mutex_unlock(&mutex);
 
-    while (1)
+    while (should_not_exit)
     {
         if (plants[plantIndex].plant_isalive)
         {
@@ -108,7 +108,7 @@ void *plant_bullet_thread(void *id)
     system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
 
     // Finché il proiettile è attivo e non è uscito dall'area di gioco
-    while (1)
+    while (should_not_exit)
     {
         if (plant_bullets[plantBulletIndex].bulletisactive)
         {

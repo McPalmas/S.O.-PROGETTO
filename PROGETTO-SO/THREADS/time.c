@@ -20,7 +20,7 @@ void* time_thread(void *a){
     pthread_mutex_unlock(&mutex);
 
     // Invio del dato
-    while(1){
+    while(should_not_exit){
         sleep(1);
         // Aggiorna lo stato
         pthread_mutex_lock(&mutex);

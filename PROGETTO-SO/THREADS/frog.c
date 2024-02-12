@@ -20,7 +20,7 @@ void *frog_thread(void *a)
     pthread_mutex_unlock(&mutex);
 
     // Ciclo di esecuzione di Frog
-    while (1)
+    while (should_not_exit)
     {
         // stampa di tutto lo schermo di gioco
         pthread_mutex_lock(&mutex);
@@ -104,7 +104,7 @@ void *frog_bullet_thread(void *a)
     pthread_mutex_unlock(&mutex);
 
     // Ciclo di esecuzione di Frog Bullet
-    while (1)
+    while (should_not_exit)
     {
 
         // se il proiettile è attivo e non è uscito dall'area di gioco

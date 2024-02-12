@@ -255,7 +255,7 @@ extern RiverFlow river_flows[RIVER_LANES_NUMBER];
 // semaforo
 extern pthread_mutex_t mutex;
 
-// extern bool should_not_exit;
+extern bool should_not_exit;
 
 /*----------------------------------------------------------------------
                FUNZIONI
@@ -295,6 +295,7 @@ void *plant_bullet_thread(void *a); // thread per la gestione del proiettile del
 void *time_thread(void *a);
 
 void *gameManche_thread(void *id);
+void gameManche();
 
 void crocodiles_inizializer();
 void initialize_river_flows();

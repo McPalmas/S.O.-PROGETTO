@@ -11,7 +11,8 @@ void initialize_game()
 
     gamedata.game_lost = false;
     gamedata.game_won = false;
-
+    should_not_exit = true;
+    
     // dichiarazione threads
     pthread_t frog_t;
     pthread_t frog_bullet_t;
@@ -46,7 +47,7 @@ void initialize_game()
     // should_not_exit = true;
 
     //* CREAZIONE THREADS -------------------
-
+    
     pthread_create(&frog_t, NULL, &frog_thread, NULL);
 
     for (int i = 0; i < N_PLANTS; i++)
@@ -62,8 +63,8 @@ void initialize_game()
 
     pthread_create(&time_t, NULL, &time_thread, NULL);
 
-    pthread_create(&gameManche_t, NULL, &gameManche_thread, NULL);
-
+    //pthread_create(&gameManche_t, NULL, &gameManche_thread, NULL);
+    gameManche();
     //* TERMINAZIONE THREADS -------------------
 
     pthread_join(frog_t, NULL);
@@ -81,16 +82,17 @@ void initialize_game()
         pthread_join(crocodile_t[i], NULL);
     }
 
-    pthread_join(gameManche_t, NULL);
+    //pthread_join(gameManche_t, NULL);
+    
 
+    //system("echo 'Messaggio di log: prima di analyze_data' > log.txt");
     analyze_data();
 }
 
 /* ----------------------------------------------
           CONTINUA O TERMINA LA PARTITA
    ----------------------------------------------*/
-void analyze_data()
-{ // da modificare
+void analyze_data(){
 
     int taken_dens = 0;
 
@@ -125,9 +127,9 @@ void analyze_data()
     }
     else if (gamedata.game_lost)
     {
-        pthread_mutex_lock(&mutex);
+        //pthread_mutex_lock(&mutex);
         gamedata.player_lives--;
-        pthread_mutex_lock(&mutex);
+        //pthread_mutex_lock(&mutex);
 
         if (gamedata.player_lives <= 0)
         { // se ha esaurito le vite si va al menu della sconfitta
@@ -151,12 +153,14 @@ void analyze_data()
 /* ----------------------------------------------
          GESTIONE MANCHE, STAMPE E COLLISIONI
    ----------------------------------------------*/
-void *gameManche_thread(void *id)
+//void *gameManche_thread(void *id)
+void gameManche()
 {
-
-    _Bool should_not_exit = true;
-
-    int crocodile_immersion_timer = getRandomInt(100); // = getRandomTimer (tempo minimo, difficoltà)
+    //system("echo \"$(date +'%Y-%m-%d %T') - Messaggio di log\" > /log.txt");
+    system("echo 'Messaggio di log: inizio gameManche' > log.txt");
+    //_Bool should_not_exit = true;
+    gamedata.player_score += 1;
+    //int crocodile_immersion_timer = getRandomInt(100); // = getRandomTimer (tempo minimo, difficoltà)
 
     int start_dens[] = {16, 27, 38, 49, 60};
 
@@ -177,7 +181,7 @@ void *gameManche_thread(void *id)
      frog.y = frog_start_y;
 
      // frog bullet
-     frog_bullet.bulletisactive = false;*/
+     frog_bullet.bulletisactive = false;
     
     // Plant
     for (int i = 0; i < N_PLANTS; i++)
@@ -191,13 +195,12 @@ void *gameManche_thread(void *id)
         plant_bullets[i].bulletisactive = false;
     }
 
-    // crocodiles_inizializer();
+    // crocodiles_inizializer();*/
 
     while (should_not_exit)
     {
-
         // COLLISIONI E MORTI --------------------------------------------------------------------------------------
-        /*
+        
             //se la rana oltrepassa il bordo
             pthread_mutex_lock(&mutex);
             if(frog.x-2 < MINX || frog.x+2 > MAXX-1 || frog.y < SCORE_ZONE_HEIGHT){
@@ -207,7 +210,7 @@ void *gameManche_thread(void *id)
             }
             pthread_mutex_unlock(&mutex);
 
-
+/*
                 // RANA - TANA --------------------------------------------------------------------------------------
 
                 // se la rana passa nella zona delle tane
@@ -343,6 +346,8 @@ void *gameManche_thread(void *id)
         pthread_mutex_lock(&mutex);
         if (gamedata.game_lost || gamedata.game_won)
         {
+        
+            gamedata.player_score += 100;
             should_not_exit = false;
         }
         pthread_mutex_unlock(&mutex);
@@ -352,6 +357,7 @@ void *gameManche_thread(void *id)
     {
         gamedata.player_score = 0;
     }
+    analyze_data();
 }
 
 /* ----------------------------------------------

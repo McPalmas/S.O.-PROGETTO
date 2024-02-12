@@ -21,7 +21,7 @@ void *crocodile_thread(void *id)
     pthread_mutex_unlock(&mutex);
 
     // Ciclo di esecuzione di crocodile
-    while (1)
+    while (should_not_exit)
     {
 
         // Se crocodile supera i margini dello schermo, muore
@@ -83,7 +83,7 @@ void *crocodile_thread(void *id)
             }
             if(!onCrocodile){
                 frog.frog_candie = false;
-                gamedata.game_lost = true;
+                //gamedata.game_lost = true;
             }
             pthread_mutex_unlock(&mutex);
         }
