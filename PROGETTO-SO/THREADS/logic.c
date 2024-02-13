@@ -163,7 +163,7 @@ void gameManche()
 
     int start_dens[] = {16, 27, 38, 49, 60};
     int crocodile_immersion_timer = getRandomInt(100);
-
+    bool onCrocodile = true;
     // posizone di partenza della rana
     /* int frog_start_y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 2;
      int frog_start_x = FROG_START;
@@ -224,21 +224,25 @@ void gameManche()
         }
         pthread_mutex_unlock(&mutex);
 
-        // Spostamento della rana se è sopra un coccodrillo - si comporta in maniera strana
-        /*
+        // se la rana è nel fiume ma non sopra un coccodrillo - ok
         pthread_mutex_lock(&mutex);
-        for (int i = 0; i < N_CROCODILE; i++)
+        if (frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT)
         {
-            if (frog.y == crocodiles[i].y && (frog.x > (crocodiles[i].x + 2) && frog.x < (crocodiles[i].x + CROCODILE_W - 1)))
+            for (int i = 0; i < N_CROCODILE; i++)
             {
-                if (crocodiles[i].direction == RIGHT)
-                    frog.x += 1;
-                else
-                    frog.x -= 1;
+                if (frog.frog_candie && frog.y == crocodiles[i].y && (frog.x > crocodiles[i].x + 1 && frog.x < crocodiles[i].x + CROCODILE_W -2))
+                {
+                    onCrocodile=true;
+                    break;
+                }else onCrocodile=false;
             }
         }
         pthread_mutex_unlock(&mutex);
-        */
+
+        if(!onCrocodile){
+            frog.frog_candie = false;
+            gamedata.game_lost = true;
+        }
 
         // Se la rana è nel fiume e si trova sopra un coccodrillo cattivo - non funziona il timer, va subito a zero
         /*
