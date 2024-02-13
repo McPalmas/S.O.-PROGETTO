@@ -46,6 +46,7 @@ void initialize_game()
     //* CREAZIONE THREADS -------------------
 
     pthread_create(&frog_t, NULL, &frog_thread, NULL);
+    pthread_create(&frog_bullet_t, NULL, &frog_bullet_thread, NULL);
 
     for (int i = 0; i < N_PLANTS; i++)
     {
@@ -77,7 +78,6 @@ void initialize_game()
     {
         pthread_join(crocodile_t[i], NULL);
     }
-
 
     // system("echo 'Messaggio di log: prima di analyze_data' > log.txt");
     analyze_data();
@@ -161,20 +161,18 @@ void gameManche()
 
     while (should_not_exit)
     {
-        // COLLISIONI E MORTI --------------------------------------------------------------------------------------
+        /*
+            Collisioni:
+            - Rana con piante
+            - Rana con proiettili piante
+            - Rana con coccodrillo
+            - Rana con tane
+            - Proiettile rana con coccodrillo
+            - Proiettile rana con piante
+            - Proiettile rana con proiettili piante
+        */
 
-        // se la rana oltrepassa il bordo - ok
-        pthread_mutex_lock(&mutex);
-        if (frog.x - 2 < MINX || frog.x + 2 > MAXX - 1 || frog.y < SCORE_ZONE_HEIGHT)
-        {
-            gamedata.player_score -= DEATH_SCORE;
-            frog.frog_candie = false;
-            gamedata.game_lost = true;
-        }
-        pthread_mutex_unlock(&mutex);
-
-        // se la rana tocca una pianta - ok
-        pthread_mutex_lock(&mutex);
+        // SE LA RANA COLLIDE CON UNA PIANTA --------------------------------------------------------------------------------------
         for (int i = 0; i < N_PLANTS; i++)
         {
             if ((frog.y == plants[i].y + 1 || frog.y == plants[i].y) && (frog.x - 2 >= plants[i].x - (FROG_W - 1) && frog.x + 2 <= plants[i].x + (FROG_W + 1)))
@@ -184,14 +182,31 @@ void gameManche()
                 gamedata.player_score += DEATH_SCORE;
             }
         }
-        pthread_mutex_unlock(&mutex);
 
-        // se la rana è nel fiume ma non sopra un coccodrillo - ok
-        pthread_mutex_lock(&mutex);
-        if (frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT)
+        // SE LA RANA E' COLPITA DA UN PROIETTILE DELLA PIANTA --------------------------------------------------------------------------------------
+        for (int i = 0; i < N_PLANT_BULLETS; i++)
+        {
+            if (plant_bullets[i].bulletisactive && frog.y == plant_bullets[i].y && (frog.x >= plant_bullets[i].x - 2 && frog.x <= plant_bullets[i].x + 2))
+            {
+                // Il proiettile viene disattivato
+                plant_bullets[i].bulletisactive = false;
+                // La rana muore
+                frog.frog_candie = false;
+                gamedata.game_lost = true;
+            }
+        }
+
+        // SE LA RANA E' SUL COCCODRILLO --------------------------------------------------------------------------------------
+        if (frog.frog_candie && frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT)
         {
             for (int i = 0; i < N_CROCODILE; i++)
             {
+                if (crocodiles[i].crocodile_immersion_timer_counter < 0)
+                {
+                    onCrocodile = false;
+                    break;
+                };
+
                 if (frog.frog_candie && frog.y == crocodiles[i].y && (frog.x > crocodiles[i].x + 1 && frog.x < crocodiles[i].x + CROCODILE_W - 2))
                 {
                     onCrocodile = true;
@@ -201,34 +216,8 @@ void gameManche()
                     onCrocodile = false;
             }
         }
-        pthread_mutex_unlock(&mutex);
 
-        if (!onCrocodile)
-        {
-            frog.frog_candie = false;
-            gamedata.game_lost = true;
-        }
-
-        // Se la rana è nel fiume e si trova sopra un coccodrillo cattivo con timer a zero - ok
-
-        if (frog.frog_candie && frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT)
-        {
-            for (int i = 0; i < N_CROCODILE; i++)
-            {
-                if (crocodiles[i].crocodile_immersion_timer_counter < 0)
-                {
-                    frog.frog_candie = false;
-                    gamedata.game_lost = true;
-                    break;
-                };
-            }
-        }
-
-
-        // RANA - TANA --------------------------------------------------------------------------------------
-
-        // se la rana passa nella zona delle tane - ok
-        pthread_mutex_lock(&mutex);
+        // SE LA RANA RAGGIUNGE UNA TANA --------------------------------------------------------------------------------------
         if (frog.y < SCORE_ZONE_HEIGHT + 2)
         {
             // per ogni tana
@@ -271,10 +260,28 @@ void gameManche()
                 }
             }
         }
-        pthread_mutex_unlock(&mutex);
 
-        // proiettili rana - piante - ok
-        pthread_mutex_lock(&mutex);
+        // SE IL PROIETTILE DELLA RANA COLPISCE UN COCCODRILLO --------------------------------------------------------------------------------------
+        for (int i = 0; i < N_CROCODILE; i++)
+        {
+            // se il proiettile sta sul coccodrillo corrente
+            if (frog_bullet.bulletisactive && (crocodiles[i].y == frog_bullet.y) && (frog_bullet.x > crocodiles[i].x && frog_bullet.x < crocodiles[i].x + CROCODILE_W))
+            {
+                if (!crocodiles[i].crocodile_is_good)
+                {
+                    // se il coccodrillo è cattivo diventa buono
+                    crocodiles[i].crocodile_is_good = true;
+                    frog_bullet.bulletisactive = false;
+                    frog.frog_canshoot = true;
+                    break;
+                }
+                // comunica al frog bullet di distruggere il proiettile
+                frog_bullet.bulletisactive = false;
+                frog.frog_canshoot = true;
+            }
+        }
+
+        // SE IL PROIETTILE DELLA RANA COLPISCE UNA PIANTA --------------------------------------------------------------------------------------
         for (int i = 0; i < N_PLANTS; i++)
         {
             // se è presente plant e la rana può sparare
@@ -304,50 +311,66 @@ void gameManche()
                 }
             }
         }
-        pthread_mutex_unlock(&mutex);
 
-        // proiettili rana - coccodrilli - ok
-        pthread_mutex_lock(&mutex);
-        for (int i = 0; i < N_CROCODILE; i++)
+        // SE IL PROIETTILE DELLA RANA COLPISCE UN PROIETTILE DELLA PIANTA --------------------------------------------------------------------------------------
+        
+        for (int i = 0; i < N_PLANT_BULLETS; i++)
         {
-            // se il proiettile sta sul coccodrillo corrente
-            if (frog_bullet.bulletisactive && (crocodiles[i].y == frog_bullet.y) && (frog_bullet.x >= crocodiles[i].x && frog_bullet.x <= crocodiles[i].x + CROCODILE_W))
+            // se il proiettile della rana colpisce un proiettile della pianta
+            if (frog_bullet.bulletisactive && plant_bullets[i].bulletisactive && (frog_bullet.y == plant_bullets[i].y) && (frog_bullet.x == plant_bullets[i].x))
             {
-                if (!crocodiles[i].crocodile_is_good)
-                {
-                    // se il coccodrillo è cattivo diventa buono
-                    crocodiles[i].crocodile_is_good = true;
-                    frog_bullet.bulletisactive = false;
-                    frog.frog_canshoot = true;
-                    break;
-                }
-                // comunica al frog bullet di distruggere il proiettile
+                // disattiva il proiettile della rana
                 frog_bullet.bulletisactive = false;
                 frog.frog_canshoot = true;
+                break;
             }
         }
-        pthread_mutex_unlock(&mutex);
+        
+
+        /*
+            Morti:
+            - Rana per out of bounds
+            - Rana per caduta in acqua
+            - Rana per tempo
+        */
+
+        // MORTE RANA PER OUT OF BOUNDS --------------------------------------------------------------------------------------
+        if (frog.x - 2 < MINX || frog.x + 2 > MAXX - 1 || frog.y < SCORE_ZONE_HEIGHT)
+        {
+            gamedata.player_score -= DEATH_SCORE;
+            frog.frog_candie = false;
+            gamedata.game_lost = true;
+        }
+
+        // MORTE RANA PER CADUTA IN ACQUA --------------------------------------------------------------------------------------
+        if (!onCrocodile)
+        {
+            frog.frog_candie = false;
+            gamedata.game_lost = true;
+        }
 
         // MORTE RANA PER TEMPO --------------------------------------------------------------------------------------
 
         // se il tempo scende a zero perdi la manche
-        pthread_mutex_lock(&mutex);
         if (time_left <= 0 && frog.frog_candie)
         {
             frog.frog_candie = false;
             gamedata.game_lost = true;
         }
-        pthread_mutex_unlock(&mutex);
+
+        /*
+            Vittorie/Perdite:
+            - Vittoria manche
+            - Sconfitta manche
+        */
 
         // se la manche è stata vinta o persa, fai terminare tutti i processi cambiando il valore di questa variabile
-        pthread_mutex_lock(&mutex);
         if (gamedata.game_lost || gamedata.game_won)
         {
 
             gamedata.player_score += 100;
             should_not_exit = false;
         }
-        pthread_mutex_unlock(&mutex);
     }
 
     if (gamedata.player_score <= 0)

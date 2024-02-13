@@ -59,50 +59,20 @@ void *frog_thread(void *a)
             if (frog.frog_canshoot)
             {
                 frog.frog_canshoot = false;
-                frog_bullet.x = frog.x;
-                frog_bullet.y = frog.y - 1;
                 frog_bullet.bulletisactive = true;
+                frog_bullet.y = frog.y - 1;
+                frog_bullet.x = frog.x;
                 system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
             }
             break;
         }
         pthread_mutex_unlock(&mutex);
 
-        pthread_mutex_lock(&mutex);
-        for (int i = 0; i < N_PLANT_BULLETS; i++)
-        {
-            // Se il proiettile colpisce la rana
-            if (frog.y == plant_bullets[i].y && (frog.x >= plant_bullets[i].x - 2 && frog.x <= plant_bullets[i].x + 2))
-            {
-                // Il proiettile viene disattivato
-                plant_bullets[i].bulletisactive = false;
-                // La rana muore
-                frog.frog_candie = false;
-                gamedata.game_lost = true;
-            }
-            // Se il proiettile colpisce il proiettile della rana
-            if (plant_bullets[i].y == frog_bullet.y && plant_bullets[i].x == frog_bullet.x)
-            {
-                frog_bullet.bulletisactive = false;
-                frog.frog_canshoot = true;
-                break;
-            }
-        }
-        pthread_mutex_unlock(&mutex);
-
         if (frog_bullet.bulletisactive)
         {
-            if (frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT)
-            {
-                frog_bullet.y -= 1;
-                usleep(FROG_BULLET_DELAY);
-            }
-            else
-            {
-                frog_bullet.bulletisactive = false;
-                frog.frog_canshoot = true;
-            }
         }
+
+
         // Rimosso usleep
         usleep(1000);
     }
@@ -113,8 +83,38 @@ void *frog_thread(void *a)
 // Funzione per la gestione del processo frog_bullet
 void *frog_bullet_thread(void *a)
 {
-    // Funziona anche se questo è vuoto? Tutto ciò che viene fatto avviene nel processo di frog
+    unsigned int thread_id = (unsigned int)(size_t)pthread_self();
+    srand(thread_id);
+
+    while (should_not_exit)
+    {
+
+        while (frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT)
+        {
+            pthread_mutex_lock(&mutex);
+            frog_bullet.y -= 1;
+            pthread_mutex_unlock(&mutex);
+            usleep(FROG_BULLET_DELAY);
+        }
+
+        pthread_mutex_lock(&mutex);
+        frog_bullet.bulletisactive = false;
+        frog.frog_canshoot = true;
+        pthread_mutex_unlock(&mutex);
+    }
 }
+/*
+// Se il proiettile colpisce il proiettile della rana
+for (int i = 0; i < N_PLANT_BULLETS; i++)
+{
+    if (plant_bullets[i].y == frog_bullet.y && plant_bullets[i].x == frog_bullet.x)
+    {
+        frog_bullet.bulletisactive = false;
+        frog.frog_canshoot = true;
+    }
+}*/
+
+// Funziona anche se questo è vuoto? Tutto ciò che viene fatto avviene nel processo di frog
 
 void printAll()
 {
