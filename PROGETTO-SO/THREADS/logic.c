@@ -151,6 +151,7 @@ void analyze_data()
 // void *gameManche_thread(void *id)
 void gameManche()
 {
+    sleep(1);
     // system("echo \"$(date +'%Y-%m-%d %T') - Messaggio di log\" > /log.txt");
     system("echo 'Messaggio di log: inizio gameManche' > log.txt");
     //_Bool should_not_exit = true;
