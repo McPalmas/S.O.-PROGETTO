@@ -5,7 +5,7 @@
 		  FROG
    ----------------------------------------------*/ 
 // Funzione per la gestione del processo frog
-void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe_frogoncrocodile[2], int pipe_plantcanspawn[2], int difficulty){
+void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe_frogoncrocodile[2], int difficulty){
 
     // Gestione pipe
     close(pipe[0]);
@@ -15,7 +15,6 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
 
     // Definizione variabili
     objectData frog;
-    objectData frog_temp;
     objectData frog_bullet;
     objectData crocodile;
 
@@ -88,16 +87,12 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
                 if(crocodile.direction==LEFT)frog.x -= 1;
                 else frog.x += 1;
             }
-            }
+        }
     
-        // Aggiorna la posizione di Frog in funzione dell'input
-        //if(!areFrogsEqual(frog, frog_temp)){ 
+      
             // Comunica il nuovo stato della rana
             write(pipe[1],&frog, sizeof(objectData));  // ho commentato sta parte perchè non ne capisco l'utilità quindi anche la funzione frogareequal
-        //}
 
-        // Salva lo stato precedente
-        //frog_temp = frog;
 
         usleep(1000);
     }
@@ -177,10 +172,3 @@ void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_des
 
 }
 
-/**
- * Controlla se due Frog sono equivalenti
-*/
-// controlla se due frogs passate come parametro sono uguali
-int areFrogsEqual(objectData frog1, objectData frog2){
-    return (frog1.x == frog2.x) && (frog1.y == frog2.y) && (frog1.frog_candie == frog2.frog_candie) && (frog1.frog_canshoot == frog2.frog_canshoot);
-}

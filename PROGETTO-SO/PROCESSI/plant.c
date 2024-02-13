@@ -4,19 +4,16 @@
 /* ----------------------------------------------   
 		  PLANT
    ----------------------------------------------*/ 
-void plant_process(int id, int pipe[2], int pipe_can_plant_spawn[2], int pipe_plant_is_dead[2], int pipe_destroy_plant_bullet[2], int difficulty){
+void plant_process(int id, int pipe[2], int pipe_plant_is_dead[2], int pipe_destroy_plant_bullet[2], int difficulty){
 
     // Gestione pipe
     close(pipe[0]);
-    close(pipe_can_plant_spawn[1]);
     close(pipe_plant_is_dead[1]);
 
     srand(getpid());
     // Posizione oggetti di gioco
     objectData plant;
     objectData plant_data;
-    objectData frog;
-    objectData frog_data;
     pid_t plant_bullet;
     int plant_bullet_timer;
     int plant_respawn_timer;
@@ -43,9 +40,6 @@ void plant_process(int id, int pipe[2], int pipe_can_plant_spawn[2], int pipe_pl
     while (1) {
         if(read(pipe_plant_is_dead[0], &plant_data, sizeof(objectData)) != -1){ 
             plant = plant_data;     
-        }
-        if(read(pipe_can_plant_spawn[0], &frog_data, sizeof(objectData)) != -1){   // non viene mai usata è la levare credo 
-            frog = frog_data;
         }
         if(plant.plant_isalive){
             plant_bullet_timer--;

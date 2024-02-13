@@ -44,12 +44,6 @@ void initialize_game(GameData gamedata){
     pipe(pipe_destroy_frog_bullet);
     fcntl(pipe_destroy_frog_bullet[0], F_SETFL, fcntl(pipe_destroy_frog_bullet[0], F_GETFL) | O_NONBLOCK);
 
-
-    // Comunicazione fra frog e plant (Plant può spawnare)
-    int pipe_can_plant_spawn[2];
-    pipe(pipe_can_plant_spawn);
-    fcntl(pipe_can_plant_spawn[0], F_SETFL, fcntl(pipe_can_plant_spawn[0], F_GETFL) | O_NONBLOCK);
-
     // Comunicazione fra oggetti e plant_bullet (Plant Bullet ha avuto una collisione)
     int pipe_destroy_plant_bullet[3][2];
     for(int i = 0; i < 3; i++){
@@ -83,7 +77,7 @@ void initialize_game(GameData gamedata){
     // Creazione processi  
     frog = fork();
     if (frog == 0){
-        frog_process(pip, pipe_shoot, pipe_canshoot, pipe_frog_on_crocodile, pipe_can_plant_spawn, gamedata.difficulty);    
+        frog_process(pip, pipe_shoot, pipe_canshoot, pipe_frog_on_crocodile, gamedata.difficulty);    
     }
     else{
         frog_bullet = fork();
@@ -111,7 +105,7 @@ void initialize_game(GameData gamedata){
 		    for (int i = 0; i < N_PLANTS; i++) {
 		        plant[i] = fork();
 		        if (plant[i] == 0) {
-		            plant_process(PLANT_ID_0+i, pip, pipe_can_plant_spawn, pipe_plant_is_dead[i], pipe_destroy_plant_bullet[i], gamedata.difficulty);
+		            plant_process(PLANT_ID_0+i, pip, pipe_plant_is_dead[i], pipe_destroy_plant_bullet[i], gamedata.difficulty);
 		            exit(0);  // Importante per evitare che il processo figlio entri nel ciclo for successivo
 		        }
 		    }
