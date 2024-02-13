@@ -47,6 +47,3 @@ GameData gamedata = {
     .difficulty = 0,
     .score = 0
 };
-
-// è necessario sto file non si possono inizializzare a inizio game ??
-

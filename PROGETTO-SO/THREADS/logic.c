@@ -43,9 +43,6 @@ void initialize_game()
     initialize_river_flows();
     crocodiles_inizializer();
 
-    // i threads, quando verranno creati, potranno avviare il loro ciclo, che terminerà quando verrà modificato il valore di questa variabile
-    // should_not_exit = true;
-
     //* CREAZIONE THREADS -------------------
 
     pthread_create(&frog_t, NULL, &frog_thread, NULL);
@@ -63,7 +60,6 @@ void initialize_game()
 
     pthread_create(&time_t, NULL, &time_thread, NULL);
 
-    // pthread_create(&gameManche_t, NULL, &gameManche_thread, NULL);
     gameManche();
     //* TERMINAZIONE THREADS -------------------
 
@@ -82,7 +78,6 @@ void initialize_game()
         pthread_join(crocodile_t[i], NULL);
     }
 
-    // pthread_join(gameManche_t, NULL);
 
     // system("echo 'Messaggio di log: prima di analyze_data' > log.txt");
     analyze_data();
@@ -163,38 +158,6 @@ void gameManche()
 
     int start_dens[] = {16, 27, 38, 49, 60};
     bool onCrocodile = true;
-    // posizone di partenza della rana
-    /* int frog_start_y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 2;
-     int frog_start_x = FROG_START;
-
-     // bool ausiliaria per controllare se una tana è occupata o meno
-     _Bool frog_in_a_den = false;
-
-     //posizione y dei dati relativi al player, ovvero score, time e vite
-     int top_score_height =  1 ;
-     int bottom_score_height = TOTAL_HEIGHT +1 ;
-
-     // inizializzazioni per evitare collisioni iniziali
-     frog.frog_candie = false;
-     frog.x = frog_start_x;
-     frog.y = frog_start_y;
-
-     // frog bullet
-     frog_bullet.bulletisactive = false;
-
-    // Plant
-    for (int i = 0; i < N_PLANTS; i++)
-    {
-        plants[i].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT;
-    }
-
-    // Plant bullet
-    for (int i = 0; i < N_PLANT_BULLETS; i++)
-    {
-        plant_bullets[i].bulletisactive = false;
-    }
-
-    // crocodiles_inizializer();*/
 
     while (should_not_exit)
     {
@@ -342,26 +305,6 @@ void gameManche()
             }
         }
         pthread_mutex_unlock(&mutex);
-
-        // proiettili rana - proiettili piante - distrugge i proiettili, ma solo graficamente. Probabilmente va gestito nello script di plant o frog
-        /*
-        pthread_mutex_lock(&mutex);
-        for (int i = 0; i < N_PLANT_BULLETS; i++)
-        {
-            if (plant_bullets[i].bulletisactive && frog_bullet.bulletisactive)
-            {
-                // se collide col proiettile della rana
-                if ((plant_bullets[i].y == frog_bullet.y) && (plant_bullets[i].x == frog_bullet.x))
-                {
-                    // disattiva entrambi i proiettili
-                    plant_bullets[i].bulletisactive = false;
-                    frog_bullet.bulletisactive = false;
-                    frog.frog_canshoot = true;
-                }
-            }
-        }
-        pthread_mutex_unlock(&mutex);
-        */
 
         // proiettili rana - coccodrilli - ok
         pthread_mutex_lock(&mutex);
