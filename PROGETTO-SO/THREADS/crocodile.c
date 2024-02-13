@@ -41,6 +41,19 @@ void *crocodile_thread(void *id)
             else
                 crocodiles[crocodileIndex].x -= 1;
             pthread_mutex_unlock(&mutex);
+            
+            
+            pthread_mutex_lock(&mutex);
+            // se la rana si trova alla stessa altezza del coccodrillo
+            //if(frog.y == crocodiles[crocodileIndex].y){
+            if (frog.y == crocodiles[crocodileIndex].y && (frog.x > (crocodiles[crocodileIndex].x + 2) && frog.x < (crocodiles[crocodileIndex].x + CROCODILE_W - 1)))
+            {
+                if(crocodiles[crocodileIndex].direction == RIGHT)
+                    frog.x += 1;
+                else  
+                    frog.x -= 1; 
+            }
+            pthread_mutex_unlock(&mutex);
         }
         else
         {

@@ -37,6 +37,7 @@ int time_left = 0;
 RiverFlow river_flows[RIVER_LANES_NUMBER];
 
 bool should_not_exit = true;
+bool onCrocodile = false;
 
 GameData gamedata = {
     .game_lost = 0,

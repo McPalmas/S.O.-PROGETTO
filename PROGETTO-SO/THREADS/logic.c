@@ -156,11 +156,6 @@ void analyze_data()
 // void *gameManche_thread(void *id)
 void gameManche()
 {
-    // system("echo \"$(date +'%Y-%m-%d %T') - Messaggio di log\" > /log.txt");
-    system("echo 'Messaggio di log: inizio gameManche' > log.txt");
-    //_Bool should_not_exit = true;
-    gamedata.player_score += 1;
-
     int start_dens[] = {16, 27, 38, 49, 60};
     int crocodile_immersion_timer = getRandomInt(100);
 
@@ -223,10 +218,11 @@ void gameManche()
             }
         }
         pthread_mutex_unlock(&mutex);
+        
 
-        // Spostamento della rana se è sopra un coccodrillo - si comporta in maniera strana
-        /*
-        pthread_mutex_lock(&mutex);
+        // Sgestita in crocodile.c
+        
+      /*  pthread_mutex_lock(&mutex);
         for (int i = 0; i < N_CROCODILE; i++)
         {
             if (frog.y == crocodiles[i].y && (frog.x > (crocodiles[i].x + 2) && frog.x < (crocodiles[i].x + CROCODILE_W - 1)))
@@ -237,18 +233,18 @@ void gameManche()
                     frog.x -= 1;
             }
         }
-        pthread_mutex_unlock(&mutex);
-        */
-
+        pthread_mutex_unlock(&mutex);*/
+        
+/*
         // Se la rana è nel fiume e si trova sopra un coccodrillo cattivo - non funziona il timer, va subito a zero
-        /*
         pthread_mutex_lock(&mutex);
         if (frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT)
         {
             for (int i = 0; i < N_CROCODILE; i++)
             {
-                if (frog.y == crocodiles[i].y && (frog.x > crocodiles[i].x && frog.x < crocodiles[i].x + CROCODILE_W))
+                if (frog.frog_candie && frog.y == crocodiles[i].y && (frog.x > crocodiles[i].x+1 && frog.x < crocodiles[i].x + CROCODILE_W-1))
                 {
+                    onCrocodile = true;
                     if (!crocodiles[i].crocodile_is_good)
                     {
                         crocodile_immersion_timer--;
@@ -274,12 +270,17 @@ void gameManche()
                             frog.frog_candie = false;
                             gamedata.game_lost = true;
                         };
-                    }
-                }
+                    }else crocodile_immersion_timer=getRandomInt(100);
+                    break;
+                }else onCrocodile = false;
             }
+            if(!onCrocodile){
+                frog.frog_candie = false;
+                gamedata.game_lost = true;
+            };
         }
         pthread_mutex_unlock(&mutex);
-        */
+  */      
 
         // RANA - TANA --------------------------------------------------------------------------------------
 
@@ -419,8 +420,6 @@ void gameManche()
         pthread_mutex_lock(&mutex);
         if (gamedata.game_lost || gamedata.game_won)
         {
-
-            gamedata.player_score += 100;
             should_not_exit = false;
         }
         pthread_mutex_unlock(&mutex);
