@@ -169,7 +169,6 @@ void gameManche()
             - Rana con tane
             - Proiettile rana con coccodrillo
             - Proiettile rana con piante
-            - Proiettile rana con proiettili piante
         */
 
         // SE LA RANA COLLIDE CON UNA PIANTA --------------------------------------------------------------------------------------
@@ -309,20 +308,6 @@ void gameManche()
                     frog.frog_canshoot = true;
                     plants[i].plant_isalive = false;
                 }
-            }
-        }
-
-        // SE IL PROIETTILE DELLA RANA COLPISCE UN PROIETTILE DELLA PIANTA --------------------------------------------------------------------------------------
-        
-        for (int i = 0; i < N_PLANT_BULLETS; i++)
-        {
-            // se il proiettile della rana colpisce un proiettile della pianta
-            if (frog_bullet.bulletisactive && plant_bullets[i].bulletisactive && (frog_bullet.y == plant_bullets[i].y) && (frog_bullet.x == plant_bullets[i].x))
-            {
-                // disattiva il proiettile della rana
-                frog_bullet.bulletisactive = false;
-                frog.frog_canshoot = true;
-                break;
             }
         }
         

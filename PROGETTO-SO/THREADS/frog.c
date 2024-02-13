@@ -58,20 +58,26 @@ void *frog_thread(void *a)
         case SPACE:
             if (frog.frog_canshoot)
             {
-                frog.frog_canshoot = false;
-                frog_bullet.bulletisactive = true;
                 frog_bullet.y = frog.y - 1;
                 frog_bullet.x = frog.x;
+                frog.frog_canshoot = false;
+                frog_bullet.bulletisactive = true;
                 system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
             }
             break;
         }
         pthread_mutex_unlock(&mutex);
 
-        if (frog_bullet.bulletisactive)
-        {
+        for(int i = 0; i< N_FROG_BULLETS; i++){
+            if(frog_bullet.bulletisactive && plant_bullets[i].bulletisactive > 0){
+                if(frog_bullet.x == plant_bullets[i].x && frog_bullet.y == plant_bullets[i].y){
+                    pthread_mutex_lock(&mutex);
+                    frog_bullet.bulletisactive = false;
+                    plant_bullets[i].bulletisactive = false;
+                    pthread_mutex_unlock(&mutex);
+                }
+            }
         }
-
 
         // Rimosso usleep
         usleep(1000);
@@ -103,16 +109,6 @@ void *frog_bullet_thread(void *a)
         pthread_mutex_unlock(&mutex);
     }
 }
-/*
-// Se il proiettile colpisce il proiettile della rana
-for (int i = 0; i < N_PLANT_BULLETS; i++)
-{
-    if (plant_bullets[i].y == frog_bullet.y && plant_bullets[i].x == frog_bullet.x)
-    {
-        frog_bullet.bulletisactive = false;
-        frog.frog_canshoot = true;
-    }
-}*/
 
 // Funziona anche se questo è vuoto? Tutto ciò che viene fatto avviene nel processo di frog
 

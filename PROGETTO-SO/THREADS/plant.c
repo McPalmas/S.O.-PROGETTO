@@ -36,9 +36,12 @@ void *plant_thread(void *id)
 
     while (should_not_exit)
     {
+
         if (plants[plantIndex].plant_isalive)
         {
+            pthread_mutex_lock(&mutex);
             plant_bullet_timer--;
+            pthread_mutex_unlock(&mutex);
             // Se il timer è scaduto
             pthread_mutex_lock(&mutex);
             if (plant_bullet_timer <= 0)
@@ -67,6 +70,12 @@ void *plant_thread(void *id)
                 plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1);
             }
         }
+        pthread_mutex_lock(&mutex);
+        if (plant_bullets[plantIndex].y == frog_bullet.y && plant_bullets[plantIndex].x == frog_bullet.x)
+        {
+            plant_bullets[plantIndex].bulletisactive = false;
+        }
+        pthread_mutex_unlock(&mutex);
         sleep(1); // 1 secondo
     }
 }
@@ -83,13 +92,10 @@ void *plant_bullet_thread(void *id)
     int plant_bullet_delay;
 
     pthread_mutex_lock(&mutex);
-    plant_bullets[plantBulletIndex].bulletisactive = false;
-    pthread_mutex_unlock(&mutex);
     // Inizializzazione proiettile
     plant_bullets[plantBulletIndex].x = plants[plantBulletIndex].x + 1;
     plant_bullets[plantBulletIndex].y = plants[plantBulletIndex].y + 1;
     plant_bullets[plantBulletIndex].bulletisactive = true;
-
     switch (gamedata.difficulty)
     {
     case EASY:
@@ -104,6 +110,7 @@ void *plant_bullet_thread(void *id)
     default:
         break;
     }
+    pthread_mutex_unlock(&mutex);
 
     system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
 
@@ -118,9 +125,11 @@ void *plant_bullet_thread(void *id)
             pthread_mutex_unlock(&mutex);
         }
         // Sposta il proiettile
+        pthread_mutex_lock(&mutex);
         plant_bullets[plantBulletIndex].y += 1;
+        pthread_mutex_unlock(&mutex);
 
-        while (plant_bullets[plantBulletIndex].y < MAXY - 12 && (plant_bullets[plantBulletIndex].y != frog_bullet.y && plant_bullets[plantBulletIndex].x != frog_bullet.x))
+        while (plant_bullets[plantBulletIndex].y < MAXY - 12)
         {
             pthread_mutex_lock(&mutex);
             plant_bullets[plantBulletIndex].y += 1;
