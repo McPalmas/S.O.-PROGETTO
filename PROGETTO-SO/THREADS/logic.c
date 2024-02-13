@@ -248,20 +248,19 @@ void gameManche()
 
         // Se la rana è nel fiume e si trova sopra un coccodrillo cattivo con timer a zero - ok
 
-        pthread_mutex_lock(&mutex);
         if (frog.frog_candie && frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT)
         {
             for (int i = 0; i < N_CROCODILE; i++)
             {
-                if (crocodiles[i].crocodile_immersion_timer_counter <= 0)
+                if (crocodiles[i].crocodile_immersion_timer_counter < 0)
                 {
                     frog.frog_candie = false;
                     gamedata.game_lost = true;
+                    break;
                 };
             }
         }
 
-        pthread_mutex_unlock(&mutex);
 
         // RANA - TANA --------------------------------------------------------------------------------------
 
@@ -345,7 +344,7 @@ void gameManche()
         pthread_mutex_unlock(&mutex);
 
         // proiettili rana - proiettili piante - distrugge i proiettili, ma solo graficamente. Probabilmente va gestito nello script di plant o frog
-        
+        /*
         pthread_mutex_lock(&mutex);
         for (int i = 0; i < N_PLANT_BULLETS; i++)
         {
@@ -362,7 +361,7 @@ void gameManche()
             }
         }
         pthread_mutex_unlock(&mutex);
-        
+        */
 
         // proiettili rana - coccodrilli - ok
         pthread_mutex_lock(&mutex);

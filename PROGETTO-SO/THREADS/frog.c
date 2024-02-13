@@ -59,7 +59,7 @@ void *frog_thread(void *a)
             if (frog.frog_canshoot)
             {
                 frog.frog_canshoot = false;
-                frog_bullet.x = frog.x + 1;
+                frog_bullet.x = frog.x;
                 frog_bullet.y = frog.y - 1;
                 frog_bullet.bulletisactive = true;
                 system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
@@ -79,6 +79,13 @@ void *frog_thread(void *a)
                 // La rana muore
                 frog.frog_candie = false;
                 gamedata.game_lost = true;
+            }
+            // Se il proiettile colpisce il proiettile della rana
+            if (plant_bullets[i].y == frog_bullet.y && plant_bullets[i].x == frog_bullet.x)
+            {
+                frog_bullet.bulletisactive = false;
+                frog.frog_canshoot = true;
+                break;
             }
         }
         pthread_mutex_unlock(&mutex);

@@ -57,10 +57,8 @@ void *crocodile_thread(void *id)
             if (!crocodiles[crocodileIndex].crocodile_is_good && frog.y == crocodiles[crocodileIndex].y && (frog.x > (crocodiles[crocodileIndex].x) && frog.x < (crocodiles[crocodileIndex].x + CROCODILE_W - 2)))
             {
                 crocodiles[crocodileIndex].crocodile_immersion_timer_counter--;
-
                 if (crocodiles[crocodileIndex].crocodile_immersion_timer_counter < (crocodiles[crocodileIndex].crocodile_immersion_timer / 2))
                 crocodiles[crocodileIndex].is_crocodile_immersing = true;
-
             }
             pthread_mutex_unlock(&mutex);
         }

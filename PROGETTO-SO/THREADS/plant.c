@@ -120,7 +120,7 @@ void *plant_bullet_thread(void *id)
         // Sposta il proiettile
         plant_bullets[plantBulletIndex].y += 1;
 
-        while (plant_bullets[plantBulletIndex].y < MAXY - 12)
+        while (plant_bullets[plantBulletIndex].y < MAXY - 12 && (plant_bullets[plantBulletIndex].y != frog_bullet.y && plant_bullets[plantBulletIndex].x != frog_bullet.x))
         {
             pthread_mutex_lock(&mutex);
             plant_bullets[plantBulletIndex].y += 1;
@@ -128,7 +128,6 @@ void *plant_bullet_thread(void *id)
 
             usleep(plant_bullet_delay);
         }
-
         pthread_mutex_lock(&mutex);
         plant_bullets[plantBulletIndex].bulletisactive = false;
         pthread_mutex_unlock(&mutex);
