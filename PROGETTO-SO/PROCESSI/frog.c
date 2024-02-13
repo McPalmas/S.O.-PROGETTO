@@ -83,13 +83,13 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
         // Legge il dato dalla pipe, se è presente
         if(read(pipe_frogoncrocodile[0], &crocodile, sizeof(objectData)) != -1){
             // Se Frog è sulla schiena del coccodrillo
-            if(frog.y == crocodile.y && (frog.x > crocodile.x+2 && frog.x < crocodile.x + CROCODILE_W-1)){
+            if(frog.y == crocodile.y && (frog.x > crocodile.x + 2 -2*crocodile.direction && frog.x < (crocodile.x + CROCODILE_W -1 - 2*crocodile.direction))){
                 // la posizione di Frog è aggiornata
                 if(crocodile.direction==LEFT)frog.x -= 1;
                 else frog.x += 1;
             }
-        }
-        
+            }
+    
         // Aggiorna la posizione di Frog in funzione dell'input
         if(!areFrogsEqual(frog, frog_temp)){ // è necessario sto controllo ???
             // Comunica il nuovo stato della rana

@@ -44,7 +44,7 @@ void *crocodile_thread(void *id)
             pthread_mutex_unlock(&mutex);
 
             pthread_mutex_lock(&mutex);
-            if (frog.y == crocodiles[crocodileIndex].y && (frog.x > (crocodiles[crocodileIndex].x) && frog.x < (crocodiles[crocodileIndex].x + CROCODILE_W - 2)))
+            if (frog.y == crocodiles[crocodileIndex].y && (frog.x > crocodiles[crocodileIndex].x + 2 -2*crocodiles[crocodileIndex].direction && frog.x < (crocodiles[crocodileIndex].x + CROCODILE_W -1 - 2*crocodiles[crocodileIndex].direction)))
             {
                 if (crocodiles[crocodileIndex].direction == RIGHT)
                     frog.x += 1;
