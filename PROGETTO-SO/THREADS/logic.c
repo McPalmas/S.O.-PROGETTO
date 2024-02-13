@@ -162,7 +162,6 @@ void gameManche()
     gamedata.player_score += 1;
 
     int start_dens[] = {16, 27, 38, 49, 60};
-    int crocodile_immersion_timer = getRandomInt(100);
     bool onCrocodile = true;
     // posizone di partenza della rana
     /* int frog_start_y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 2;
@@ -230,60 +229,39 @@ void gameManche()
         {
             for (int i = 0; i < N_CROCODILE; i++)
             {
-                if (frog.frog_candie && frog.y == crocodiles[i].y && (frog.x > crocodiles[i].x + 1 && frog.x < crocodiles[i].x + CROCODILE_W -2))
+                if (frog.frog_candie && frog.y == crocodiles[i].y && (frog.x > crocodiles[i].x + 1 && frog.x < crocodiles[i].x + CROCODILE_W - 2))
                 {
-                    onCrocodile=true;
+                    onCrocodile = true;
                     break;
-                }else onCrocodile=false;
+                }
+                else
+                    onCrocodile = false;
             }
         }
         pthread_mutex_unlock(&mutex);
 
-        if(!onCrocodile){
+        if (!onCrocodile)
+        {
             frog.frog_candie = false;
             gamedata.game_lost = true;
         }
 
-        // Se la rana è nel fiume e si trova sopra un coccodrillo cattivo - non funziona il timer, va subito a zero
-        /*
+        // Se la rana è nel fiume e si trova sopra un coccodrillo cattivo con timer a zero - ok
+
         pthread_mutex_lock(&mutex);
-        if (frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT)
+        if (frog.frog_candie && frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT)
         {
             for (int i = 0; i < N_CROCODILE; i++)
             {
-                if (frog.y == crocodiles[i].y && (frog.x > crocodiles[i].x && frog.x < crocodiles[i].x + CROCODILE_W))
+                if (crocodiles[i].crocodile_immersion_timer_counter <= 0)
                 {
-                    if (!crocodiles[i].crocodile_is_good)
-                    {
-                        crocodile_immersion_timer--;
-
-                        switch (gamedata.difficulty)
-                        {
-                        case EASY:
-                            if (crocodile_immersion_timer <= (CROCODILE_IMMERSION_TIME_EASY / 2))
-                                crocodiles[i].is_crocodile_immersing = true;
-                            break;
-                        case NORMAL:
-                            if (crocodile_immersion_timer <= (CROCODILE_IMMERSION_TIME_NORMAL / 2))
-                                crocodiles[i].is_crocodile_immersing = true;
-                            break;
-
-                        case HARD:
-                            if (crocodile_immersion_timer <= (CROCODILE_IMMERSION_TIME_HARD / 2))
-                                crocodiles[i].is_crocodile_immersing = true;
-                            break;
-                        }
-                        if (crocodile_immersion_timer <= 0)
-                        {
-                            frog.frog_candie = false;
-                            gamedata.game_lost = true;
-                        };
-                    }
-                }
+                    frog.frog_candie = false;
+                    gamedata.game_lost = true;
+                };
             }
         }
+
         pthread_mutex_unlock(&mutex);
-        */
 
         // RANA - TANA --------------------------------------------------------------------------------------
 
@@ -366,8 +344,8 @@ void gameManche()
         }
         pthread_mutex_unlock(&mutex);
 
-        // proiettili rana - proiettili piante - distrugge i proiettili, ma solo graficamente
-        /*
+        // proiettili rana - proiettili piante - distrugge i proiettili, ma solo graficamente. Probabilmente va gestito nello script di plant o frog
+        
         pthread_mutex_lock(&mutex);
         for (int i = 0; i < N_PLANT_BULLETS; i++)
         {
@@ -384,8 +362,8 @@ void gameManche()
             }
         }
         pthread_mutex_unlock(&mutex);
-        */
         
+
         // proiettili rana - coccodrilli - ok
         pthread_mutex_lock(&mutex);
         for (int i = 0; i < N_CROCODILE; i++)
@@ -407,7 +385,7 @@ void gameManche()
             }
         }
         pthread_mutex_unlock(&mutex);
-        
+
         // MORTE RANA PER TEMPO --------------------------------------------------------------------------------------
 
         // se il tempo scende a zero perdi la manche
@@ -528,20 +506,20 @@ bool getRandomBoolean(float probability)
     return rand() > probability * ((float)RAND_MAX + 1.0);
 }
 
-int getRandomInt(int min)
+int getCrocodileTimer()
 {
     int randomTimer;
 
     switch (gamedata.difficulty)
     {
     case (EASY):
-        randomTimer = rand() % (CROCODILE_IMMERSION_TIME_EASY + 1) + min;
+        randomTimer = rand() % (CROCODILE_IMMERSION_TIME_EASY + CROCODILE_IMMERSION_TIME_MIN);
         break;
     case (NORMAL):
-        randomTimer = rand() % (CROCODILE_IMMERSION_TIME_NORMAL + 1) + min;
+        randomTimer = rand() % (CROCODILE_IMMERSION_TIME_NORMAL + CROCODILE_IMMERSION_TIME_MIN);
         break;
     case (HARD):
-        randomTimer = rand() % (CROCODILE_IMMERSION_TIME_HARD + 1) + min;
+        randomTimer = rand() % (CROCODILE_IMMERSION_TIME_HARD + CROCODILE_IMMERSION_TIME_MIN);
         break;
     default:
         break;

@@ -6,7 +6,6 @@
    ----------------------------------------------*/
 void *crocodile_thread(void *id)
 {
-
     // estrazione dell'id passato alla funzione
     int crocodileIndex = *((int *)id);
 
@@ -18,6 +17,8 @@ void *crocodile_thread(void *id)
     // Inizializzazione oggetto crocodile (Da completare)
     crocodiles[crocodileIndex].is_crocodile_immersing = false;
     crocodiles[crocodileIndex].is_crocodile_alive = true;
+    crocodiles[crocodileIndex].crocodile_immersion_timer = getCrocodileTimer();
+    crocodiles[crocodileIndex].crocodile_immersion_timer_counter = crocodiles[crocodileIndex].crocodile_immersion_timer;
     pthread_mutex_unlock(&mutex);
 
     // Ciclo di esecuzione di crocodile
@@ -49,6 +50,17 @@ void *crocodile_thread(void *id)
                     frog.x += 1;
                 else
                     frog.x -= 1;
+            }
+            pthread_mutex_unlock(&mutex);
+
+            pthread_mutex_lock(&mutex);
+            if (!crocodiles[crocodileIndex].crocodile_is_good && frog.y == crocodiles[crocodileIndex].y && (frog.x > (crocodiles[crocodileIndex].x) && frog.x < (crocodiles[crocodileIndex].x + CROCODILE_W - 2)))
+            {
+                crocodiles[crocodileIndex].crocodile_immersion_timer_counter--;
+
+                if (crocodiles[crocodileIndex].crocodile_immersion_timer_counter < (crocodiles[crocodileIndex].crocodile_immersion_timer / 2))
+                crocodiles[crocodileIndex].is_crocodile_immersing = true;
+
             }
             pthread_mutex_unlock(&mutex);
         }
@@ -83,7 +95,8 @@ void *crocodile_thread(void *id)
             crocodiles[crocodileIndex].crocodile_is_good = rand() % 2;
             crocodiles[crocodileIndex].is_crocodile_alive = true;
             crocodiles[crocodileIndex].is_crocodile_immersing = false;
-            crocodiles[crocodileIndex].crocodile_immersion_timer = getRandomInt(100);
+            crocodiles[crocodileIndex].crocodile_immersion_timer = getCrocodileTimer();
+            crocodiles[crocodileIndex].crocodile_immersion_timer_counter = crocodiles[crocodileIndex].crocodile_immersion_timer;
             if (crocodiles[crocodileIndex].direction == LEFT)
                 crocodiles[crocodileIndex].x = MAXX - 2;
             else

@@ -100,9 +100,10 @@
 #define CROCODILE_IS_BAD_PROBABILITY_NORMAL 0.35
 #define CROCODILE_IS_BAD_PROBABILITY_HARD 0.5
 // Tempo di immersione del coccodrillo
-#define CROCODILE_IMMERSION_TIME_EASY 240
-#define CROCODILE_IMMERSION_TIME_NORMAL 180
-#define CROCODILE_IMMERSION_TIME_HARD 120
+#define CROCODILE_IMMERSION_TIME_EASY 24
+#define CROCODILE_IMMERSION_TIME_NORMAL 18
+#define CROCODILE_IMMERSION_TIME_HARD 12
+#define CROCODILE_IMMERSION_TIME_MIN 12
 // Velocità dei proiettili delle piante
 #define PLANT_BULLET_DELAY_EASY 100000
 #define PLANT_BULLET_DELAY_NORMAL 80000
@@ -230,6 +231,7 @@ typedef struct
    bool is_crocodile_alive;
    int flow_number;
    int crocodile_immersion_timer;
+   int crocodile_immersion_timer_counter;
 } Crocodile;
 
 extern int time_left;
@@ -299,6 +301,6 @@ void gameManche();
 
 void crocodiles_inizializer();
 void initialize_river_flows();
-int getRandomInt(int min);
+int getCrocodileTimer();
 bool getRandomBoolean(float probability);
 int getRandomTimer(int min);
