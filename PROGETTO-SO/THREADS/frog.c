@@ -83,6 +83,19 @@ void *frog_thread(void *a)
         }
         pthread_mutex_unlock(&mutex);
 
+        if (frog_bullet.bulletisactive)
+        {
+            if (frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT)
+            {
+                frog_bullet.y -= 1;
+                usleep(FROG_BULLET_DELAY);
+            }
+            else
+            {
+                frog_bullet.bulletisactive = false;
+                frog.frog_canshoot = true;
+            }
+        }
         // Rimosso usleep
         usleep(1000);
     }
@@ -93,47 +106,7 @@ void *frog_thread(void *a)
 // Funzione per la gestione del processo frog_bullet
 void *frog_bullet_thread(void *a)
 {
-
-    unsigned int thread_id = (unsigned int)(size_t)pthread_self();
-    srand(thread_id);
-    
-
-    // inizialmente il proiettile non è attivo
-    pthread_mutex_lock(&mutex);
-    frog_bullet.bulletisactive = false;
-    pthread_mutex_unlock(&mutex);
-
-    // Ciclo di esecuzione di Frog Bullet
-    while (should_not_exit)
-    {
-
-        // se il proiettile è attivo e non è uscito dall'area di gioco
-        if (frog_bullet.bulletisactive == true)
-        {
-            // posizione
-            ;
-        }
-
-        frog_bullet.y -= 1;
-
-        // fino a che il proiettile non supera il limite dell'area di gioco o fino a che non viene disattivato
-        while (frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT)
-        {
-            // sposta il proiettile verso l'alto
-            pthread_mutex_lock(&mutex);
-            frog_bullet.y -= 1;
-            pthread_mutex_unlock(&mutex);
-
-            // velocità del proiettile (più è bassa, più è veloce)
-            usleep(FROG_BULLET_DELAY);
-        }
-
-        // quando esce dal while disattiva il proiettile e permette alla rana di sparare
-        pthread_mutex_lock(&mutex);
-        frog_bullet.bulletisactive = false;
-        frog.frog_canshoot = true;
-        pthread_mutex_unlock(&mutex);
-    }
+    // Funziona anche se questo è vuoto? Tutto ciò che viene fatto avviene nel processo di frog
 }
 
 void printAll()

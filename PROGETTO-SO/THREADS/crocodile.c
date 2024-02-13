@@ -41,51 +41,6 @@ void *crocodile_thread(void *id)
             else
                 crocodiles[crocodileIndex].x -= 1;
             pthread_mutex_unlock(&mutex);
-
-            pthread_mutex_lock(&mutex);
-            bool onCrocodile = false;
-            // Se la rana si trova sul coccodrillo
-            if (frog.y == crocodiles[crocodileIndex].y && (frog.x > crocodiles[crocodileIndex].x + 2 && frog.x < crocodiles[crocodileIndex].x + CROCODILE_W - 1))
-            {
-                onCrocodile = true;
-                if (crocodiles[crocodileIndex].direction == RIGHT)
-                    frog.x += 1;
-                else
-                    frog.x -= 1;
-                if (!crocodiles[crocodileIndex].crocodile_is_good)
-                {
-                    crocodiles[crocodileIndex].crocodile_immersion_timer--;
-                    switch (gamedata.difficulty)
-                    {
-                    case EASY:
-                        if (crocodiles[crocodileIndex].crocodile_immersion_timer <= (CROCODILE_IMMERSION_TIME_EASY / 2))
-                            crocodiles[crocodileIndex].is_crocodile_immersing = true;
-                        break;
-                    case NORMAL:
-                        if (crocodiles[crocodileIndex].crocodile_immersion_timer <= (CROCODILE_IMMERSION_TIME_NORMAL / 2))
-                            crocodiles[crocodileIndex].is_crocodile_immersing = true;
-                        break;
-                    case HARD:
-                        if (crocodiles[crocodileIndex].crocodile_immersion_timer <= (CROCODILE_IMMERSION_TIME_HARD / 2))
-                            crocodiles[crocodileIndex].is_crocodile_immersing = true;
-                        break;
-                    }
-                    if (crocodiles[crocodileIndex].crocodile_immersion_timer <= 0)
-                    {
-                        frog.frog_candie = false;
-                        gamedata.game_lost = true;
-                    };
-                }
-            }
-            else if (frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT && frog.y < MAXY - START_ZONE_HEIGHT - 1)
-            {
-                onCrocodile = false;
-            }
-            if(!onCrocodile){
-                frog.frog_candie = false;
-                //gamedata.game_lost = true;
-            }
-            pthread_mutex_unlock(&mutex);
         }
         else
         {
