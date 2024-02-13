@@ -68,7 +68,6 @@ void *frog_thread(void *a)
         }
         pthread_mutex_unlock(&mutex);
 
-        
         pthread_mutex_lock(&mutex);
         for (int i = 0; i < N_PLANT_BULLETS; i++)
         {
@@ -97,6 +96,7 @@ void *frog_thread(void *a)
                 frog.frog_canshoot = true;
             }
         }
+        // Rimosso usleep
         usleep(1000);
     }
 }
