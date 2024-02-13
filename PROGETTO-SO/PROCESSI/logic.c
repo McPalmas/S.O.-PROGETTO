@@ -433,7 +433,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             // per ogni coccodrillo
             for(i = 0; i < N_CROCODILE; i++){
                 // se la rana si trova su almeno un coccodrillo, aggiorna la variabile ed esce dal ciclo
-                if(frog.frog_candie && frog.y==crocodile[i].y && (frog.x > crocodile[i].x+1 && frog.x < crocodile[i].x + CROCODILE_W-1)){
+                if(frog.frog_candie && frog.y==crocodile[i].y && (frog.x > crocodile[i].x + 1 -1*crocodile[i].direction && frog.x < (crocodile[i].x + CROCODILE_W -1 -crocodile[i].direction))){
                     onCrocodile = true;
                     if(!crocodile[i].crocodile_is_good){
                         crocodile_immersion_timer--;
