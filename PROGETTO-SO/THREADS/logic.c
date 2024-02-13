@@ -148,14 +148,10 @@ void analyze_data()
 /* ----------------------------------------------
          GESTIONE MANCHE, STAMPE E COLLISIONI
    ----------------------------------------------*/
-// void *gameManche_thread(void *id)
 void gameManche()
 {
     sleep(1);
-    // system("echo \"$(date +'%Y-%m-%d %T') - Messaggio di log\" > /log.txt");
     system("echo 'Messaggio di log: inizio gameManche' > log.txt");
-    //_Bool should_not_exit = true;
-    gamedata.player_score += 1;
 
     int start_dens[] = {16, 27, 38, 49, 60};
     bool onCrocodile = true;
@@ -353,8 +349,6 @@ void gameManche()
         // se la manche è stata vinta o persa, fai terminare tutti i processi cambiando il valore di questa variabile
         if (gamedata.game_lost || gamedata.game_won)
         {
-
-            gamedata.player_score += 100;
             should_not_exit = false;
         }
     }

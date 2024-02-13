@@ -41,10 +41,10 @@ void plant_process(int id, int pipe[2], int pipe_can_plant_spawn[2], int pipe_pl
 		plant.x = PLANT_2_START;
     
     while (1) {
-        if(read(pipe_plant_is_dead[0], &plant_data, sizeof(objectData)) != -1){ //nonn so se serve
+        if(read(pipe_plant_is_dead[0], &plant_data, sizeof(objectData)) != -1){ 
             plant = plant_data;     
         }
-        if(read(pipe_can_plant_spawn[0], &frog_data, sizeof(objectData)) != -1){    //nonn so se serve  
+        if(read(pipe_can_plant_spawn[0], &frog_data, sizeof(objectData)) != -1){   // non viene mai usata è la levare credo 
             frog = frog_data;
         }
         if(plant.plant_isalive){
@@ -145,13 +145,13 @@ int getRandomTimer(int min, int difficulty){
     switch (difficulty)
     {
     case (EASY):
-        randomTimer = rand() % (PLANT_BULLET_RELOAD_EASY + 1) + min;
+        randomTimer = rand() % (min + 1) + PLANT_BULLET_RELOAD_EASY;
         break;
     case (NORMAL):
-        randomTimer = rand() % (PLANT_BULLET_RELOAD_NORMAL + 1) + min;
+        randomTimer = rand() % (min + 1) + PLANT_BULLET_RELOAD_NORMAL;
         break;
     case(HARD):
-        randomTimer = rand() % (PLANT_BULLET_RELOAD_HARD + 1) + min;
+        randomTimer = rand() % (min + 1) + PLANT_BULLET_RELOAD_HARD;
         break;
     default:
         break;

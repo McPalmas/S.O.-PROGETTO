@@ -62,7 +62,7 @@ void *frog_thread(void *a)
                 frog_bullet.x = frog.x;
                 frog.frog_canshoot = false;
                 frog_bullet.bulletisactive = true;
-                system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
+                system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1 &");
             }
             break;
         }
@@ -79,7 +79,6 @@ void *frog_thread(void *a)
             }
         }
 
-        // Rimosso usleep
         usleep(1000);
     }
 }

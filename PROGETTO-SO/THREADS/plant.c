@@ -150,13 +150,13 @@ int getRandomTimer(int min)
     switch (gamedata.difficulty)
     {
     case (EASY):
-        randomTimer = rand() % (PLANT_BULLET_RELOAD_EASY + 1) + min;
+        randomTimer = rand() % (min + 1) + PLANT_BULLET_RELOAD_EASY;
         break;
     case (NORMAL):
-        randomTimer = rand() % (PLANT_BULLET_RELOAD_NORMAL + 1) + min;
+        randomTimer = rand() % (min + 1) + PLANT_BULLET_RELOAD_NORMAL;
         break;
     case (HARD):
-        randomTimer = rand() % (PLANT_BULLET_RELOAD_HARD + 1) + min;
+        randomTimer = rand() % (min + 1) + PLANT_BULLET_RELOAD_HARD;
         break;
     default:
         break;

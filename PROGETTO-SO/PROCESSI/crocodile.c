@@ -38,8 +38,8 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
 
         // Se crocodile è vivo
 	    if(crocodile.is_crocodile_alive){
-            // Se crocodile è stato colpito, diventa buono
-            if(read(pipe_crocodile_is_shot[0], &crocodile, sizeof(objectData)) != -1)crocodile.crocodile_is_good = true;
+                    // Se crocodile è stato colpito, diventa buono
+                    if(read(pipe_crocodile_is_shot[0], &crocodile, sizeof(objectData)) != -1)crocodile.crocodile_is_good = true;
 
 		    // Aggiornamento posizione di crocodile
 		    if (crocodile.direction == RIGHT)
