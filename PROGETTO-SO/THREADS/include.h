@@ -15,8 +15,8 @@
 /*-----------------------------------------------------------------------
    MACRO UTILIZZATE COME TASTI PER IL MOVIMENTO VERTICALE DI FROG
    -----------------------------------------------------------------------*/
-#define UP 65   /* Cursore sopra */
-#define DOWN 66 /* Cursore sotto */
+#define UP 65   /* Tasto 'Freccia su'  */
+#define DOWN 66 /* Tasto 'Freccia giù' */
 
 /*-----------------------------------------------------------------------
    MACRO UTILIZZATE PER LA GESTIONE DEI TASTI GIOCO
@@ -90,7 +90,6 @@
    ----------------------------------------------------------------------*/
 // Velocità proiettile rana
 #define FROG_BULLET_DELAY 50000
-
 // Velocità movimento crocodile (inversamente proporzionale)
 #define CROCODILE_DELAY_EASY 80000000
 #define CROCODILE_DELAY_NORMAL 60000000
@@ -144,11 +143,31 @@
 #define DEATH_SCORE 50
 #define MAX_BONUS_SCORE 100 // punteggio bonus in base al tempo di completamento da aggiungere al punteggio di base
 
+
 /*----------------------------------------------------------------------
-               STRUTTURE
+               ENUMERAZIONI
+   ----------------------------------------------------------------------*/
+// enum dati della difficoltà
+enum Difficulty
+{
+   EASY,
+   NORMAL,
+   HARD
+};
+
+// enumerazione dati della direzione
+enum Direction
+{
+   LEFT,
+   RIGHT
+};
+
+
+/*----------------------------------------------------------------------
+               STRUTTURE DATI
    ----------------------------------------------------------------------*/
 
-// Struttura dati del gioco
+// Dati partita
 typedef struct
 {
    _Bool game_lost;
@@ -160,29 +179,17 @@ typedef struct
    int score;
 } GameData;
 
-// enumerazione dati della direzione
-enum Direction
-{
-   LEFT,
-   RIGHT
-};
 
-// Struttura dati flusso fiume
+// Dati flusso fiume
 typedef struct
 {
    enum Direction direction; // Direzione del flusso: 0 per sinistra, 1 per destra
    int speed;                // Velocità del flusso
 } RiverFlow;
 
-// enum dati della difficoltà
-enum Difficulty
-{
-   EASY,
-   NORMAL,
-   HARD
-};
 
-// Struttura dati rana
+
+// Dati rana
 typedef struct
 {
    int x;
@@ -199,7 +206,7 @@ typedef struct
    bool bulletisactive;
 } FrogBullet;
 
-// Struttura dati pianta
+// Dati pianta
 typedef struct
 {
    int id;
@@ -210,6 +217,7 @@ typedef struct
    bool plant_bulletisactive;
 } Plant;
 
+// Dati proiettile pianta
 typedef struct
 {
    int id;
@@ -218,7 +226,7 @@ typedef struct
    bool bulletisactive;
 } PlantBullet;
 
-// Struttura dati coccodrillo
+// Dati coccodrillo
 typedef struct
 {
    int id;
@@ -234,29 +242,22 @@ typedef struct
    int crocodile_immersion_timer_counter;
 } Crocodile;
 
+/*----------------------------------------------------------------------
+               VARIABILI GLOBALI
+   ----------------------------------------------------------------------*/
+// Variabili di gioco
 extern int time_left;
-
 extern int start_dens[5];
-
-// variabili di gioco
 extern GameData gamedata;
-
-// rana
 extern Frog frog;
-// proiettile della rana
 extern FrogBullet frog_bullet;
-// tronchi
 extern Plant plants[N_PLANTS];
-// proiettili dei tronchi
 extern PlantBullet plant_bullets[N_PLANT_BULLETS];
-// macchine
 extern Crocodile crocodiles[N_CROCODILE];
-
 extern RiverFlow river_flows[RIVER_LANES_NUMBER];
 
-// semaforo
+// Thread
 extern pthread_mutex_t mutex;
-
 extern bool should_not_exit;
 
 /*----------------------------------------------------------------------
@@ -294,13 +295,15 @@ void *plant_thread(void *a);        // thread per la gestione della pianta
 void *plant_bullet_thread(void *a); // thread per la gestione del proiettile della pianta
 
 // time.c
-void *time_thread(void *a);
+void *time_thread(void *a); // thread per la gestione del tempo di gioco
 
-void *gameManche_thread(void *id);
-void gameManche();
+// logic.c
+void *gameManche_thread(void *id); // thread per la gestione della partita
+void gameManche();                 // funzione per la gestione della partita
+void crocodiles_inizializer(); // inizializzazione dei coccodrilli
+void initialize_river_flows(); // inizializzazione del flusso del fiume
 
-void crocodiles_inizializer();
-void initialize_river_flows();
-int getCrocodileTimer();
-bool getRandomBoolean(float probability);
-int getRandomTimer(int min);
+// funzioni di supporto
+int getCrocodileTimer();      // restituisce un timer per l'inabissamento dei coccodrilli
+bool getRandomBoolean(float probability); // restituisce un booleano in base alla difficoltà
+int getRandomTimer(int min); // restituisce un timer per la ricarica dei proiettili delle piante

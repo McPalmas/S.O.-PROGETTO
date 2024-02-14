@@ -3,17 +3,16 @@
 /* ----------------------------------------------
           LOGIC PARTITA E PROCESSI
    ----------------------------------------------*/
-// Funzione per inizializzare la partita
 void initialize_game()
 {
 
+    // Inizializzazione variabili
     srand(time(NULL));
-
     gamedata.game_lost = false;
     gamedata.game_won = false;
     should_not_exit = true;
 
-    // dichiarazione threads
+    // Dichiarazione threads
     pthread_t frog_t;
     pthread_t frog_bullet_t;
     pthread_t time_t;
@@ -22,7 +21,10 @@ void initialize_game()
     pthread_t crocodile_t[N_CROCODILE];
     pthread_t gameManche_t;
 
-    // definizione degli id delle piante
+    /**
+     * Definizione id
+     */
+    // Piante e proiettili piante
     for (int i = 0; i < N_PLANTS; i++)
     {
         pthread_mutex_lock(&mutex);
@@ -31,7 +33,7 @@ void initialize_game()
         pthread_mutex_unlock(&mutex);
     }
 
-    // definizione degli id dei coccodrilli
+    // Coccodrilli
     for (int i = 0; i < N_CROCODILE; i++)
     {
         pthread_mutex_lock(&mutex);
@@ -43,29 +45,41 @@ void initialize_game()
     initialize_river_flows();
     crocodiles_inizializer();
 
-    //* CREAZIONE THREADS -------------------
+    /**
+     * Gestione dei threads
+     */
 
+    // Inizializzazione della rana
     pthread_create(&frog_t, NULL, &frog_thread, NULL);
     pthread_create(&frog_bullet_t, NULL, &frog_bullet_thread, NULL);
 
+    // Inizializzazione delle piante e dei proiettili delle piante
     for (int i = 0; i < N_PLANTS; i++)
     {
         pthread_create(&plant_t[i], NULL, &plant_thread, (void *)&plants[i].id);
         pthread_create(&plantBullet_t[i], NULL, &plant_bullet_thread, (void *)&plant_bullets[i].id);
     }
 
+    // Inizializzazione dei coccodrilli
     for (int i = 0; i < N_CROCODILE; i++)
     {
         pthread_create(&crocodile_t[i], NULL, &crocodile_thread, (void *)&crocodiles[i].id);
     }
 
+    // Inizializzazione del timer
     pthread_create(&time_t, NULL, &time_thread, NULL);
 
+    // Inizializzazione del suono del fiume
     system("aplay ../SUONI/riverSound.wav > /dev/null 2>&1 &");
 
-
+    /**
+     * Gestione della manche
+     */
     gameManche();
-    //* TERMINAZIONE THREADS -------------------
+
+    /**
+     * Join dei threads
+     */
 
     pthread_join(frog_t, NULL);
     pthread_join(frog_bullet_t, NULL);
@@ -87,30 +101,34 @@ void initialize_game()
 }
 
 /* ----------------------------------------------
-          CONTINUA O TERMINA LA PARTITA
+          ANALISI DEI DATI E GESTIONE FINE PARTITA
    ----------------------------------------------*/
 void analyze_data()
 {
+    // Termina la riproduzione dei suoni della partita
     system("killall aplay");
-    int taken_dens = 0;
 
+    // Pulisce lo schermo
     erase();
     bkgd(COLOR_PAIR(WHITE_WHITE)); /* Setta il background color dello schermo */
     attron(COLOR_PAIR(BLACK_WHITE));
 
-    // conta il numero di tane occupate
+    int taken_dens = 0;
+
+    // Conta le tane occupate
     for (int i = 0; i < N_DENS; i++)
         if (gamedata.dens[i] == true)
             taken_dens++;
 
+    // Se la manche è stata vinta
     if (gamedata.game_won)
     {
-        // se ha occupato tutte le tane si va al menu della vittoria
+        // Se ha occupato tutte le tane si va al menu della vittoria
         if (taken_dens >= N_DENS)
         {
             system("aplay ../SUONI/victory.wav > /dev/null 2>&1 &");
             attron(COLOR_PAIR(BLACK_GREEN));
-	    mvprintw(3, 14, "Punti : %d    Vite : %d    Tane raggiunte : %d", gamedata.player_score,gamedata.player_lives,taken_dens);
+            mvprintw(3, 14, "Punti : %d    Vite : %d    Tane raggiunte : %d", gamedata.player_score, gamedata.player_lives, taken_dens);
             attroff(COLOR_PAIR(BLACK_GREEN));
             endGameMenu(1);
         }
@@ -126,32 +144,32 @@ void analyze_data()
             initialize_game();
         }
     }
-    else if (gamedata.game_lost)
-    {
-        // pthread_mutex_lock(&mutex);
-        gamedata.player_lives--;
-        // pthread_mutex_lock(&mutex);
+    else
+        // Se la manche è stata persa
+        if (gamedata.game_lost)
+        {
+            gamedata.player_lives--;
 
-        if (gamedata.player_lives <= 0)
-        { // se ha esaurito le vite si va al menu della sconfitta
-            system("aplay ../SUONI/gameover.wav > /dev/null 2>&1 &");
-            attron(COLOR_PAIR(BLACK_RED));
-	    mvprintw(3, 14, "Punti : %d    Vite : %d    Tane raggiunte : %d", gamedata.player_score,gamedata.player_lives,taken_dens);
-            attroff(COLOR_PAIR(BLACK_RED));
-            endGameMenu(0);
-        }
-        else
-        { // altrimenti stampa relativa al numero di vite rimanenti
-            mvprintw(MAXY / 3, MAXX / 2 - 8, "Tane raggiunte: %d", taken_dens);
-            mvprintw(MAXY / 3 + 1, MAXX / 2 - 8, "Vite rimanenti: %d", gamedata.player_lives);
-            refresh();
-            system("aplay ../SUONI/death.wav > /dev/null 2>&1");
-            // tempo di attesa prima del caricamento della schermata successiva
-            sleep(2);
+            if (gamedata.player_lives <= 0)
+            { // se ha esaurito le vite si va al menu della sconfitta
+                system("aplay ../SUONI/gameover.wav > /dev/null 2>&1 &");
+                attron(COLOR_PAIR(BLACK_RED));
+                mvprintw(3, 14, "Punti : %d    Vite : %d    Tane raggiunte : %d", gamedata.player_score, gamedata.player_lives, taken_dens);
+                attroff(COLOR_PAIR(BLACK_RED));
+                endGameMenu(0);
+            }
+            else
+            { // altrimenti stampa relativa al numero di vite rimanenti
+                mvprintw(MAXY / 3, MAXX / 2 - 8, "Tane raggiunte: %d", taken_dens);
+                mvprintw(MAXY / 3 + 1, MAXX / 2 - 8, "Vite rimanenti: %d", gamedata.player_lives);
+                refresh();
+                system("aplay ../SUONI/death.wav > /dev/null 2>&1");
+                // tempo di attesa prima del caricamento della schermata successiva
+                sleep(2);
 
-            initialize_game();
+                initialize_game();
+            }
         }
-    }
 }
 
 /* ----------------------------------------------
@@ -177,7 +195,7 @@ void gameManche()
             - Proiettile rana con piante
         */
 
-        // SE LA RANA COLLIDE CON UNA PIANTA --------------------------------------------------------------------------------------
+        // SE LA RANA COLLIDE CON UNA PIANTA
         for (int i = 0; i < N_PLANTS; i++)
         {
             if ((frog.y == plants[i].y + 1 || frog.y == plants[i].y) && (frog.x - 2 >= plants[i].x - (FROG_W - 1) && frog.x + 2 <= plants[i].x + (FROG_W + 1)))
@@ -188,7 +206,7 @@ void gameManche()
             }
         }
 
-        // SE LA RANA E' COLPITA DA UN PROIETTILE DELLA PIANTA --------------------------------------------------------------------------------------
+        // SE LA RANA E' COLPITA DA UN PROIETTILE DELLA PIANTA
         for (int i = 0; i < N_PLANT_BULLETS; i++)
         {
             if (plant_bullets[i].bulletisactive && frog.y == plant_bullets[i].y && (frog.x >= plant_bullets[i].x - 2 && frog.x <= plant_bullets[i].x + 2))
@@ -201,7 +219,7 @@ void gameManche()
             }
         }
 
-        // SE LA RANA E' SUL COCCODRILLO --------------------------------------------------------------------------------------
+        // SE LA RANA E' SUL COCCODRILLO
         if (frog.frog_candie && frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT)
         {
             for (int i = 0; i < N_CROCODILE; i++)
@@ -222,7 +240,7 @@ void gameManche()
             }
         }
 
-        // SE LA RANA RAGGIUNGE UNA TANA --------------------------------------------------------------------------------------
+        // SE LA RANA RAGGIUNGE UNA TANA
         if (frog.y < SCORE_ZONE_HEIGHT + 2)
         {
             // per ogni tana
@@ -266,7 +284,7 @@ void gameManche()
             }
         }
 
-        // SE IL PROIETTILE DELLA RANA COLPISCE UN COCCODRILLO --------------------------------------------------------------------------------------
+        // SE IL PROIETTILE DELLA RANA COLPISCE UN COCCODRILLO
         for (int i = 0; i < N_CROCODILE; i++)
         {
             // se il proiettile sta sul coccodrillo corrente
@@ -286,7 +304,7 @@ void gameManche()
             }
         }
 
-        // SE IL PROIETTILE DELLA RANA COLPISCE UNA PIANTA --------------------------------------------------------------------------------------
+        // SE IL PROIETTILE DELLA RANA COLPISCE UNA PIANTA
         for (int i = 0; i < N_PLANTS; i++)
         {
             // se è presente plant e la rana può sparare
@@ -316,7 +334,6 @@ void gameManche()
                 }
             }
         }
-        
 
         /*
             Morti:
@@ -325,7 +342,7 @@ void gameManche()
             - Rana per tempo
         */
 
-        // MORTE RANA PER OUT OF BOUNDS --------------------------------------------------------------------------------------
+        // MORTE RANA PER OUT OF BOUNDS
         if (frog.x - 2 < MINX || frog.x + 2 > MAXX - 1 || frog.y < SCORE_ZONE_HEIGHT)
         {
             gamedata.player_score -= DEATH_SCORE;
@@ -333,16 +350,14 @@ void gameManche()
             gamedata.game_lost = true;
         }
 
-        // MORTE RANA PER CADUTA IN ACQUA --------------------------------------------------------------------------------------
+        // MORTE RANA PER CADUTA IN ACQUA
         if (!onCrocodile)
         {
             frog.frog_candie = false;
             gamedata.game_lost = true;
         }
 
-        // MORTE RANA PER TEMPO --------------------------------------------------------------------------------------
-
-        // se il tempo scende a zero perdi la manche
+        // MORTE RANA PER TEMPO
         if (time_left <= 0 && frog.frog_candie)
         {
             frog.frog_candie = false;
@@ -375,8 +390,8 @@ void gameManche()
 void crocodiles_inizializer()
 {
     int crocodileIndex = 0;
-    // Itera su ciascun fiume
 
+    // Itera su ciascun fiume
     for (int riverIndex = 0; riverIndex < RIVER_LANES_NUMBER; riverIndex++)
     {
         // Assegna 3 coccodrilli a ciascun fiume
@@ -452,7 +467,11 @@ void initialize_river_flows()
     }
 }
 
-// Function to generate a random boolean with a given probability
+/* ----------------------------------------------
+         Utility
+   ----------------------------------------------*/
+
+// Genera un booleano casuale con una certa probabilità
 bool getRandomBoolean(float probability)
 {
     if (probability < 0 || probability > 1)
@@ -460,6 +479,7 @@ bool getRandomBoolean(float probability)
     return rand() > probability * ((float)RAND_MAX + 1.0);
 }
 
+// Restituisce un timer casuale per l'immersione dei coccodrilli
 int getCrocodileTimer()
 {
     int randomTimer;
@@ -478,6 +498,5 @@ int getCrocodileTimer()
     default:
         break;
     }
-
     return randomTimer;
 }

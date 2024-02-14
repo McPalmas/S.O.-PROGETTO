@@ -1,49 +1,44 @@
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/types.h> 
-#include <sys/wait.h> 
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <time.h>
 #include <stdbool.h>
 #include <string.h>
 #include <fcntl.h>
-#include <signal.h> 
+#include <signal.h>
 #include <curses.h>
 #include <ncurses.h>
-#include <pthread.h> 
+#include <pthread.h>
 #include <stdio.h>
-
-
-
 
 /*-----------------------------------------------------------------------
    MACRO UTILIZZATE COME TASTI PER IL MOVIMENTO VERTICALE DI FROG
    -----------------------------------------------------------------------*/
-#define UP      65    /* Cursore sopra */
-#define DOWN      66    /* Cursore sotto */
-
+#define UP 65 /* Tasto 'Freccia su' \
+#define DOWN      66    /* Tasto 'Freccia giù' */
 
 /*-----------------------------------------------------------------------
    MACRO UTILIZZATE PER LA GESTIONE DEI TASTI GIOCO
    -----------------------------------------------------------------------*/
-#define QUIT      113    /* Tasto 'q' */
-#define SPACE      32    /* Tasto 'SPACE' */
-
+#define QUIT 113 /* Tasto 'q' */
+#define SPACE 32 /* Tasto 'SPACE' */
 
 /*----------------------------------------------------------------------
    MACRO UTILIZZATE PER DEFINIRE LE DIMENSIONI MASSIME DELLO SCHERMO
    ----------------------------------------------------------------------*/
-#define MINX    10  
-#define MAXX    MINX + 60    /* Dimensione dello schermo di output (colonne) */
-#define MAXY    40    /* Dimensione dello schermo di output (righe)   */
+#define MINX 10
+#define MAXX MINX + 60 /* Dimensione dello schermo di output (colonne) */
+#define MAXY 40        /* Dimensione dello schermo di output (righe)   */
 
 /*----------------------------------------------------------------------
    MACRO UTILIZZATE PER DEFINIRE LE DIMENSIONI DEGLI OGGETTI
    ----------------------------------------------------------------------*/
-#define FROG_W 5    /* Larghezza della rana */
-#define FROG_H 2    /* Altezza della rana */
+#define FROG_W 5 /* Larghezza della rana */
+#define FROG_H 2 /* Altezza della rana */
 
-#define CROCODILE_W 10    /* Larghezza del coccodrillo */
-#define CROCODILE_H 2    /* Altezza del coccodrillo */
+#define CROCODILE_W 10 /* Larghezza del coccodrillo */
+#define CROCODILE_H 2  /* Altezza del coccodrillo */
 
 /*----------------------------------------------------------------------
    MACRO UTILIZZATE PER DEFINRIE LE POSIZIONI DEGLI OGGETTI
@@ -61,79 +56,42 @@
 /*----------------------------------------------------------------------
    MACRO UTILIZZATE PER DEFINRIE LE DIMENSIONI DEL CAMPO DI GIOCO
    ----------------------------------------------------------------------*/
-#define SCORE_ZONE_HEIGHT 3          /* altezza zona blue con i punteggi ecc.*/
-#define DENS_ZONE_HEIGHT 3       /* altezza zona tane */
-#define PLANTS_ZONE_HEIGHT 4    /* altezza zona piante */
-#define START_ZONE_HEIGHT 3    /* altezza zona di partenza */
-#define RIVER_LANES_NUMBER 8    /* numero corsie fiume*/
+#define SCORE_ZONE_HEIGHT 3                                                                                                   /* altezza zona blue con i punteggi ecc.*/
+#define DENS_ZONE_HEIGHT 3                                                                                                    /* altezza zona tane */
+#define PLANTS_ZONE_HEIGHT 4                                                                                                  /* altezza zona piante */
+#define START_ZONE_HEIGHT 3                                                                                                   /* altezza zona di partenza */
+#define RIVER_LANES_NUMBER 8                                                                                                  /* numero corsie fiume*/
 #define TOTAL_HEIGHT SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT /* altezza totale del campo di gioco */
 
+
 /*----------------------------------------------------------------------
-   			   STRUTTURE
+               COPPIE DI COLORI
    ----------------------------------------------------------------------*/
-// Struttura dati del gioco
-typedef struct{
-    _Bool game_lost;
-    _Bool game_won;
-    _Bool dens[5];
-    int player_score;
-    int player_lives;
-    int difficulty;
-} GameData;
-
-// enumerazione dati della direzione
-enum Direction {
-    LEFT,
-    RIGHT
-};
-
-// Struttura dati flusso fiume
-typedef struct {
-    enum Direction direction; // Direzione del flusso: 0 per sinistra, 1 per destra
-    int speed;     // Velocità del flusso
-} RiverFlow;
-
-// enum dati della difficoltà
-enum Difficulty {
-    EASY,
-    NORMAL,
-    HARD
-};
-
-// Struttura dati oggetto
-typedef struct{
-   // generali
-   int id;
-   int x;
-   int y;
-   // frog
-   bool frog_canshoot;
-   bool frog_candie;
-   bool frog_bulletisactive;
-   // plant
-   bool plant_isalive;
-   bool plant_canshoot;
-   bool plant_bulletisactive;
-   // crocodile
-   enum Direction direction;
-   int crocodile_speed;
-   bool crocodile_is_good;
-   bool is_crocodile_immersing;
-   bool is_crocodile_alive;
-   int flow_number;
-   // time
-   int time_left;
-} objectData;
-
-extern int start_dens[5];
+#define WHITE_GREEN 1
+#define WHITE_RED 2
+#define BLACK_BLACK 3
+#define WHITE_WHITE 4
+#define GREEN_GREEN 5
+#define CYAN_CYAN 6
+#define MAGENTA_MAGENTA 7
+#define BLUE_BLUE 8
+#define GREEN_BLACK 9
+#define GREEN_YELLOW 10
+#define RED_YELLOW 11
+#define BLACK_RED 12
+#define BLACK_GREEN 13
+#define RED_GREEN 14
+#define YELLOW_GREEN 15
+#define GREEN_MAGENTA 16
+#define BLACK_WHITE 17
+#define WHITE_BLUE 18
 
 
 /*----------------------------------------------------------------------
-   			   PARAMETRI DI GIOCO
+               PARAMETRI DI GIOCO
    ----------------------------------------------------------------------*/
 // Velocità proiettile rana
 #define FROG_BULLET_DELAY 50000
-
 // Velocità movimento crocodile (inversamente proporzionale)
 #define CROCODILE_DELAY_EASY 80000000
 #define CROCODILE_DELAY_NORMAL 60000000
@@ -170,24 +128,25 @@ extern int start_dens[5];
 #define TIMELIMIT_NORMAL 150
 #define TIMELIMIT_HARD 100
 // Difficoltà
-#define DIFFICULTIES 3 //possibili difficoltà di gioco
+#define DIFFICULTIES 3 // possibili difficoltà di gioco
 // Numero di oggetti
-#define N_DENS 5 //numero di tane
-#define N_PLANTS 3 //numero di vite
-#define N_LIVES 3 //numero di vite
-#define N_CROCODILE 24 //numero di coccodrilli 
-#define N_PLANT_BULLETS 3 //numero di proiettili per pianta
-#define N_FROG_BULLETS 3 //numero di proiettili per rana
+#define N_DENS 5          // numero di tane
+#define N_PLANTS 3        // numero di vite
+#define N_LIVES 3         // numero di vite
+#define N_CROCODILE 24    // numero di coccodrilli
+#define N_PLANT_BULLETS 3 // numero di proiettili per pianta
+#define N_FROG_BULLETS 3  // numero di proiettili per rana
 #define CROCODILES_PER_RIVER 3
 // Punteggi
 #define DEN_SCORE_EASY 50
 #define DEN_SCORE_NORMAL 100
 #define DEN_SCORE_HARD 150
 #define DEATH_SCORE 50
-#define MAX_BONUS_SCORE 100  //punteggio bonus in base al tempo di completamento da aggiungere al punteggio di base
+#define MAX_BONUS_SCORE 100 // punteggio bonus in base al tempo di completamento da aggiungere al punteggio di base
+
 
 /*----------------------------------------------------------------------
-   			   ID OGGETTI
+               ID OGGETTI
    ----------------------------------------------------------------------*/
 // Frog
 #define FROG_ID 1
@@ -227,74 +186,116 @@ extern int start_dens[5];
 #define PLANT_BULLET_ID_2 32
 // Time
 #define TIME_ID 33
- 
- 
-/*----------------------------------------------------------------------
-   			   COPPIE DI COLORI
-   ----------------------------------------------------------------------*/
-#define WHITE_GREEN 1          
-#define WHITE_RED 2            
-#define BLACK_BLACK 3    	
-#define WHITE_WHITE 4    	
-#define GREEN_GREEN 5    	
-#define CYAN_CYAN 6    	
-#define MAGENTA_MAGENTA 7    	
-#define BLUE_BLUE 8    	
-#define GREEN_BLACK 9     	
-#define GREEN_YELLOW 10            
-#define RED_YELLOW 11 
-#define BLACK_RED 12 	
-#define BLACK_GREEN 13 	
-#define RED_GREEN 14	
-#define YELLOW_GREEN 15	
-#define GREEN_MAGENTA 16
-#define BLACK_WHITE 17
-#define WHITE_BLUE 18
+
 
 /*----------------------------------------------------------------------
-   				FUNZIONI
+               ENUMERAZIONI
    ----------------------------------------------------------------------*/
+// Enumerazione dati della difficoltà
+enum Difficulty
+{
+   EASY,
+   NORMAL,
+   HARD
+};
+
+// Enumerazione dati della direzione
+enum Direction
+{
+   LEFT,
+   RIGHT
+};
 
 
+/*----------------------------------------------------------------------
+               STRUTTURE DATI
+   ----------------------------------------------------------------------*/
+// Dati partita
+typedef struct
+{
+   _Bool game_lost;
+   _Bool game_won;
+   _Bool dens[5];
+   int player_score;
+   int player_lives;
+   int difficulty;
+} GameData;
+
+// Dati flusso fiume
+typedef struct
+{
+   enum Direction direction; // Direzione del flusso: 0 per sinistra, 1 per destra
+   int speed;                // Velocità del flusso
+} RiverFlow;
+
+// Dati oggetto
+typedef struct
+{
+   // generali
+   int id;
+   int x;
+   int y;
+   // frog
+   bool frog_canshoot;
+   bool frog_candie;
+   bool frog_bulletisactive;
+   // plant
+   bool plant_isalive;
+   bool plant_canshoot;
+   bool plant_bulletisactive;
+   // crocodile
+   enum Direction direction;
+   int crocodile_speed;
+   bool crocodile_is_good;
+   bool is_crocodile_immersing;
+   bool is_crocodile_alive;
+   int flow_number;
+   // time
+   int time_left;
+} objectData;
+
+extern int start_dens[5];
+/*----------------------------------------------------------------------
+               FUNZIONI
+   ----------------------------------------------------------------------*/
 
 // menu.c
-void mainMenu();    // visualizzazione del menu principale
-void menuDifficulty();     // visualizzazione del menu per la scelta della difficoltà
-void endGameMenu(bool win);     // menu di fine partita in base a se si è vinto o meno
+void mainMenu();            // visualizzazione del menu principale
+void menuDifficulty();      // visualizzazione del menu per la scelta della difficoltà
+void endGameMenu(bool win); // menu di fine partita in base a se si è vinto o meno
 
-//graphic.c
-void initializeScr();	// inizializzazione dello schermo per ncurses
-void gameField();   //disegna il terreno di gioco
-void printDens(bool dens[]); 	//stampa delle tane 
-void frogBody(int x, int y);   //disegna lo sprite della rana
-void frogBullett(int y, int x);	   //disegna il proiettile della rana
-void crocodileBody(objectData c);	//disegna lo sprite del coccodrillo
-void plantBody(objectData p);		//stampa della pianta
-void plantBullett(int y, int x);	//stampa il proiettile della pianta
+// graphic.c
+void initializeScr();             // inizializzazione dello schermo per ncurses
+void gameField();                 // disegna il terreno di gioco
+void printDens(bool dens[]);      // stampa delle tane
+void frogBody(int x, int y);      // disegna lo sprite della rana
+void frogBullett(int y, int x);   // disegna il proiettile della rana
+void crocodileBody(objectData c); // disegna lo sprite del coccodrillo
+void plantBody(objectData p);     // stampa della pianta
+void plantBullett(int y, int x);  // stampa il proiettile della pianta
 
-//frog.c
-void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe_frogoncrocodile[2], int difficulty);
-void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_destroy_frog_bullet[2]);
+// frog.c
+void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe_frogoncrocodile[2], int difficulty); // processo per la gestione della rana
+void frog_bullet_process(int p[2], int p_shoot[2], int p_can_shoot[2], int p_destroy_frog_bullet[2]);              // processo per la gestione dei proiettili della rana
 
-//crocodile.c
-void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int pipe_frog_on_crocodile[2], int pipe_crocodile_is_shot[2], int difficulty,RiverFlow river_flows[]);
+// crocodile.c
+void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int pipe_frog_on_crocodile[2], int pipe_crocodile_is_shot[2], int difficulty, RiverFlow river_flows[]); // processo per la gestione dei coccodrilli
 
-//plant.c
-void plant_process(int id, int pipe[2], int pipe_plant_is_dead[2], int pipe_destroy_plant_bullet[2], int difficulty);
-void plant_bullet_process(int p[2], objectData plant, int p_destroy_plant_bullet[2], int difficulty);
+// plant.c
+void plant_process(int id, int pipe[2], int pipe_plant_is_dead[2], int pipe_destroy_plant_bullet[2], int difficulty); // processo per la gestione delle piante
+void plant_bullet_process(int p[2], objectData plant, int p_destroy_plant_bullet[2], int difficulty);              // processo per la gestione dei proiettili delle piante
 
-//time.c
-void time_process(int p[2], int difficulty);
+// time.c
+void time_process(int p[2], int difficulty); // processo per la gestione del tempo
 
-//logic.c
-void initialize_game(GameData gamedata);    // creazione e comunicazione tra processi
-void initialize_river_flows(RiverFlow river_flows[], GameData gamedata);
-GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[N_CROCODILE][2], int pipe_crocodile_is_shot[N_CROCODILE][2], GameData gamedata);     // gestione della manche stampe e collsioni
-void analyze_data(GameData gamedata);  // analizza i dati e in base a essi decide se la partita deve continuare o finire
-void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]);   // inizializza i coccodrilli nei fiumi
+// logic.c
+void initialize_game(GameData gamedata); // creazione e comunicazione tra processi
+void initialize_river_flows(RiverFlow river_flows[], GameData gamedata); // inizializza i flussi dei fiumi
+GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[N_CROCODILE][2], int pipe_crocodile_is_shot[N_CROCODILE][2], GameData gamedata); // gestione della manche stampe e collsioni
+void analyze_data(GameData gamedata);                                                                                                                                                                                                                                 // analizza i dati e in base a essi decide se la partita deve continuare o finire
+void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]);                                                                                                                                                                                              // inizializza i coccodrilli nei fiumi
 
-//funzioni di supporto
-bool getRandomBoolean(float probability);
-int getRandomInt(int min, int difficulty);
-int getRandomTimer(int min, int difficulty);
-
+// funzioni di supporto
+bool getRandomBoolean(float probability); // restituisce un valore booleano in base alla difficoltà
+int getCrocodileTmer(int min, int difficulty); // restituisce un timer per l'inabissamento dei coccodrilli
+int getPlantReloadTimer(int min, int difficulty); // restituisce un timer per la ricarica dei proiettili delle piante

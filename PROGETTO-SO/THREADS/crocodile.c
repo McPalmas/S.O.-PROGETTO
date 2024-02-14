@@ -4,17 +4,18 @@
 /* ----------------------------------------------
           CROCODILE
    ----------------------------------------------*/
+// Funzione per la gestione del thread crocodile
 void *crocodile_thread(void *id)
 {
-    // estrazione dell'id passato alla funzione
+    // Estrazione dell'id passato alla funzione
     int crocodileIndex = *((int *)id);
 
     // srand sulla base del thread
     unsigned int thread_id = (unsigned int)(size_t)pthread_self();
     srand(thread_id);
 
+    // Inizializzazione oggetto crocodile
     pthread_mutex_lock(&mutex);
-    // Inizializzazione oggetto crocodile (Da completare)
     crocodiles[crocodileIndex].is_crocodile_immersing = false;
     crocodiles[crocodileIndex].is_crocodile_alive = true;
     crocodiles[crocodileIndex].crocodile_immersion_timer = getCrocodileTimer();
@@ -34,17 +35,17 @@ void *crocodile_thread(void *id)
         // Se crocodile è vivo
         if (crocodiles[crocodileIndex].is_crocodile_alive)
         {
-            // Se crocodile è stato colpito, diventa buono -> prima era gestito da pipe.
-            pthread_mutex_lock(&mutex);
             // Aggiornamento posizione di crocodile
+            pthread_mutex_lock(&mutex);
             if (crocodiles[crocodileIndex].direction == RIGHT)
                 crocodiles[crocodileIndex].x += 1;
             else
                 crocodiles[crocodileIndex].x -= 1;
             pthread_mutex_unlock(&mutex);
 
+            // Aggiornamento posizione di frog se è su crocodile
             pthread_mutex_lock(&mutex);
-            if (frog.y == crocodiles[crocodileIndex].y && (frog.x > crocodiles[crocodileIndex].x + 2 -2*crocodiles[crocodileIndex].direction && frog.x < (crocodiles[crocodileIndex].x + CROCODILE_W -1 - 2*crocodiles[crocodileIndex].direction)))
+            if (frog.y == crocodiles[crocodileIndex].y && (frog.x > crocodiles[crocodileIndex].x + 2 - 2 * crocodiles[crocodileIndex].direction && frog.x < (crocodiles[crocodileIndex].x + CROCODILE_W - 1 - 2 * crocodiles[crocodileIndex].direction)))
             {
                 if (crocodiles[crocodileIndex].direction == RIGHT)
                     frog.x += 1;
@@ -53,27 +54,28 @@ void *crocodile_thread(void *id)
             }
             pthread_mutex_unlock(&mutex);
 
+            // Gestione immersione di crocodile
             pthread_mutex_lock(&mutex);
             if (!crocodiles[crocodileIndex].crocodile_is_good && frog.y == crocodiles[crocodileIndex].y && (frog.x > (crocodiles[crocodileIndex].x) && frog.x < (crocodiles[crocodileIndex].x + CROCODILE_W - 2)))
             {
                 crocodiles[crocodileIndex].crocodile_immersion_timer_counter--;
                 if (crocodiles[crocodileIndex].crocodile_immersion_timer_counter < (crocodiles[crocodileIndex].crocodile_immersion_timer / 2))
-                crocodiles[crocodileIndex].is_crocodile_immersing = true;
+                    crocodiles[crocodileIndex].is_crocodile_immersing = true;
             }
             pthread_mutex_unlock(&mutex);
         }
         else
         {
-            pthread_mutex_lock(&mutex);
             // Aggiornamento posizione di crocodile
+            pthread_mutex_lock(&mutex);
             if (crocodiles[crocodileIndex].direction == RIGHT)
                 crocodiles[crocodileIndex].x += 1;
             else
                 crocodiles[crocodileIndex].x -= 1;
             pthread_mutex_unlock(&mutex);
 
-            pthread_mutex_lock(&mutex);
             // Se crocodile è morto, viene inizializzato a una nuova corsia
+            pthread_mutex_lock(&mutex);
             if (crocodiles[crocodileIndex].flow_number == 0 || crocodiles[crocodileIndex].flow_number % 2 == 0)
             {
                 crocodiles[crocodileIndex].y += 2;
@@ -86,8 +88,8 @@ void *crocodile_thread(void *id)
             }
             pthread_mutex_unlock(&mutex);
 
-            pthread_mutex_lock(&mutex);
             // Inizializzazione delle nuove variabili di crocodile
+            pthread_mutex_lock(&mutex);
             crocodiles[crocodileIndex].crocodile_speed = river_flows[crocodiles[crocodileIndex].flow_number].speed;
             crocodiles[crocodileIndex].direction = river_flows[crocodiles[crocodileIndex].flow_number].direction;
             crocodiles[crocodileIndex].crocodile_is_good = rand() % 2;

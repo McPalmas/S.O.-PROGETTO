@@ -3,15 +3,15 @@
 /* ----------------------------------------------
           FROG
    ----------------------------------------------*/
-// Funzione per la gestione del processo frog
+// Funzione per la gestione del thread frog
 void *frog_thread(void *a)
 {
 
-    // posizione di partenza della rana
+    // Posizione di partenza della rana
     int frog_start_y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 3;
     int frog_start_x = FROG_START;
 
-    // inizializzazione posizione e possibilità di sparare e morire della rana
+    // Inizializzazione dei parametri di Frog
     pthread_mutex_lock(&mutex);
     frog.y = frog_start_y;
     frog.x = frog_start_x;
@@ -22,7 +22,7 @@ void *frog_thread(void *a)
     // Ciclo di esecuzione di Frog
     while (should_not_exit)
     {
-        // stampa di tutto lo schermo di gioco
+        // Stampa di tutto lo schermo di gioco
         pthread_mutex_lock(&mutex);
         printAll();
         pthread_mutex_unlock(&mutex);
@@ -68,9 +68,13 @@ void *frog_thread(void *a)
         }
         pthread_mutex_unlock(&mutex);
 
-        for(int i = 0; i< N_PLANT_BULLETS; i++){
-            if(frog_bullet.bulletisactive && plant_bullets[i].bulletisactive > 0){
-                if(frog_bullet.x == plant_bullets[i].x && frog_bullet.y == plant_bullets[i].y){
+        for (int i = 0; i < N_PLANT_BULLETS; i++)
+        {
+            if (frog_bullet.bulletisactive && plant_bullets[i].bulletisactive > 0)
+            {
+                if (frog_bullet.x == plant_bullets[i].x && frog_bullet.y == plant_bullets[i].y)
+                {   
+                    // Se il proiettile della rana colpisce un proiettile delle piante, entrambi vengono disattivati
                     pthread_mutex_lock(&mutex);
                     frog_bullet.bulletisactive = false;
                     plant_bullets[i].bulletisactive = false;
@@ -83,11 +87,12 @@ void *frog_thread(void *a)
     }
 }
 
-//* FROG BULLET ----------------------------------------------
-
+/* ----------------------------------------------
+          FROG BULLET
+   ----------------------------------------------*/
 // Funzione per la gestione del processo frog_bullet
 void *frog_bullet_thread(void *a)
-{
+{   
     unsigned int thread_id = (unsigned int)(size_t)pthread_self();
     srand(thread_id);
 
@@ -96,12 +101,14 @@ void *frog_bullet_thread(void *a)
 
         while (frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT)
         {
+            // Aggiornamento posizione del proiettile
             pthread_mutex_lock(&mutex);
             frog_bullet.y -= 1;
             pthread_mutex_unlock(&mutex);
+
             usleep(FROG_BULLET_DELAY);
         }
-
+        // Se il proiettile esce dallo schermo, viene disattivato
         pthread_mutex_lock(&mutex);
         frog_bullet.bulletisactive = false;
         frog.frog_canshoot = true;
@@ -109,8 +116,9 @@ void *frog_bullet_thread(void *a)
     }
 }
 
-// Funziona anche se questo è vuoto? Tutto ciò che viene fatto avviene nel processo di frog
-
+/* ----------------------------------------------
+          STAMMPA
+   ----------------------------------------------*/
 void printAll()
 {
     erase();

@@ -1,31 +1,20 @@
 
-/*------------------------------------------------------------------
-   LIBRERIE INCLUSE ALL'INTERNO DEL PROGRAMMA
-   ---------------------------------------------------------------*/
 #include "include.h"
 
-
-
 /* ----------------------------------------------------------------
-				MAIN
+            MAIN
    --------------------------------------------------------------*/
+int main()
+{
+   // Inizializzazione
+   initializeScr();
+   cbreak();
 
-int main(){
+   // Gioco
+   mainMenu();
 
-    initializeScr(); 
-    
-    /* rende  disponibile l'input dell'utente  */
-    cbreak(); 
-
-    /* funzione per il menu principale */
-    mainMenu();
-    //endGameMenu(false); //solo per provarlo
-
-    /* Ripristino la modalità di funzionamento normale del terminale */
-    endwin();
-
-    /* Termino il gioco ed esco dal Pogramma */
-    printf("\n\n Uscito dal programma.\n\n");
-
-    return 0;
+   // Uscita
+   endwin();
+   printf("\n\n Uscito dal programma.\n\n");
+   return 0;
 }
