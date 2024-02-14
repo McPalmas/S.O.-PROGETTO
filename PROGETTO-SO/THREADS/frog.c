@@ -73,7 +73,7 @@ void *frog_thread(void *a)
             if (frog_bullet.bulletisactive && plant_bullets[i].bulletisactive > 0)
             {
                 if (frog_bullet.x == plant_bullets[i].x && frog_bullet.y == plant_bullets[i].y)
-                {   
+                {
                     // Se il proiettile della rana colpisce un proiettile delle piante, entrambi vengono disattivati
                     pthread_mutex_lock(&mutex);
                     frog_bullet.bulletisactive = false;
@@ -92,27 +92,30 @@ void *frog_thread(void *a)
    ----------------------------------------------*/
 // Funzione per la gestione del processo frog_bullet
 void *frog_bullet_thread(void *a)
-{   
+{
+
     unsigned int thread_id = (unsigned int)(size_t)pthread_self();
     srand(thread_id);
 
     while (should_not_exit)
     {
-
-        while (frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT)
+        if (frog_bullet.bulletisactive)
         {
-            // Aggiornamento posizione del proiettile
-            pthread_mutex_lock(&mutex);
-            frog_bullet.y -= 1;
-            pthread_mutex_unlock(&mutex);
+            while (frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT)
+            {
+                // Aggiornamento posizione del proiettile
+                pthread_mutex_lock(&mutex);
+                frog_bullet.y -= 1;
+                pthread_mutex_unlock(&mutex);
 
-            usleep(FROG_BULLET_DELAY);
+                usleep(FROG_BULLET_DELAY);
+            }
+            // Se il proiettile esce dallo schermo, viene disattivato
+            pthread_mutex_lock(&mutex);
+            frog_bullet.bulletisactive = false;
+            frog.frog_canshoot = true;
+            pthread_mutex_unlock(&mutex);
         }
-        // Se il proiettile esce dallo schermo, viene disattivato
-        pthread_mutex_lock(&mutex);
-        frog_bullet.bulletisactive = false;
-        frog.frog_canshoot = true;
-        pthread_mutex_unlock(&mutex);
     }
 }
 
