@@ -106,6 +106,9 @@ void analyze_data()
         if (taken_dens >= N_DENS)
         {
             system("aplay ../SUONI/victory.wav > /dev/null 2>&1 &");
+            attron(COLOR_PAIR(BLACK_GREEN));
+	    mvprintw(3, 14, "Punti : %d    Vite : %d    Tane raggiunte : %d", gamedata.player_score,gamedata.player_lives,taken_dens);
+            attroff(COLOR_PAIR(BLACK_GREEN));
             endGameMenu(1);
         }
         else
@@ -129,6 +132,9 @@ void analyze_data()
         if (gamedata.player_lives <= 0)
         { // se ha esaurito le vite si va al menu della sconfitta
             system("aplay ../SUONI/gameover.wav > /dev/null 2>&1 &");
+            attron(COLOR_PAIR(BLACK_RED));
+	    mvprintw(3, 14, "Punti : %d    Vite : %d    Tane raggiunte : %d", gamedata.player_score,gamedata.player_lives,taken_dens);
+            attroff(COLOR_PAIR(BLACK_RED));
             endGameMenu(0);
         }
         else

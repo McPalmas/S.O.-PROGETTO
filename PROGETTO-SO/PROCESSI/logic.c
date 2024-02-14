@@ -155,14 +155,15 @@ void analyze_data(GameData gamedata){
 	// conta il numero di tane occupate
 	for(int i = 0; i < N_DENS; i++)
 		if(gamedata.dens[i] == true)
-		        taken_dens++;
-		        
-		        
+		        taken_dens++;		       
 
 	if(gamedata.game_won){
 		// se ha occupato tutte le tane si va al menu della vittoria
 		if(taken_dens >= N_DENS){
 		    system("aplay ../SUONI/victory.wav > /dev/null 2>&1 &");
+		    attron(COLOR_PAIR(BLACK_GREEN));
+		    mvprintw(3, 14, "Punti : %d    Vite : %d    Tane raggiunte : %d", gamedata.player_score,gamedata.player_lives,taken_dens);
+		    attroff(COLOR_PAIR(BLACK_GREEN));
 		    endGameMenu(1);
 		}
 		else{	// altrimenti stampa relativa alle tane occupate e inizio manche successiva
@@ -184,6 +185,9 @@ void analyze_data(GameData gamedata){
 		
 		if(gamedata.player_lives <= 0){ // se ha esaurito le vite si va al menu della sconfitta
             		system("aplay ../SUONI/gameover.wav > /dev/null 2>&1 &");
+            		attron(COLOR_PAIR(BLACK_RED));
+            		mvprintw(3, 14, "Punti : %d    Vite : %d    Tane raggiunte : %d", gamedata.player_score,gamedata.player_lives,taken_dens);
+            		attroff(COLOR_PAIR(BLACK_RED));
             		endGameMenu(0);
             	}else{      // altrimenti stampa relativa al numero di vite rimanenti         
             		mvprintw(MAXY/3, MAXX/2-8, "Tane raggiunte: %d", taken_dens);
