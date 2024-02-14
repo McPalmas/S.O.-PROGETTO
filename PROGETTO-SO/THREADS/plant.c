@@ -95,7 +95,7 @@ void *plant_bullet_thread(void *id)
     // Inizializzazione proiettile
     plant_bullets[plantBulletIndex].x = plants[plantBulletIndex].x + 1;
     plant_bullets[plantBulletIndex].y = plants[plantBulletIndex].y + 1;
-    plant_bullets[plantBulletIndex].bulletisactive = true;
+    //plant_bullets[plantBulletIndex].bulletisactive = true;
     switch (gamedata.difficulty)
     {
     case EASY:
@@ -123,23 +123,20 @@ void *plant_bullet_thread(void *id)
             plant_bullets[plantBulletIndex].x = plants[plantBulletIndex].x + 1;
             plant_bullets[plantBulletIndex].y = plants[plantBulletIndex].y + 1;
             pthread_mutex_unlock(&mutex);
-        }
-        // Sposta il proiettile
-        pthread_mutex_lock(&mutex);
-        plant_bullets[plantBulletIndex].y += 1;
-        pthread_mutex_unlock(&mutex);
+            
+            while (plant_bullets[plantBulletIndex].y < MAXY - 12)
+            {
+                pthread_mutex_lock(&mutex);
+                plant_bullets[plantBulletIndex].y += 1;
+                pthread_mutex_unlock(&mutex);
 
-        while (plant_bullets[plantBulletIndex].y < MAXY - 12)
-        {
+                usleep(plant_bullet_delay);
+            }
             pthread_mutex_lock(&mutex);
-            plant_bullets[plantBulletIndex].y += 1;
+            plant_bullets[plantBulletIndex].bulletisactive = false;
             pthread_mutex_unlock(&mutex);
-
-            usleep(plant_bullet_delay);
         }
-        pthread_mutex_lock(&mutex);
-        plant_bullets[plantBulletIndex].bulletisactive = false;
-        pthread_mutex_unlock(&mutex);
+       
     }
 }
 
