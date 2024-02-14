@@ -74,6 +74,7 @@ void initialize_game(GameData gamedata){
     // Inizializzazione dei flussi del fiume
     initialize_river_flows(river_flows,gamedata);
     
+    system("aplay ../SUONI/riverSound.wav > /dev/null 2>&1 &");
     // Creazione processi  
     frog = fork();
     if (frog == 0){
@@ -145,7 +146,7 @@ void initialize_game(GameData gamedata){
           CONTINUA O TERMINA LA PARTITA 
    ----------------------------------------------*/
 void analyze_data(GameData gamedata){
-
+    system("killall aplay");
 	int taken_dens = 0;
 	
 	erase();

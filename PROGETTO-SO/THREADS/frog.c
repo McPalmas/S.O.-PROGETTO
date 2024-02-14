@@ -68,7 +68,7 @@ void *frog_thread(void *a)
         }
         pthread_mutex_unlock(&mutex);
 
-        for(int i = 0; i< N_FROG_BULLETS; i++){
+        for(int i = 0; i< N_PLANT_BULLETS; i++){
             if(frog_bullet.bulletisactive && plant_bullets[i].bulletisactive > 0){
                 if(frog_bullet.x == plant_bullets[i].x && frog_bullet.y == plant_bullets[i].y){
                     pthread_mutex_lock(&mutex);

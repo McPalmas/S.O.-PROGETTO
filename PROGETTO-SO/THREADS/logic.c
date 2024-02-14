@@ -61,6 +61,9 @@ void initialize_game()
 
     pthread_create(&time_t, NULL, &time_thread, NULL);
 
+    system("aplay ../SUONI/riverSound.wav > /dev/null 2>&1 &");
+
+
     gameManche();
     //* TERMINAZIONE THREADS -------------------
 
@@ -88,7 +91,7 @@ void initialize_game()
    ----------------------------------------------*/
 void analyze_data()
 {
-
+    system("killall aplay");
     int taken_dens = 0;
 
     erase();
