@@ -304,6 +304,7 @@ void crocodiles_inizializer(); // inizializzazione dei coccodrilli
 void initialize_river_flows(); // inizializzazione del flusso del fiume
 
 // funzioni di supporto
+int getPlantReloadTimer(int min);  // restituisce il tempo di ricarica del proiettile della pianta
 int getCrocodileTimer();      // restituisce un timer per l'inabissamento dei coccodrilli
 bool getRandomBoolean(float probability); // restituisce un booleano in base alla difficoltà
 int getRandomTimer(int min); // restituisce un timer per la ricarica dei proiettili delle piante

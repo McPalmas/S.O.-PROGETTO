@@ -96,7 +96,6 @@ void initialize_game()
         pthread_join(crocodile_t[i], NULL);
     }
 
-    // system("echo 'Messaggio di log: prima di analyze_data' > log.txt");
     analyze_data();
 }
 
@@ -178,7 +177,6 @@ void analyze_data()
 void gameManche()
 {
     sleep(1);
-    system("echo 'Messaggio di log: inizio gameManche' > log.txt");
 
     int start_dens[] = {16, 27, 38, 49, 60};
     bool onCrocodile = true;
