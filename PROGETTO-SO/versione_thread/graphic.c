@@ -265,3 +265,16 @@ void plantBody(Plant p)
     mvprintw(p.y + 1, p.x, "_|_");
     attroff(COLOR_PAIR(GREEN_MAGENTA));
 }
+
+
+
+/*----------------------------------------------------------------------
+        PROCEDURA CHE STAMPA LA SCRITTA PAUSA
+   -------------------------------------------------------------------*/
+void pausePrint(){
+    attron(COLOR_PAIR(WHITE_BLUE));
+    mvprintw(1,  PAUSE_X , "Pause ||");
+    attron(COLOR_PAIR(WHITE_BLUE));
+}
+
+

@@ -79,7 +79,8 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
                 write(pipe_shoot[1], &frog, sizeof(objectData));
                 system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
             }
-            break;          
+            break; 
+        }         
 
         // Legge il dato dalla pipe, se è presente
         if (read(pipe_frogoncrocodile[0], &crocodile, sizeof(objectData)) != -1)
@@ -94,6 +95,7 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
                     frog.x += 1;
             }
         }
+        
 
         // Comunica il nuovo stato della rana
         write(pipe[1], &frog, sizeof(objectData)); // ho commentato sta parte perchè non ne capisco l'utilità quindi anche la funzione frogareequal

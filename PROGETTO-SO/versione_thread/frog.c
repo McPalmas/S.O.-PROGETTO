@@ -77,6 +77,7 @@ void *frog_thread(void *a)
             if(!block){
 		 block = true;
 		 system("killall aplay");
+		 pausePrint();
 	    }
 	    break;
         }

@@ -50,8 +50,10 @@
 #define PLANT_2_START 54
 
 #define SCORE_X 20
+#define PAUSE_X 50
 #define LIFES_X 22
 #define TIME_X 33
+
 
 /*----------------------------------------------------------------------
    MACRO UTILIZZATE PER DEFINRIE LE DIMENSIONI DEL CAMPO DI GIOCO
@@ -280,6 +282,7 @@ void crocodileBody(Crocodile c); // disegna lo sprite del coccodrillo
 void plantBody(Plant p);         // stampa della pianta
 void plantBullett(int y, int x); // stampa il proiettile della pianta
 void printAll();
+void pausePrint();		 // stampa la scritta pausa
 
 void initialize_game();
 void analyze_data();
