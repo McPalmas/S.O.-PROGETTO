@@ -31,6 +31,7 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
           INIZIALIZZAZIONE VARIABILI
  ----------------------------------------------*/
 
+bool block = false;
 
 int time_left = 0;
 

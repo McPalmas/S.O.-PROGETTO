@@ -36,7 +36,8 @@ void *plant_thread(void *id)
     // Ciclo di esecuzione della pianta
     while (should_not_exit)
     {
-
+	while(block){}
+	
         if (plants[plantIndex].plant_isalive)
         {
             // Aggiornamento timer
@@ -129,6 +130,8 @@ void *plant_bullet_thread(void *id)
     // Ciclo di esecuzione del proiettile
     while (should_not_exit)
     {
+        while(block){}
+        
         if (plant_bullets[plantBulletIndex].bulletisactive)
         {
             // Posizionamento proiettile

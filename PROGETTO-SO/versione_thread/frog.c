@@ -22,6 +22,14 @@ void *frog_thread(void *a)
     // Ciclo di esecuzione di Frog
     while (should_not_exit)
     {
+        while(block){
+            int c = getch();
+            if(c == 'q'){
+                 block = false;
+                 system("aplay ../SUONI/riverSound.wav > /dev/null 2>&1 &");
+            }
+        }
+        
         // Stampa di tutto lo schermo di gioco
         pthread_mutex_lock(&mutex);
         printAll();
@@ -65,6 +73,12 @@ void *frog_thread(void *a)
                 system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1 &");
             }
             break;
+        case 'q': 
+            if(!block){
+		 block = true;
+		 system("killall aplay");
+	    }
+	    break;
         }
         pthread_mutex_unlock(&mutex);
 
@@ -98,6 +112,8 @@ void *frog_bullet_thread(void *a)
 
     while (should_not_exit)
     {
+        while(block){}
+        
         if(frog_bullet.bulletisactive){
 		while (frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT)
 		{

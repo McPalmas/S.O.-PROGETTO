@@ -183,6 +183,10 @@ void gameManche()
 
     while (should_not_exit)
     {
+    
+    	while(block){}
+    	
+    	
         /*
             Collisioni:
             - Rana con piante

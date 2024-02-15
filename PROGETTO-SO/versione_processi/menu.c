@@ -91,13 +91,14 @@ void menuDifficulty()
     int selection = 0; // Tiene traccia dell'opzione correntemente selezionat
     int c;             // Carattere della Getch, per le varie opzioni del men
     bool exitMenu = false;
-
     int i;
+    
     GameData game_data;
     game_data.game_lost = false;
     game_data.game_won = false;
     game_data.player_score = 0;
     game_data.player_lives = N_LIVES;
+    
     for (i = 0; i < N_DENS; i++)
     {
         game_data.dens[i] = false;
@@ -184,6 +185,7 @@ void menuDifficulty()
                 game_data.player_lives = 1;
             }
             break;
+	    
         default:
             break;
         }

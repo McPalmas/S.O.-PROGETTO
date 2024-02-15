@@ -25,6 +25,8 @@ void *time_thread(void *a)
     // Invio del dato
     while (should_not_exit)
     {
+    	while(block){}
+    	
         sleep(1);
         // Aggiorna IL TIMER
         pthread_mutex_lock(&mutex);

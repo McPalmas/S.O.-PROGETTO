@@ -259,6 +259,7 @@ extern RiverFlow river_flows[RIVER_LANES_NUMBER];
 // Thread
 extern pthread_mutex_t mutex;
 extern bool should_not_exit;
+extern bool block;
 
 /*----------------------------------------------------------------------
                FUNZIONI

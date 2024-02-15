@@ -296,6 +296,7 @@ void analyze_data(GameData gamedata);                                           
 void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]);                                                                                                                                                                                              // inizializza i coccodrilli nei fiumi
 
 // funzioni di supporto
+int getCrocodileTimer(int min, int difficulty);  // Restituisce un timer casuale per l'immersione dei coccodrilli
 bool getRandomBoolean(float probability); // restituisce un valore booleano in base alla difficoltà
 int getCrocodileTimer(int min, int difficulty); // restituisce un timer per l'inabissamento dei coccodrilli
 int getPlantReloadTimer(int min, int difficulty); // restituisce un timer per la ricarica dei proiettili delle piante
