@@ -193,6 +193,7 @@ void printAll()
 
     // stampa dello score a schermo
     attron(COLOR_PAIR(WHITE_BLUE));
+    mvprintw(1, PAUSE_X-5, "Press 'Q' to pause");
     mvprintw(1, SCORE_X, "Score: %d", gamedata.player_score);
     // stampa delle vite a schermo
     mvprintw(TOTAL_HEIGHT + 1, LIFES_X, "Lifes: %d", gamedata.player_lives);
