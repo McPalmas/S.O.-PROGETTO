@@ -273,7 +273,7 @@ void plantBody(Plant p)
    -------------------------------------------------------------------*/
 void pausePrint(){
     attron(COLOR_PAIR(WHITE_BLUE));
-    mvprintw(1,  PAUSE_X , "Pause     ||     ");
+    mvprintw(1,  PAUSE_X-6 , "     Paused     ||     ");
     attron(COLOR_PAIR(WHITE_BLUE));
 }
 
