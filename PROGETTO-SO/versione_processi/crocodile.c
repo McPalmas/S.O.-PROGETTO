@@ -16,9 +16,14 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
 
     // Definizione variabili
     objectData crocodile;
+    objectData crocodileData;
 
+    
     // Inizializzazione oggetto crocodile
-    read(pipe_crocodile_position[0], &crocodile, sizeof(objectData));
+    read(pipe_crocodile_position[0], &crocodileData, sizeof(objectData));
+ 
+    crocodile=crocodileData;
+
     crocodile.id = id;
     crocodile.is_crocodile_immersing = false;
     crocodile.is_crocodile_alive = true;

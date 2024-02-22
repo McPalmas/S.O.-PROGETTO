@@ -5,7 +5,7 @@
    ----------------------------------------------*/
 void initialize_game()
 {
-
+// i coccodrilli si immergono a caso sempre non solo se ci salgo sopra
     // Inizializzazione variabili
     srand(time(NULL));
     gamedata.game_lost = false;

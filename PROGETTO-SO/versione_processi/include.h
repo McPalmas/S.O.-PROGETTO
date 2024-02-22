@@ -101,9 +101,9 @@
 #define CROCODILE_IS_BAD_PROBABILITY_NORMAL 0.35
 #define CROCODILE_IS_BAD_PROBABILITY_HARD 0.5
 // Tempo di immersione del coccodrillo
-#define CROCODILE_IMMERSION_TIME_EASY 240
-#define CROCODILE_IMMERSION_TIME_NORMAL 180
-#define CROCODILE_IMMERSION_TIME_HARD 120
+#define CROCODILE_IMMERSION_TIME_EASY 2400
+#define CROCODILE_IMMERSION_TIME_NORMAL 1800
+#define CROCODILE_IMMERSION_TIME_HARD 1200
 // Velocità dei proiettili delle piante
 #define PLANT_BULLET_DELAY_EASY 100000
 #define PLANT_BULLET_DELAY_NORMAL 80000
@@ -291,7 +291,7 @@ void time_process(int p[2], int difficulty); // processo per la gestione del tem
 // logic.c
 void initialize_game(GameData gamedata); // creazione e comunicazione tra processi
 void initialize_river_flows(RiverFlow river_flows[], GameData gamedata); // inizializza i flussi dei fiumi
-GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[N_CROCODILE][2], int pipe_crocodile_is_shot[N_CROCODILE][2], GameData gamedata); // gestione della manche stampe e collsioni
+GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[2], int pipe_crocodile_is_shot[N_CROCODILE][2], GameData gamedata); // gestione della manche stampe e collsioni
 void analyze_data(GameData gamedata);                                                                                                                                                                                                                                 // analizza i dati e in base a essi decide se la partita deve continuare o finire
 void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]);                                                                                                                                                                                              // inizializza i coccodrilli nei fiumi
 

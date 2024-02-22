@@ -52,11 +52,9 @@ void initialize_game(GameData gamedata)
     }
 
     // Comunicazione della posizione dei coccodrilli
-    int pipe_crocodile_position[N_CROCODILE][2];
-    for (int i = 0; i < N_CROCODILE; i++)
-    {
-        pipe(pipe_crocodile_position[i]);
-    }
+    int pipe_crocodile_position[2];
+    pipe(pipe_crocodile_position);
+
 
     // Comunicazione della morte delle piante
     int pipe_plant_is_dead[N_PLANTS][2];
@@ -109,7 +107,7 @@ void initialize_game(GameData gamedata)
                     crocodile[i] = fork();
                     if (crocodile[i] == 0)
                     {
-                        crocodile_process(CROCODILE_ID_0 + i, pip, pipe_crocodile_position[i], pipe_frog_on_crocodile, pipe_crocodile_is_shot[i], gamedata.difficulty, river_flows);
+                        crocodile_process(CROCODILE_ID_0 + i, pip, pipe_crocodile_position, pipe_frog_on_crocodile, pipe_crocodile_is_shot[i], gamedata.difficulty, river_flows);
                         exit(0); // Importante per evitare che il processo figlio entri nel ciclo for successivo
                     }
                 }
@@ -244,7 +242,7 @@ void analyze_data(GameData gamedata)
 /* ----------------------------------------------
          GESTIONE MANCHE, STAMPE E COLLISIONI
    ----------------------------------------------*/
-GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[N_CROCODILE][2], int pipe_crocodile_is_shot[N_CROCODILE][2], GameData gamedata)
+GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[2], int pipe_crocodile_is_shot[N_CROCODILE][2], GameData gamedata)
 {
 
     int i, j;
@@ -258,10 +256,9 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
     {
         close(pipe_plant_is_dead[i][0]);
     }
-    for (i = 0; i < N_CROCODILE; i++)
-    {
-        close(pipe_crocodile_position[i][0]);
-    }
+
+    close(pipe_crocodile_position[0]);
+
 
     srand(getpid());
 
@@ -313,10 +310,10 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
     crocodiles_inizializer(gamedata, crocodile);
     // l'inizializzazione dei coccodrilli viene comunicata a displlay
-    for (i = 0; i < N_CROCODILE; i++)
-    {
-        write(pipe_crocodile_position[i][1], &crocodile[i], sizeof(objectData));
-    }
+    
+
+    write(pipe_crocodile_position[1], &crocodile, N_CROCODILE * sizeof(objectData));
+
 
     while (should_not_exit)
     {
@@ -473,7 +470,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                     // disattiva il proiettile e uccidi plant
                     frog_bullet.frog_bulletisactive = false;
                     frog.frog_canshoot = true;
-                    plant[i].plant_isalive = false;
+                    plant[i].plant_isalive = false; //****
 
                     // comunica che la pianta è morta
                     write(pipe_plant_is_dead[i][1], &plant[i], sizeof(objectData));
@@ -699,6 +696,7 @@ void crocodiles_inizializer(GameData gamedata, objectData crocodiles[])
         // Assegna 3 coccodrilli a ciascun fiume
         for (int i = 0; i < CROCODILES_PER_RIVER; i++)
         {
+            crocodiles[crocodileIndex].id = CROCODILE_ID_0 + crocodileIndex;
             // Assegna l'indice del fiume al coccodrillo
             crocodiles[crocodileIndex].flow_number = riverIndex;
             // Assegna speed e direction dal fiume corrispondente
