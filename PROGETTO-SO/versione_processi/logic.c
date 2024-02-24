@@ -44,12 +44,10 @@ void initialize_game(GameData gamedata)
     fcntl(pipe_destroy_frog_bullet[0], F_SETFL, fcntl(pipe_destroy_frog_bullet[0], F_GETFL) | O_NONBLOCK);
 
     // Comunicazione fra oggetti e plant_bullet (Plant Bullet ha avuto una collisione)
-    int pipe_destroy_plant_bullet[3][2];
-    for (int i = 0; i < 3; i++)
-    {
-        pipe(pipe_destroy_plant_bullet[i]);
-        fcntl(pipe_destroy_plant_bullet[i][0], F_SETFL, fcntl(pipe_destroy_plant_bullet[i][0], F_GETFL) | O_NONBLOCK);
-    }
+    int pipe_destroy_plant_bullet[2];
+    pipe(pipe_destroy_plant_bullet);
+    fcntl(pipe_destroy_plant_bullet[0], F_SETFL, fcntl(pipe_destroy_plant_bullet[0], F_GETFL) | O_NONBLOCK);
+
 
     // Comunicazione della posizione dei coccodrilli
     int pipe_crocodile_position[2];
@@ -57,20 +55,16 @@ void initialize_game(GameData gamedata)
 
 
     // Comunicazione della morte delle piante
-    int pipe_plant_is_dead[N_PLANTS][2];
-    for (int i = 0; i < N_PLANTS; i++)
-    {
-        pipe(pipe_plant_is_dead[i]);
-        fcntl(pipe_plant_is_dead[i][0], F_SETFL, fcntl(pipe_plant_is_dead[i][0], F_GETFL) | O_NONBLOCK);
-    }
+    int pipe_plant_is_dead[2];
+    pipe(pipe_plant_is_dead);
+    fcntl(pipe_plant_is_dead[0], F_SETFL, fcntl(pipe_plant_is_dead[0], F_GETFL) | O_NONBLOCK);
+
 
     // Comunicazione della collisione fra Bullet e coccodrilli
-    int pipe_crocodile_is_shot[N_CROCODILE][2];
-    for (int i = 0; i < N_CROCODILE; i++)
-    {
-        pipe(pipe_crocodile_is_shot[i]);
-        fcntl(pipe_crocodile_is_shot[i][0], F_SETFL, fcntl(pipe_crocodile_is_shot[i][0], F_GETFL) | O_NONBLOCK);
-    }
+    int pipe_crocodile_is_shot[2];
+    pipe(pipe_crocodile_is_shot);
+    fcntl(pipe_crocodile_is_shot[0], F_SETFL, fcntl(pipe_crocodile_is_shot[0], F_GETFL) | O_NONBLOCK);
+
 
     // Inizializzazione dei flussi del fiume
     initialize_river_flows(river_flows, gamedata);
@@ -107,7 +101,7 @@ void initialize_game(GameData gamedata)
                     crocodile[i] = fork();
                     if (crocodile[i] == 0)
                     {
-                        crocodile_process(CROCODILE_ID_0 + i, pip, pipe_crocodile_position, pipe_frog_on_crocodile, pipe_crocodile_is_shot[i], gamedata.difficulty, river_flows);
+                        crocodile_process(CROCODILE_ID_0 + i, pip, pipe_crocodile_position, pipe_frog_on_crocodile, pipe_crocodile_is_shot, gamedata.difficulty, river_flows);
                         exit(0); // Importante per evitare che il processo figlio entri nel ciclo for successivo
                     }
                 }
@@ -118,7 +112,7 @@ void initialize_game(GameData gamedata)
                     plant[i] = fork();
                     if (plant[i] == 0)
                     {
-                        plant_process(PLANT_ID_0 + i, pip, pipe_plant_is_dead[i], pipe_destroy_plant_bullet[i], gamedata.difficulty);
+                        plant_process(PLANT_ID_0 + i, pip, pipe_plant_is_dead, pipe_destroy_plant_bullet, gamedata.difficulty);
                         exit(0); // Importante per evitare che il processo figlio entri nel ciclo for successivo
                     }
                 }
@@ -242,7 +236,7 @@ void analyze_data(GameData gamedata)
 /* ----------------------------------------------
          GESTIONE MANCHE, STAMPE E COLLISIONI
    ----------------------------------------------*/
-GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[N_PLANT_BULLETS][2], int pipe_crocodile_position[2], int pipe_crocodile_is_shot[N_CROCODILE][2], GameData gamedata)
+GameData gameManche(int pip[2], int pipe_plant_is_dead[2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[2], int pipe_crocodile_position[2], int pipe_crocodile_is_shot[2], GameData gamedata)
 {
 
     int i, j;
@@ -252,11 +246,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
     // Gestione pipe
     close(pip[1]);
     close(pipe_destroy_frog_bullet[0]);
-    for (i = 0; i < N_PLANTS; i++)
-    {
-        close(pipe_plant_is_dead[i][0]);
-    }
-
+    close(pipe_plant_is_dead[0]);
     close(pipe_crocodile_position[0]);
 
 
@@ -470,10 +460,10 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                     // disattiva il proiettile e uccidi plant
                     frog_bullet.frog_bulletisactive = false;
                     frog.frog_canshoot = true;
-                    plant[i].plant_isalive = false; //****
+                    plant[i].plant_isalive = false;
 
                     // comunica che la pianta è morta
-                    write(pipe_plant_is_dead[i][1], &plant[i], sizeof(objectData));
+                    write(pipe_plant_is_dead[1], &plant[i], sizeof(objectData));
                     // comunica al frog bullet di distruggere il proiettile
                     write(pipe_destroy_frog_bullet[1], &frog_bullet, sizeof(objectData));
                 }
@@ -500,7 +490,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                     gamedata.game_lost = true;
                     plant_bullet[i].plant_bulletisactive = false;
                     // comunica a plant bullet che il proiettile deve essere disattivato
-                    write(pipe_destroy_plant_bullet[i][1], &plant_bullet, sizeof(objectData));
+                    write(pipe_destroy_plant_bullet[1], &plant_bullet, sizeof(objectData));
                 }
             }
         }
@@ -511,8 +501,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
             // se il proiettile sta sul coccodrillo corrente
             if (frog_bullet.frog_bulletisactive && (crocodile[i].y + 1 == frog_bullet.y) && (frog_bullet.x >= crocodile[i].x && frog_bullet.x <= crocodile[i].x + CROCODILE_W))
             {
-
-                write(pipe_crocodile_is_shot[i][1], &crocodile[i], sizeof(objectData));
+                write(pipe_crocodile_is_shot[1], &crocodile[i],sizeof(objectData));
 
                 // comunica al frog bullet di distruggere il proiettile
                 frog_bullet.frog_bulletisactive = false;
@@ -539,13 +528,13 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
 
                     // comunica al frog bullet di distruggere il proiettile
                     write(pipe_destroy_frog_bullet[1], &frog_bullet, sizeof(objectData));
-                    write(pipe_destroy_plant_bullet[i][1], &plant_bullet, sizeof(objectData));
+                    write(pipe_destroy_plant_bullet[1], &plant_bullet, sizeof(objectData));
                 }
             }
         }
 
         // SE LA RANA E' SULLA SCHIENA DI UN COCCODRILLO
-        // SE LA RANA E' NEL FIUME
+ /*       // SE LA RANA E' NEL FIUME
         bool onCrocodile = false;
         // Se la rana si trova nel fiume
         if (frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT)
@@ -594,7 +583,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[N_PLANTS][2], int pipe_de
                 gamedata.game_lost = true;
             };
         }
-
+*/
         // SE LA RANA E' NELLA ZONA DELLE TANE
         if (frog.y < SCORE_ZONE_HEIGHT + 2)
         {

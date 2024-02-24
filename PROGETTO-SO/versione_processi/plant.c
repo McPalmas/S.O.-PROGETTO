@@ -8,7 +8,7 @@ void plant_process(int id, int pipe[2], int pipe_plant_is_dead[2], int pipe_dest
 
     // Gestione pipe
     close(pipe[0]);
-    close(pipe_plant_is_dead[1]);
+    //close(pipe_plant_is_dead[1]);
     
     srand(getpid());
     // Posizione oggetti di gioco
@@ -35,15 +35,18 @@ void plant_process(int id, int pipe[2], int pipe_plant_is_dead[2], int pipe_dest
 
     // Ciclo di esecuzione della pianta
     while (1)
-    {
-        if (read(pipe_plant_is_dead[0], &plant_data, sizeof(objectData)) != -1)
-        {
-            plant = plant_data;
-        }
+    {        
         
-        
+        if (read(pipe_plant_is_dead[0], &plant_data, sizeof(objectData)) != -1) {
+                if(plant_data.id == plant.id){
+                     plant = plant_data;
+                }else
+                     write(pipe_plant_is_dead[1], &plant_data,sizeof(objectData));
+        }      
+      
+      
         if (plant.plant_isalive)
-        {
+        {        
             plant_bullet_timer--;
             // Se il timer è scaduto
             if (plant_bullet_timer <= 0)

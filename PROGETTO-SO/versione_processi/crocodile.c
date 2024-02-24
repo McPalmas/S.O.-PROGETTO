@@ -17,12 +17,10 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
     // Definizione variabili
     objectData crocodile;
     objectData crocodileData;
-
     
     // Inizializzazione oggetto crocodile
-    read(pipe_crocodile_position[0], &crocodileData, sizeof(objectData));
- 
-    crocodile=crocodileData;
+    read(pipe_crocodile_position[0], &crocodile, sizeof(objectData));
+
 
     crocodile.id = id;
     crocodile.is_crocodile_immersing = false;
@@ -45,8 +43,13 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
         if (crocodile.is_crocodile_alive)
         {
             // Se crocodile è stato colpito, diventa buono
-            if (read(pipe_crocodile_is_shot[0], &crocodile, sizeof(objectData)) != -1)
-                crocodile.crocodile_is_good = true;
+            if (read(pipe_crocodile_is_shot[0], &crocodileData, sizeof(objectData)) != -1)
+                if (crocodileData.id == crocodile.id){
+                    crocodile = crocodileData;
+                    crocodile.crocodile_is_good = true;
+                }else{ 
+                    write(pipe_crocodile_is_shot[1], &crocodileData,sizeof(objectData));
+                }
 
             // Aggiornamento posizione di crocodile
             if (crocodile.direction == RIGHT)
