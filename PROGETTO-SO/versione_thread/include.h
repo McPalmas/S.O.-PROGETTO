@@ -146,6 +146,22 @@
 #define MAX_BONUS_SCORE 100 // punteggio bonus in base al tempo di completamento da aggiungere al punteggio di base
 
 
+
+
+#define DIMBUFFER 100000 /* Capacità massima del Buffer Condiviso */
+objectData buffer[DIMBUFFER];
+objectData consumedObject;
+
+
+pthread_mutex_t mutexBuffer; /* Mutex per il buffer principale */
+pthread_mutex_t mutexSecondBuffer; /* Mutex per il buffer secondario */
+
+sem_t semaphoreSlotFull; /* Semaforo che conta quanti slot del buffer sono pieni */
+sem_t semaphoreSlotEmpty; /* Semaforo che conta quanti slot del buffer sono vuoti */
+
+
+
+
 /*----------------------------------------------------------------------
                ENUMERAZIONI
    ----------------------------------------------------------------------*/
@@ -189,60 +205,30 @@ typedef struct
    int speed;                // Velocità del flusso
 } RiverFlow;
 
-
-
-// Dati rana
+// Dati oggetto
 typedef struct
 {
+   // generali
+   int id;
    int x;
    int y;
+   // frog
    bool frog_canshoot;
    bool frog_candie;
    bool frog_bulletisactive;
-} Frog;
-
-typedef struct
-{
-   int x;
-   int y;
-   bool bulletisactive;
-} FrogBullet;
-
-// Dati pianta
-typedef struct
-{
-   int id;
-   int x;
-   int y;
+   // plant
    bool plant_isalive;
    bool plant_canshoot;
    bool plant_bulletisactive;
-} Plant;
-
-// Dati proiettile pianta
-typedef struct
-{
-   int id;
-   int x;
-   int y;
-   bool bulletisactive;
-} PlantBullet;
-
-// Dati coccodrillo
-typedef struct
-{
-   int id;
-   int x;
-   int y;
+   // crocodile
    enum Direction direction;
    int crocodile_speed;
    bool crocodile_is_good;
    bool is_crocodile_immersing;
    bool is_crocodile_alive;
    int flow_number;
-   int crocodile_immersion_timer;
-   int crocodile_immersion_timer_counter;
-} Crocodile;
+} objectData;
+
 
 /*----------------------------------------------------------------------
                VARIABILI GLOBALI
@@ -251,12 +237,12 @@ typedef struct
 extern int time_left;
 extern int start_dens[5];
 extern GameData gamedata;
-extern Frog frog;
-extern FrogBullet frog_bullet;
-extern Plant plants[N_PLANTS];
-extern PlantBullet plant_bullets[N_PLANT_BULLETS];
-extern Crocodile crocodiles[N_CROCODILE];
-extern RiverFlow river_flows[RIVER_LANES_NUMBER];
+extern objectData frog;
+extern objectData frog_bullet;
+extern objectData plants[N_PLANTS];
+extern objectData plant_bullets[N_PLANT_BULLETS];
+extern objectData crocodiles[N_CROCODILE];
+extern objectData river_flows[RIVER_LANES_NUMBER];
 
 // Thread
 extern pthread_mutex_t mutex;
@@ -278,8 +264,8 @@ void gameField();                // disegna il terreno di gioco
 void printDens(bool dens[]);     // stampa delle tane
 void frogBody(int x, int y);     // disegna lo sprite della rana
 void frogBullett(int y, int x);  // disegna il proiettile della rana
-void crocodileBody(Crocodile c); // disegna lo sprite del coccodrillo
-void plantBody(Plant p);         // stampa della pianta
+void crocodileBody(objectData c); // disegna lo sprite del coccodrillo
+void plantBody(objectData p);         // stampa della pianta
 void plantBullett(int y, int x); // stampa il proiettile della pianta
 void printAll();
 void pausePrint();		 // stampa la scritta pausa

@@ -29,11 +29,6 @@ void *frog_thread(void *a)
                  system("aplay ../SUONI/riverSound.wav > /dev/null 2>&1 &");
             }
         }
-        
-        // Stampa di tutto lo schermo di gioco
-        pthread_mutex_lock(&mutex);
-        printAll();
-        pthread_mutex_unlock(&mutex);
 
         // Attende l'input, altrimenti continua senza bloccare il gioco
         timeout(1);

@@ -4,21 +4,21 @@
           FROG
  ----------------------------------------------*/
 
-Frog frog;
-FrogBullet frog_bullet;
+objectData frog;
+objectData frog_bullet;
 
 
 /* ----------------------------------------------   
           PLANT
  ----------------------------------------------*/
-Plant plants[N_PLANTS];
-PlantBullet plant_bullets[N_PLANTS];
+objectData plants[N_PLANTS];
+objectData plant_bullets[N_PLANTS];
 
 
 /* ----------------------------------------------   
           CROCODILE
  ----------------------------------------------*/
-Crocodile crocodiles[N_CROCODILE];
+objectData crocodiles[N_CROCODILE];
 
 
 /* ----------------------------------------------   
