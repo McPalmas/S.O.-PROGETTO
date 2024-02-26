@@ -11,7 +11,7 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
     // Gestione pipe
     close(pipe[0]);
     close(pipe_crocodile_position[1]);
-    close(pipe_frog_on_crocodile[0]);
+    //close(pipe_frog_on_crocodile[0]);
     srand(getpid());
 
     // Definizione variabili
@@ -47,8 +47,6 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
                 if (crocodileData.id == crocodile.id){
                     crocodile = crocodileData;
                     crocodile.crocodile_is_good = true;
-                }else{ 
-                    write(pipe_crocodile_is_shot[1], &crocodileData,sizeof(objectData));
                 }
 
             // Aggiornamento posizione di crocodile

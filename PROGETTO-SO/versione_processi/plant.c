@@ -37,12 +37,10 @@ void plant_process(int id, int pipe[2], int pipe_plant_is_dead[2], int pipe_dest
     while (1)
     {        
         
-        if (read(pipe_plant_is_dead[0], &plant_data, sizeof(objectData)) != -1) {
-                if(plant_data.id == plant.id){
-                     plant = plant_data;
-                }else
-                     write(pipe_plant_is_dead[1], &plant_data,sizeof(objectData));
-        }      
+        if (read(pipe_plant_is_dead[0], &plant_data, sizeof(objectData)) != -1)
+            if(plant_data.id == plant.id)
+                plant = plant_data;
+   
       
       
         if (plant.plant_isalive)

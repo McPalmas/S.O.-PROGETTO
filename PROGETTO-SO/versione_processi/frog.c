@@ -98,7 +98,7 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
         
 
         // Comunica il nuovo stato della rana
-        write(pipe[1], &frog, sizeof(objectData)); // ho commentato sta parte perchè non ne capisco l'utilità quindi anche la funzione frogareequal
+        write(pipe[1], &frog, sizeof(objectData));
 
         usleep(1000);
     }

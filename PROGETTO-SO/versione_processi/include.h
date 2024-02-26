@@ -291,7 +291,7 @@ void time_process(int p[2], int difficulty); // processo per la gestione del tem
 // logic.c
 void initialize_game(GameData gamedata); // creazione e comunicazione tra processi
 void initialize_river_flows(RiverFlow river_flows[], GameData gamedata); // inizializza i flussi dei fiumi
-GameData gameManche(int pip[2], int pipe_plant_is_dead[2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[2], int pipe_crocodile_position[2], int pipe_crocodile_is_shot[2], GameData gamedata); // gestione della manche stampe e collsioni
+GameData gameManche(int pip[2], int pipe_plant_is_dead[2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[2], int pipe_crocodile_position[2], int pipe_crocodile_is_shot[2], int pipe_frog_on_crocodile[2],GameData gamedata); // gestione della manche stampe e collsioni
 void analyze_data(GameData gamedata);                                                                                                                                                                                                                                 // analizza i dati e in base a essi decide se la partita deve continuare o finire
 void crocodiles_inizializer(GameData gamedata, objectData crocodiles[]);                                                                                                                                                                                              // inizializza i coccodrilli nei fiumi
 

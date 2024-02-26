@@ -122,7 +122,7 @@ void initialize_game(GameData gamedata)
                 /**
                  * Gestione della manche
                  */
-                gamedata = gameManche(pip, pipe_plant_is_dead, pipe_destroy_frog_bullet, pipe_destroy_plant_bullet, pipe_crocodile_position, pipe_crocodile_is_shot, gamedata);
+                gamedata = gameManche(pip, pipe_plant_is_dead, pipe_destroy_frog_bullet, pipe_destroy_plant_bullet, pipe_crocodile_position, pipe_crocodile_is_shot,pipe_frog_on_crocodile, gamedata);
 
                 // se la manche è stata vinta
                 if (gamedata.game_won)
@@ -236,7 +236,7 @@ void analyze_data(GameData gamedata)
 /* ----------------------------------------------
          GESTIONE MANCHE, STAMPE E COLLISIONI
    ----------------------------------------------*/
-GameData gameManche(int pip[2], int pipe_plant_is_dead[2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[2], int pipe_crocodile_position[2], int pipe_crocodile_is_shot[2], GameData gamedata)
+GameData gameManche(int pip[2], int pipe_plant_is_dead[2], int pipe_destroy_frog_bullet[2], int pipe_destroy_plant_bullet[2], int pipe_crocodile_position[2], int pipe_crocodile_is_shot[2],int pipe_frog_on_crocodile[2],GameData gamedata)
 {
 
     int i, j;
@@ -248,7 +248,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[2], int pipe_destroy_frog
     close(pipe_destroy_frog_bullet[0]);
     close(pipe_plant_is_dead[0]);
     close(pipe_crocodile_position[0]);
-
+    close(pipe_frog_on_crocodile[0]);
 
     srand(getpid());
 
@@ -463,7 +463,8 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[2], int pipe_destroy_frog
                     plant[i].plant_isalive = false;
 
                     // comunica che la pianta è morta
-                    write(pipe_plant_is_dead[1], &plant[i], sizeof(objectData));
+                    for(int y = 0; y < N_PLANTS; y++ )
+                        write(pipe_plant_is_dead[1], &plant[i], sizeof(objectData));
                     // comunica al frog bullet di distruggere il proiettile
                     write(pipe_destroy_frog_bullet[1], &frog_bullet, sizeof(objectData));
                 }
@@ -501,7 +502,8 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[2], int pipe_destroy_frog
             // se il proiettile sta sul coccodrillo corrente
             if (frog_bullet.frog_bulletisactive && (crocodile[i].y + 1 == frog_bullet.y) && (frog_bullet.x >= crocodile[i].x && frog_bullet.x <= crocodile[i].x + CROCODILE_W))
             {
-                write(pipe_crocodile_is_shot[1], &crocodile[i],sizeof(objectData));
+                for(int y = 0; y < N_CROCODILE; y++ )
+                    write(pipe_crocodile_is_shot[1], &crocodile[i],sizeof(objectData));
 
                 // comunica al frog bullet di distruggere il proiettile
                 frog_bullet.frog_bulletisactive = false;
@@ -534,7 +536,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[2], int pipe_destroy_frog
         }
 
         // SE LA RANA E' SULLA SCHIENA DI UN COCCODRILLO
- /*       // SE LA RANA E' NEL FIUME
+        // SE LA RANA E' NEL FIUME
         bool onCrocodile = false;
         // Se la rana si trova nel fiume
         if (frog.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frog.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT)
@@ -544,7 +546,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[2], int pipe_destroy_frog
             {
                 // se la rana si trova su almeno un coccodrillo, aggiorna la variabile ed esce dal ciclo
                 if (frog.frog_candie && frog.y == crocodile[i].y && (frog.x > crocodile[i].x + 1 - 1 * crocodile[i].direction && frog.x < (crocodile[i].x + CROCODILE_W - 1 - crocodile[i].direction)))
-                {
+                {  
                     onCrocodile = true;
                     if (!crocodile[i].crocodile_is_good)
                     {
@@ -572,7 +574,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[2], int pipe_destroy_frog
                     }
                     else
                         crocodile_immersion_timer = getCrocodileTimer(100, gamedata.difficulty);
-                    break;
+                    break;      
                 }
                 else
                     onCrocodile = false;
@@ -581,9 +583,9 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[2], int pipe_destroy_frog
             {
                 frog.frog_candie = false;
                 gamedata.game_lost = true;
-            };
+            }
         }
-*/
+
         // SE LA RANA E' NELLA ZONA DELLE TANE
         if (frog.y < SCORE_ZONE_HEIGHT + 2)
         {
