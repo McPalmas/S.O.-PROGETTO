@@ -149,15 +149,14 @@
 
 
 #define DIMBUFFER 100000 /* Capacità massima del Buffer Condiviso */
-objectData buffer[DIMBUFFER];
-objectData consumedObject;
+extern objectData buffer[DIMBUFFER];
+extern objectData consumedObject;
 
 
-pthread_mutex_t mutexBuffer; /* Mutex per il buffer principale */
-pthread_mutex_t mutexSecondBuffer; /* Mutex per il buffer secondario */
+extern pthread_mutex_t mutexBuffer; /* Mutex per il buffer */
 
-sem_t semaphoreSlotFull; /* Semaforo che conta quanti slot del buffer sono pieni */
-sem_t semaphoreSlotEmpty; /* Semaforo che conta quanti slot del buffer sono vuoti */
+extern sem_t semaphoreSlotFull; /* Semaforo che conta quanti slot del buffer sono pieni */
+extern sem_t semaphoreSlotEmpty; /* Semaforo che conta quanti slot del buffer sono vuoti */
 
 
 
@@ -245,7 +244,7 @@ extern objectData crocodiles[N_CROCODILE];
 extern objectData river_flows[RIVER_LANES_NUMBER];
 
 // Thread
-extern pthread_mutex_t mutex;
+//extern pthread_mutex_t mutex;
 extern bool should_not_exit;
 extern bool block;
 

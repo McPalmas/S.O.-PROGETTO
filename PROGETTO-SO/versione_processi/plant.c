@@ -8,7 +8,7 @@ void plant_process(int id, int pipe[2], int pipe_plant_is_dead[2], int pipe_dest
 
     // Gestione pipe
     close(pipe[0]);
-    //close(pipe_plant_is_dead[1]);
+    close(pipe_plant_is_dead[1]);
     
     srand(getpid());
     // Posizione oggetti di gioco

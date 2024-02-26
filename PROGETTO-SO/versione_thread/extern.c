@@ -24,12 +24,18 @@ objectData crocodiles[N_CROCODILE];
 /* ----------------------------------------------   
           SEMAPHORE
  ----------------------------------------------*/
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutexBuffer = PTHREAD_MUTEX_INITIALIZER;
 
 
 /* ----------------------------------------------   
           INIZIALIZZAZIONE VARIABILI
  ----------------------------------------------*/
+
+objectData buffer[DIMBUFFER];
+objectData consumedObject;
+
+sem_t semaphoreSlotFull;
+sem_t semaphoreSlotEmpty
 
 bool block = false;
 
