@@ -678,6 +678,7 @@ void *gameManche_thread(void *a, objectData frog, objectData frog_bullet, object
     // analyze_data();
 }
 
+
 /* ----------------------------------------------
          INIZIALIZZAZIONE COCCODRILLI
    ----------------------------------------------*/
@@ -763,6 +764,54 @@ void initialize_river_flows(GameData gamedata, objectData river_flows[])
 }
 
 /* ----------------------------------------------
+         INIZIALIZZAZIONE PIANTE
+   ----------------------------------------------*/
+void initialize_plants(objectData plants[], objectData plant_bullets[], int difficulty){
+    for (int i = 0; i < N_PLANTS; i++)
+    {
+        plants[i].plant_isalive = true;
+        plants[i].id = PLANT_ID_0 + i;
+        plants[i].plant_bullet_timer = getPlantReloadTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
+
+        switch(difficulty){
+            case EASY:
+                plant_bullets[i].plant_bullet_delay = PLANT_BULLET_DELAY_EASY;
+                break;
+            case NORMAL:
+                plant_bullets[i].plant_bullet_delay = PLANT_BULLET_DELAY_NORMAL;
+                break;
+            case HARD:
+                plant_bullets[i].plant_bullet_delay = PLANT_BULLET_DELAY_HARD;
+                break;
+            default:
+                break;
+        }
+        plant_bullets[i].id = PLANT_BULLET_ID_0 + i;
+    }
+}
+
+/* ----------------------------------------------
+         INIZIALIZZAZIONE TEMPO
+   ----------------------------------------------*/
+void initialize_time(objectData time, int difficulty){
+    switch (difficulty)
+    {
+    case EASY:
+        time.time_left = TIMELIMIT_EASY;
+        break;
+    case NORMAL:
+        time.time_left = TIMELIMIT_NORMAL;
+        break;
+    case HARD:
+        time.time_left = TIMELIMIT_HARD;
+        break;
+    default:
+        break;
+    }
+}
+
+
+/* ----------------------------------------------
          Utility
    ----------------------------------------------*/
 
@@ -793,5 +842,33 @@ int getCrocodileTimer(int min, GameData gamedata)
     default:
         break;
     }
+    return randomTimer;
+}
+
+
+/**
+ * Utility
+ */
+
+// Restituisce un timer per il prossimo sparo della pianta
+int getPlantReloadTimer(int min, int difficulty)
+{
+    int randomTimer;
+
+    switch (difficulty)
+    {
+    case (EASY):
+        randomTimer = rand() % (min + 1) + PLANT_BULLET_RELOAD_EASY;
+        break;
+    case (NORMAL):
+        randomTimer = rand() % (min + 1) + PLANT_BULLET_RELOAD_NORMAL;
+        break;
+    case (HARD):
+        randomTimer = rand() % (min + 1) + PLANT_BULLET_RELOAD_HARD;
+        break;
+    default:
+        break;
+    }
+
     return randomTimer;
 }

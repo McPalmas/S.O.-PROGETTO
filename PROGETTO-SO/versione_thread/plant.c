@@ -3,12 +3,8 @@
 /* ----------------------------------------------
           PLANT
    ----------------------------------------------*/
-void *plant_thread(void *id, void *gameData)
+void *plant_thread(void *id)
 {
-    GameData *game_data = (GameData *)gameData;
-    int difficulty = game_data->difficulty;
-    
-
     // Estrazione dell'id passato alla funzione
     int plantIndex = *((int *)id);
     // srand sulla base del thread
@@ -30,7 +26,6 @@ void *plant_thread(void *id, void *gameData)
         plants[plantIndex].x = PLANT_2_START;
     plants[plantIndex].plant_canshoot = true;
     plants[plantIndex].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT;
-    plant_bullet_timer = getPlantReloadTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
 
     insertObject(plants[plantIndex]); // Potrebbe non servire
     // Ciclo di esecuzione della pianta
@@ -65,10 +60,10 @@ void *plant_thread(void *id, void *gameData)
 /* ----------------------------------------------
           PLANT BULLET
    ----------------------------------------------*/
-void *plant_bullet_thread(void *data, void *gameData)
+void *plant_bullet_thread(void *data)
 {
+    // Estrazione dei dati passati alla funzione
     bulletData *plantBullet = (bulletData *)data;
-    GameData *game_data = (GameData *)gameData;
 
     // Inizializzazione proiettile
     objectData plant_bullet[N_PLANT_BULLETS];
@@ -76,32 +71,9 @@ void *plant_bullet_thread(void *data, void *gameData)
     plant_bullet[bulletIndex].x = plantBullet->x;
     plant_bullet[bulletIndex].y = plantBullet->y;
 
-    // Salvataggio dato difficoltà
-    int difficulty;
-    difficulty = game_data->difficulty;
-
     // Estrazione dell'id passato alla funzione
     unsigned int thread_id = (unsigned int)(size_t)pthread_self();
     srand(thread_id);
-
-    // Inizializzazione
-    int plant_bullet_delay;
-
-    // Inizializzazione proiettile
-    switch (difficulty)
-    {
-    case EASY:
-        plant_bullet_delay = PLANT_BULLET_DELAY_EASY;
-        break;
-    case NORMAL:
-        plant_bullet_delay = PLANT_BULLET_DELAY_NORMAL;
-        break;
-    case HARD:
-        plant_bullet_delay = PLANT_BULLET_DELAY_HARD;
-        break;
-    default:
-        break;
-    }
 
     insertObject(plant_bullet[bulletIndex]);
 
@@ -122,33 +94,7 @@ void *plant_bullet_thread(void *data, void *gameData)
 
         insertObject(plant_bullet[bulletIndex]);
 
-        usleep(plant_bullet_delay);
+        usleep(plant_bullet[bulletIndex].plant_bullet_delay);
     }
 }
 
-/**
- * Utility
- */
-
-// Restituisce un timer per il prossimo sparo della pianta
-int getPlantReloadTimer(int min, int difficulty)
-{
-    int randomTimer;
-
-    switch (difficulty)
-    {
-    case (EASY):
-        randomTimer = rand() % (min + 1) + PLANT_BULLET_RELOAD_EASY;
-        break;
-    case (NORMAL):
-        randomTimer = rand() % (min + 1) + PLANT_BULLET_RELOAD_NORMAL;
-        break;
-    case (HARD):
-        randomTimer = rand() % (min + 1) + PLANT_BULLET_RELOAD_HARD;
-        break;
-    default:
-        break;
-    }
-
-    return randomTimer;
-}

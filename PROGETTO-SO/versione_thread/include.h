@@ -254,6 +254,8 @@ typedef struct
    bool plant_isalive;
    bool plant_canshoot;
    bool plant_bulletisactive;
+   bool plant_bullet_timer;
+   bool plant_bullet_delay;
    // crocodile
    enum Direction direction;
    int crocodile_speed;
@@ -326,7 +328,8 @@ void *time_thread(void *a); // thread per la gestione del tempo di gioco
 void *gameManche_thread(void *id, objectData frog, objectData frog_bulletData, objectData plantData[], objectData plant_bulletData[], objectData crocodileData[], objectData time, GameData gamedata); // thread per la gestione della partita
 void crocodiles_inizializer(objectData crocodiles[], GameData gamedata, objectData river_flow[]);     // inizializzazione dei coccodrilli
 void initialize_river_flows(GameData gamedata, objectData RiverFlow[]);     // inizializzazione del flusso del fiume
-
+void plants_initializer(objectData plants[], objectData plant_bullets[], int difficulty);             // inizializzazione delle piante
+void initialize_time(objectData time, int difficulty);                                              // inizializzazione del tempo di gioco
 // funzioni di supporto
 int getPlantReloadTimer(int min);         // restituisce il tempo di ricarica del proiettile della pianta
 int getCrocodileTimer();                  // restituisce un timer per l'inabissamento dei coccodrilli
@@ -336,5 +339,6 @@ int getRandomTimer(int min);              // restituisce un timer per la ricaric
 // funzioni di supporto per la gestione del buffer
 void removeObject();          // rimuove un oggetto dal buffer
 void insertObject(objectData obj); // inserisce un oggetto nel buffer
+
 
 
