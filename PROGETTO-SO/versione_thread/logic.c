@@ -8,11 +8,15 @@ void initialize_game(GameData game_data)
     // Inizializzazione variabili
     srand(time(NULL));
 
-    GameData *gamedata = (GameData *)malloc(sizeof(GameData));
-    
     // Inizializzazione variabili
-    gamedata = &game_data;
+    GameData gameData = game_data;
     should_not_exit = true;
+
+    in = 0;
+    out = 0;
+
+    gameData.game_won = false;
+    gameData.game_lost = false;
     
     /* Inizializzazione di mutex buffer e semafori */
     pthread_mutex_init(&mutexBuffer, NULL);
@@ -21,7 +25,7 @@ void initialize_game(GameData game_data)
 
     pthread_t gameManche_t;
 
-    pthread_create(&gameManche_t, NULL, &gameManche_thread, gamedata);
+    pthread_create(&gameManche_t, NULL, &gameManche_thread, &gameData);
 
     // Inizializzazione del suono del fiume
     system("aplay ../SUONI/riverSound.wav > /dev/null 2>&1 &");
@@ -49,6 +53,19 @@ void removeObject()
     sem_post(&semaphoreSlotEmpty);      /* Esegue una SIGNAL al semaforo empty */
 }
 
+void removeData()
+{
+    sem_wait(&semaphoreSlotFull);     /* Esegue una wait sul semaforo full */
+    pthread_mutex_lock(&mutexBuffer); /* Blocca il mutex principale */
+
+    /* SEZIONE CRITICA */
+    consumedData = dataBuffer[data_out]; /* Preleva l'elemento e scorre l'indice del buffer */
+    data_out = (data_out + 1) % DIMBUFFER;
+
+    pthread_mutex_unlock(&mutexBuffer); /* Sblocca il mutex principale */
+    sem_post(&semaphoreSlotEmpty);      /* Esegue una SIGNAL al semaforo empty */
+}
+
 /*-----------------------------------------------------------------------
    PROCEDURA 'PRODUTTORE' - NEW OBJECT IN BUFFER
    La procedura si occupa di aggiungere un nuovo elemento nel buffer.
@@ -67,6 +84,19 @@ void insertObject(objectData newObject)
 
     pthread_mutex_unlock(&mutexBuffer); /* Sblocca mutex */
     sem_post(&semaphoreSlotFull);       /* Esegue una SIGNAL al semaforo full */
+}
+
+void insertData(GameData newData){
+    sem_wait(&semaphoreSlotEmpty);    /* Esegue una wait sul semaforo empty */
+    pthread_mutex_lock(&mutexBuffer); /* Blocca il mutex principale */
+
+    /* SEZIONE CRITICA */
+    dataBuffer[data_in] = newData; /* Inserisce l'elemento e scorre l'indice del buffer */
+    data_in = (data_in + 1) % DIMBUFFER;
+
+    pthread_mutex_unlock(&mutexBuffer); /* Sblocca mutex */
+    sem_post(&semaphoreSlotFull);       /* Esegue una SIGNAL al semaforo full */
+
 }
 
 /* ----------------------------------------------
@@ -146,8 +176,6 @@ void analyze_data(GameData gamedata)
    ----------------------------------------------*/
 void *gameManche_thread(void *game_data)
 {
-    sleep(1);
-
     int start_dens[] = {16, 27, 38, 49, 60};
     bool onCrocodile = true;
 
@@ -184,14 +212,14 @@ void *gameManche_thread(void *game_data)
     }
 
     // Creazione dei threads
- /*   pthread_create(&frog_t, NULL, &frog_thread, NULL);
+    pthread_create(&frog_t, NULL, &frog_thread, NULL);
     pthread_create(&time_t, NULL, &time_thread, (void *)&time);
     for (int i = 0; i < N_PLANTS; i++)
         pthread_create(&plant_t[i], NULL, &plant_thread, (void *)&plantData[i]);
     for (int i = 0; i < N_CROCODILE; i++){
         crocodile_dataPacket.object = crocodileData[i];
         pthread_create(&crocodile_t[i], NULL, &crocodile_thread, (void *)&crocodile_dataPacket);
-    }*/
+    }
 
     while (should_not_exit)
     {
@@ -262,12 +290,13 @@ void *gameManche_thread(void *game_data)
         // STAMPA ELEMENTI ----------------------------------------
 
         // stampa dei coccodrilli
+        
         for (int i = 0; i < N_CROCODILE; i++)
         {
             if (crocodileData[i].is_crocodile_alive)
                 crocodileBody(crocodileData[i]);
         }
-
+        
         // STAMPA DEL NERO SUI COCCODRILLI USCENTI DAL CAMPO DI GIOCO
         attron(COLOR_PAIR(BLACK_BLACK));
         for (int i = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT; i < TOTAL_HEIGHT; i++)
@@ -279,7 +308,7 @@ void *gameManche_thread(void *game_data)
             mvprintw(i, 0, "          ");
         }
         attroff(COLOR_PAIR(BLACK_BLACK));
-
+        
         // stampa piante
         for (int i = 0; i < N_PLANTS; i++)
         {
@@ -304,7 +333,7 @@ void *gameManche_thread(void *game_data)
 
         // stampa della rana
         frogBody(frogData.x, frogData.y);
-
+        
         // stampa dello score a schermo
         attron(COLOR_PAIR(WHITE_BLUE));
         mvprintw(1, PAUSE_X - 5, "Press 'Q' to pause");
@@ -315,7 +344,7 @@ void *gameManche_thread(void *game_data)
         mvprintw(TOTAL_HEIGHT + 1, TIME_X + 15, "Time: %d", time.time_left);
         attroff(COLOR_PAIR(WHITE_BLUE));
 
-        refresh();
+        //refresh();
 
         /*
             Collisioni che prima erano gestite in crocodile.c e vanno implementate
@@ -596,14 +625,16 @@ void *gameManche_thread(void *game_data)
             - Rana per tempo
         */
 
-        // MORTE RANA PER OUT OF BOUNDS
+        // MORTE RANA PER OUT OF BOUNDS - C'è un problema 
+        /*
         if (frogData.x - 2 < MINX || frogData.x + 2 > MAXX - 1 || frogData.y < SCORE_ZONE_HEIGHT)
         {
             gamedata.player_score -= DEATH_SCORE;
             frogData.frog_candie = false;
             gamedata.game_lost = true;
-        }
+        }*/
 
+        
         // MORTE RANA PER CADUTA IN ACQUA
         if (!onCrocodile)
         {
@@ -611,12 +642,13 @@ void *gameManche_thread(void *game_data)
             gamedata.game_lost = true;
         }
 
-        // MORTE RANA PER TEMPO
+        // MORTE RANA PER TEMPO - C'è un problema con time
+        /*
         if (time.time_left <= 0 && frogData.frog_candie)
         {
             frogData.frog_candie = false;
             gamedata.game_lost = true;
-        }
+        }*/
 
         /*
             Vittorie/Perdite:
@@ -628,6 +660,8 @@ void *gameManche_thread(void *game_data)
         if (gamedata.game_lost || gamedata.game_won)
         {
             should_not_exit = false;
+
+            insertData(gamedata);
 
             pthread_join(frog_t, NULL);
             pthread_join(frog_bullet_t, NULL);
