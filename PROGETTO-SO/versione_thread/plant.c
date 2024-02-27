@@ -100,12 +100,17 @@ void *plant_thread(void *id)
 /* ----------------------------------------------
           PLANT BULLET
    ----------------------------------------------*/
-void *plant_bullet_thread(void *id)
+void *plant_bullet_thread(void *data)
 {
-    objectData plant_bullets[N_PLANTS];
+    bulletData *plantBullet = (bulletData *)data;
+
+    objectData plant_bullet[N_PLANT_BULLETS];
+    int bulletIndex = *((int *)plantBullet->id);
+    plant_bullet[bulletIndex].x = plantBullet->x;
+    plant_bullet[bulletIndex].y = plantBullet->y;
+
+
     // Estrazione dell'id passato alla funzione
-    int plantBulletIndex = *((int *)id);
-    // srand sulla base del thread
     unsigned int thread_id = (unsigned int)(size_t)pthread_self();
     srand(thread_id);
 
@@ -128,10 +133,12 @@ void *plant_bullet_thread(void *id)
         break;
     }
 
-    insertObject(plant_bullets[plantBulletIndex]);
+    insertObject(plant_bullet[bulletIndex]);
 
     // Suono
     system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
+
+    insertObject(plant_bullet[bulletIndex]);
 
     // Ciclo di esecuzione del proiettile
     while (should_not_exit)
@@ -159,9 +166,9 @@ void *plant_bullet_thread(void *id)
         // Da gestire in logic con la distruzione del thread
 
         // Aggiornamento posizione
-        plant_bullets[plantBulletIndex].y += 1;
+        plant_bullet[bulletIndex].y += 1;
 
-        insertObject(plant_bullets[plantBulletIndex]);
+        insertObject(plant_bullet[bulletIndex]);
 
         usleep(plant_bullet_delay);
     }

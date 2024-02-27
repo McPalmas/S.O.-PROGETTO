@@ -123,11 +123,19 @@ void *frog_thread(void *a)
 // Funzione per la gestione del processo frog_bullet
 void *frog_bullet_thread(void *a)
 {
+    bulletData *frogBullet = (bulletData *)a;
+
     objectData frog_bullet;
+    frog_bullet.x = frogBullet->x;
+    frog_bullet.y = frogBullet->y;
+
 
     // Estrazione dell'id passato alla funzione
     unsigned int thread_id = (unsigned int)(size_t)pthread_self();
     srand(thread_id);
+
+
+    insertObject(frog_bullet);
 
     while (should_not_exit)
     {

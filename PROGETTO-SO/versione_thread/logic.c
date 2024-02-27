@@ -34,15 +34,10 @@ void initialize_game()
     // Piante e proiettili piante
     for (int i = 0; i < N_PLANTS; i++)
     {
-        plants[i].id = i;
-        plant_bullets[i].id = i;
+        plants[i].id = PLANT_ID_0 + i;
+        plant_bullets[i].id = PLANT_BULLET_ID_0 + i;
     }
 
-    // Coccodrilli
-    for (int i = 0; i < N_CROCODILE; i++)
-    {
-        crocodiles[i].id = i;
-    }
 
     // Inizializzazione dei flussi del fiume
     initialize_river_flows();
@@ -68,7 +63,7 @@ void initialize_game()
     // Inizializzazione dei coccodrilli
     for (int i = 0; i < N_CROCODILE; i++)
     {
-        pthread_create(&crocodile_t[i], NULL, &crocodile_thread, (void *)&crocodiles[i].id);
+        pthread_create(&crocodile_t[i], NULL, &crocodile_thread, (void *)&crocodiles[i]);
     }
 
     // Inizializzazione del timer
@@ -580,11 +575,12 @@ void crocodiles_inizializer(objectData crocodiles[])
             // Assegna l'indice del fiume al coccodrillo
             crocodiles[crocodileIndex].flow_number = riverIndex;
             // Assegna speed e direction dal fiume corrispondente
-            // crocodiles[crocodileIndex].crocodile_speed = river_flows[riverIndex].speed;
+            crocodiles[crocodileIndex].crocodile_speed = river_flows[riverIndex].flow_speed;
             crocodiles[crocodileIndex].direction = river_flows[riverIndex].direction;
             crocodiles[crocodileIndex].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (riverIndex * 2);
             crocodiles[crocodileIndex].is_crocodile_alive = true;
             crocodiles[crocodileIndex].is_crocodile_immersing = false;
+            crocodiles[crocodileIndex].id = CROCODILE_ID_0 + crocodileIndex;
             switch (gamedata.difficulty)
             {
             case EASY:
