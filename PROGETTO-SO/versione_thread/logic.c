@@ -189,13 +189,12 @@ void *gameManche_thread(void *game_data)
     objectData receivedPacket; // dove ricevo i dati letti
     objectData frogData;
     objectData frog_bulletData;
-    objectData plantData[N_PLANTS];
-    objectData plant_bulletData[N_PLANT_BULLETS];
-    objectData crocodileData[N_CROCODILE];
+    objectData *plantData = (objectData *)malloc(N_PLANTS * sizeof(objectData));
+    objectData *plant_bulletData = (objectData *)malloc(N_PLANT_BULLETS * sizeof(objectData));
+    objectData *crocodileData = (objectData *)malloc(N_CROCODILE * sizeof(objectData));
     objectData time;
-    objectData river_flow[RIVER_LANES_NUMBER];
-    GameData *receivedData = (GameData *)game_data;
-    GameData gamedata = *receivedData;
+    objectData *river_flow = (objectData *)malloc(RIVER_LANES_NUMBER * sizeof(objectData));
+    GameData gamedata = *(GameData *)game_data;
 
     int crocodile_immersion_timer = getCrocodileTimer(100, gamedata); // = getRandomTimer (tempo minimo, difficoltà)
 
@@ -301,13 +300,11 @@ void *gameManche_thread(void *game_data)
         // assegnamento del dato al rispettivo elemento
         if (receivedPacket.id == FROG_ID)
         {
-            frogData.x = receivedPacket.x;
-            frogData.y = receivedPacket.y;
+            frogData = receivedPacket;
         }
         else if (receivedPacket.id == FROG_BULLET_ID)
         {
-            frog_bulletData.x = receivedPacket.x;
-            frog_bulletData.y = receivedPacket.y;
+            frog_bulletData = receivedPacket;
         }
         else if (receivedPacket.id >= PLANT_BULLET_ID_0 && receivedPacket.id <= PLANT_BULLET_ID_2)
         {
@@ -315,8 +312,7 @@ void *gameManche_thread(void *game_data)
             {
                 if (receivedPacket.id == i + PLANT_BULLET_ID_0)
                 {
-                    plant_bulletData[i].x = receivedPacket.x;
-                    plant_bulletData[i].y = receivedPacket.y;
+                    plant_bulletData[i] = receivedPacket;
                 }
             }
         }
@@ -326,6 +322,7 @@ void *gameManche_thread(void *game_data)
             {
                 if (receivedPacket.id == i + PLANT_ID_0)
                 {
+                    plantData[i] = receivedPacket;
                     // in realtà non mi serve nulla della pianta deve fare tutt0  da sola però quando la sparo gli devo comunicare che è morta
                     //  In caso di collisione dovremo fare l'uccisione del processo
                 }
@@ -337,28 +334,31 @@ void *gameManche_thread(void *game_data)
             {
                 if (receivedPacket.id == i + CROCODILE_ID_0)
                 {
-                    crocodileData[i].x = receivedPacket.x;
-                    crocodileData[i].y = receivedPacket.y;
-                    crocodileData[i].flow_number = receivedPacket.flow_number;
-                    crocodileData[i].crocodile_speed = receivedPacket.crocodile_speed;
-                    crocodileData[i].direction = receivedPacket.direction;
-                    crocodileData[i].is_crocodile_alive = receivedPacket.is_crocodile_alive;
-                    crocodileData[i].is_crocodile_immersing = receivedPacket.is_crocodile_immersing;
-                }
+                    crocodileData[i] = receivedPacket;
+                    }
             }
         }
         else if (receivedPacket.id == TIME_ID)
         {
-            time.time_left = receivedPacket.time_left;
+            time = receivedPacket;
         }
 
+        int banana = 0;
+        for (int i = 0; i++; i < N_CROCODILE)
+        {
+            crocodileData[i].crocodile_is_good = false; // test
+            if (frogData.y == crocodileData[i].y)
+                banana = 1;
+        }
 
-        for(int i = 0; i++; i < N_CROCODILE){
-            if(!crocodileData[i].is_crocodile_alive){
-                crocodileData[i].is_crocodile_alive = true;
-                crocodileData[i].crocodile_is_good = rand() % 2; // test
-                insertObject(crocodileData[i]);
-            }
+        if(frog_bulletData.frog_bulletisactive && frog_bulletData.y <= SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT){
+            frog_bulletData.frog_bulletisactive = false;
+            //destroyFrogBullet(frog_bulletData); -> Fa crashare il gioco
+        }
+        if (banana == 1)
+        {
+            frogData.x += 1;
+            insertObject(frogData);
         }
         /*
             Collisioni che prima erano gestite in crocodile.c e vanno implementate
@@ -742,12 +742,15 @@ void crocodiles_inizializer(objectData crocodiles[], GameData gamedata, objectDa
             {
             case EASY:
                 crocodiles[crocodileIndex].crocodile_is_good = getRandomBoolean(CROCODILE_IS_BAD_PROBABILITY_EASY);
+                crocodiles[crocodileIndex].crocodile_is_bad_probability = CROCODILE_IS_BAD_PROBABILITY_EASY;
                 break;
             case NORMAL:
                 crocodiles[crocodileIndex].crocodile_is_good = getRandomBoolean(CROCODILE_IS_BAD_PROBABILITY_NORMAL);
+                crocodiles[crocodileIndex].crocodile_is_bad_probability = CROCODILE_IS_BAD_PROBABILITY_NORMAL;
                 break;
             case HARD:
                 crocodiles[crocodileIndex].crocodile_is_good = getRandomBoolean(CROCODILE_IS_BAD_PROBABILITY_HARD);
+                crocodiles[crocodileIndex].crocodile_is_bad_probability = CROCODILE_IS_BAD_PROBABILITY_HARD;
                 break;
             default:
                 break;
@@ -923,4 +926,10 @@ int getPlantReloadTimer(int min, int difficulty)
     }
 
     return randomTimer;
+}
+
+
+void destroyFrogBullet(objectData frog_bulletData){
+    // Termina il processo del proiettile
+    pthread_cancel(frog_bulletData.thread_id);
 }

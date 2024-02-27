@@ -7,7 +7,9 @@
 void *frog_thread(void *frogData)
 {
     objectData frog = *(objectData *)frogData;
-    pthread_t frog_thread, frog_bullet_thread_t;
+    frog.thread_id = pthread_self();
+
+    pthread_t frog_bullet_thread_t;
 
     int frog_start_x = frog.x;
     int frog_start_y = frog.y;
@@ -58,8 +60,8 @@ void *frog_thread(void *frogData)
                 // Aggiornamento variabile
                 frog.frog_canshoot = false;
                 // Inizializzazione proiettile
-                bulletData *frogBullet = (bulletData *)malloc(sizeof(frogBullet));
-                objectData frog_bullet;
+                objectData *frogBullet = (objectData *)malloc(sizeof(frogBullet));
+                objectData frog_bullet = *frogBullet;
                 frog_bullet.x = frog.x;
                 frog_bullet.y = frog.y;
                 frog_bullet.id = FROG_BULLET_ID;
@@ -92,18 +94,11 @@ void *frog_thread(void *frogData)
 // Funzione per la gestione del processo frog_bullet
 void *frog_bullet_thread(void *a)
 {
-    bulletData *frogBullet = (bulletData *)a;
-
-    objectData frog_bullet;
-    frog_bullet.x = frogBullet->x;
-    frog_bullet.y = frogBullet->y;
-
-    // Estrazione dell'id passato alla funzione
-    unsigned int thread_id = (unsigned int)(size_t)pthread_self();
-    srand(thread_id);
-
+    objectData *frogBullet = (objectData *)a;
+    objectData frog_bullet = *frogBullet;
+    frog_bullet.thread_id = pthread_self();
+    frog_bullet.frog_bulletisactive = true;
     insertObject(frog_bullet);
-
     while (should_not_exit)
     {
         while (block)

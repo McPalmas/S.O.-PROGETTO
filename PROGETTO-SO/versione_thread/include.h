@@ -251,12 +251,15 @@ typedef struct
    enum Direction direction;
    int crocodile_speed;
    bool crocodile_is_good;
+   float crocodile_is_bad_probability;
    bool is_crocodile_immersing;
    bool is_crocodile_alive;
    int flow_number;
    int flow_speed;
    // time
    int time_left;
+
+   pid_t thread_id;
 } objectData;
 
 // Dati posizione proiettili
@@ -345,3 +348,4 @@ int getRandomTimer(int min);                      // restituisce un timer per la
 // funzioni di supporto per la gestione del buffer
 void removeObject();               // rimuove un oggetto dal buffer
 void insertObject(objectData obj); // inserisce un oggetto nel buffer
+void destroyFrogBullet(objectData frog_bulletData);
