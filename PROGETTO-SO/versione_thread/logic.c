@@ -8,7 +8,7 @@ void initialize_game(GameData game_data)
     // Inizializzazione variabili
     srand(time(NULL));
 
-    GameData *gamedata = (bulletData *)malloc(sizeof(GameData));
+    GameData *gamedata = (GameData *)malloc(sizeof(GameData));
     
     // Inizializzazione variabili
     gamedata=&game_data;
@@ -169,14 +169,14 @@ void *gameManche_thread(void *game_data)
 
     // Inizializzazione variabili
     initialize_plants(plantData, plant_bulletData, gamedata.difficulty);
-    river_flows_initializer(river_flow, gamedata.difficulty);
+    initialize_river_flows(gamedata, river_flow);
     crocodiles_inizializer(crocodileData, gamedata, river_flow);
     initialize_time(time, gamedata.difficulty);
 
     // Creazione dei threads
     pthread_create(&frog_t, NULL, &frog_thread, NULL);
     pthread_create(&frog_bullet_t, NULL, &frog_bullet_thread, NULL);
-    pthread_create(&time_t, NULL, &time_thread, NULL);
+    pthread_create(&time_t, NULL, &time_thread, (void *)&time);
     for (int i = 0; i < N_PLANTS; i++)
         pthread_create(&plant_t[i], NULL, &plant_thread, (void *)&plantData[i]);
     for (int i = 0; i < N_CROCODILE; i++)
@@ -195,7 +195,7 @@ void *gameManche_thread(void *game_data)
         // stampa tane
         printDens(gamedata.dens);
 
-        consumatore();
+        removeObject();
         receivedPacket = consumedObject;
 
         // assegnamento del dato al rispettivo elemento
@@ -532,14 +532,13 @@ void *gameManche_thread(void *game_data)
                     frog_bulletData.frog_bulletisactive = false;
                     frogData.frog_canshoot = true;
 
-                    produttore(crocodileData[i]);
+                    insertObject(crocodileData[i]);
                     break;
                 }
                 // comunica al frog bullet di distruggere il proiettile
                 frog_bulletData.frog_bulletisactive = false;
                 frogData.frog_canshoot = true;
 
-                produttore(frog_bulletData);
             }
         }
 

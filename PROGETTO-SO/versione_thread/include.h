@@ -188,14 +188,6 @@
 #define TIME_ID 33
 
 #define DIMBUFFER 100000 /* Capacità massima del Buffer Condiviso */
-objectData buffer[DIMBUFFER];
-objectData consumedObject;
-
-pthread_mutex_t mutexBuffer; /* Mutex per il buffer */
-
-sem_t semaphoreSlotFull;  /* Semaforo che conta quanti slot del buffer sono pieni */
-sem_t semaphoreSlotEmpty; /* Semaforo che conta quanti slot del buffer sono vuoti */
-
 int in,out; /* Indici per la gestione del buffer */
 
 /*----------------------------------------------------------------------
@@ -273,18 +265,30 @@ typedef struct {
     int x,y,id;
 } bulletData;
 
+typedef struct {
+    objectData object;
+    objectData riverFlow[]; 
+} args;
+
 /*----------------------------------------------------------------------
                VARIABILI GLOBALI -> Queste dovremmo rimuoverle?
    ----------------------------------------------------------------------*/
 // Variabili di gioco
  int start_dens[5];
 
- 
 
 // Thread
 // extern pthread_mutex_t mutex;
 extern bool should_not_exit;
 extern bool block;
+
+extern objectData buffer[DIMBUFFER];
+extern objectData consumedObject;
+
+extern pthread_mutex_t mutexBuffer; /* Mutex per il buffer */
+
+sem_t semaphoreSlotFull;  /* Semaforo che conta quanti slot del buffer sono pieni */
+sem_t semaphoreSlotEmpty; /* Semaforo che conta quanti slot del buffer sono vuoti */
 
 /*----------------------------------------------------------------------
                FUNZIONI
@@ -312,26 +316,27 @@ void analyze_data();
 
 // frog.c
 void *frog_thread(void *a);        // thread per la gestione della rana
-void *frog_bullet_thread(void *a); // thread per la gestione del proiettile della rana
+void *frog_bullet_thread(void *frogBullet_data); // thread per la gestione del proiettile della rana
 
 // crocodile.c
-void *crocodile_thread(void *a, void *b); // thread per la gestione del coccodrillo
+void *crocodile_thread(void *args); // thread per la gestione del coccodrillo
 
 // plant.c
-void *plant_thread(void *a);        // thread per la gestione della pianta
-void *plant_bullet_thread(void *a); // thread per la gestione del proiettile della pianta
+void *plant_thread(void *id);        // thread per la gestione della pianta
+void *plant_bullet_thread(void *data); // thread per la gestione del proiettile della pianta
 
 // time.c
-void *time_thread(void *a); // thread per la gestione del tempo di gioco
+void *time_thread(void *time_data); // thread per la gestione del tempo di gioco
 
 // logic.c
-void *gameManche_thread(void *id, objectData frog, objectData frog_bulletData, objectData plantData[], objectData plant_bulletData[], objectData crocodileData[], objectData time, GameData gamedata); // thread per la gestione della partita
+void *gameManche_thread(void *game_data); // thread per la gestione della partita
 void crocodiles_inizializer(objectData crocodiles[], GameData gamedata, objectData river_flow[]);     // inizializzazione dei coccodrilli
 void initialize_river_flows(GameData gamedata, objectData RiverFlow[]);     // inizializzazione del flusso del fiume
 void plants_initializer(objectData plants[], objectData plant_bullets[], int difficulty);             // inizializzazione delle piante
 void initialize_time(objectData time, int difficulty);                                              // inizializzazione del tempo di gioco
+void initialize_plants(objectData plants[], objectData plant_bullets[], int difficulty);
 // funzioni di supporto
-int getPlantReloadTimer(int min);         // restituisce il tempo di ricarica del proiettile della pianta
+int getPlantReloadTimer(int min,int difficulty);         // restituisce il tempo di ricarica del proiettile della pianta
 int getCrocodileTimer();                  // restituisce un timer per l'inabissamento dei coccodrilli
 bool getRandomBoolean(float probability); // restituisce un booleano in base alla difficoltà
 int getRandomTimer(int min);              // restituisce un timer per la ricarica dei proiettili delle piante
