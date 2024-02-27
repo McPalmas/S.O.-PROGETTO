@@ -88,6 +88,7 @@ void mainMenu()
    -------------------------------------------------------------------*/
 void menuDifficulty()
 {
+    GameData gamedata;
     int selection = 0; // Tiene traccia dell'opzione correntemente selezionata
     int c;             // Carattere della Getch, per le varie opzioni del menù
     bool exitMenu = false;

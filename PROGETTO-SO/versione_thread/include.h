@@ -276,8 +276,8 @@ typedef struct {
    ----------------------------------------------------------------------*/
 // Variabili di gioco
  int start_dens[5];
- GameData gamedata;
- objectData river_flows[RIVER_LANES_NUMBER];
+
+ 
 
 // Thread
 // extern pthread_mutex_t mutex;
@@ -313,7 +313,7 @@ void *frog_thread(void *a);        // thread per la gestione della rana
 void *frog_bullet_thread(void *a); // thread per la gestione del proiettile della rana
 
 // crocodile.c
-void *crocodile_thread(void *a); // thread per la gestione del coccodrillo
+void *crocodile_thread(void *a, void *b); // thread per la gestione del coccodrillo
 
 // plant.c
 void *plant_thread(void *a);        // thread per la gestione della pianta
@@ -323,10 +323,9 @@ void *plant_bullet_thread(void *a); // thread per la gestione del proiettile del
 void *time_thread(void *a); // thread per la gestione del tempo di gioco
 
 // logic.c
-void *gameManche_thread(void *id, objectData frog, objectData frog_bulletData, objectData plantData[], objectData plant_bulletData[], objectData crocodileData[], objectData time); // thread per la gestione della partita
-void gameManche();                 // funzione per la gestione della partita
-void crocodiles_inizializer();     // inizializzazione dei coccodrilli
-void initialize_river_flows();     // inizializzazione del flusso del fiume
+void *gameManche_thread(void *id, objectData frog, objectData frog_bulletData, objectData plantData[], objectData plant_bulletData[], objectData crocodileData[], objectData time, GameData gamedata); // thread per la gestione della partita
+void crocodiles_inizializer(objectData crocodiles[], GameData gamedata, objectData river_flow[]);     // inizializzazione dei coccodrilli
+void initialize_river_flows(GameData gamedata, objectData RiverFlow[]);     // inizializzazione del flusso del fiume
 
 // funzioni di supporto
 int getPlantReloadTimer(int min);         // restituisce il tempo di ricarica del proiettile della pianta

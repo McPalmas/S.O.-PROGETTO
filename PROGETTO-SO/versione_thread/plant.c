@@ -3,21 +3,25 @@
 /* ----------------------------------------------
           PLANT
    ----------------------------------------------*/
-void *plant_thread(void *id)
+void *plant_thread(void *id, void *gameData)
 {
-    objectData plants[N_PLANTS];
-    srand(getpid());
+    GameData *game_data = (GameData *)gameData;
+    int difficulty = game_data->difficulty;
+    
 
     // Estrazione dell'id passato alla funzione
     int plantIndex = *((int *)id);
     // srand sulla base del thread
     unsigned int thread_id = (unsigned int)(size_t)pthread_self();
     srand(thread_id);
+    srand(getpid()); // Quale ci va dei due?
 
+    
     int plant_bullet_timer;
     int i;
 
     // Inizializzazione piante
+    objectData plants[N_PLANTS];
     if (plants[plantIndex].id == 0)
         plants[plantIndex].x = PLANT_0_START;
     else if (plants[plantIndex].id == 1)
@@ -26,22 +30,21 @@ void *plant_thread(void *id)
         plants[plantIndex].x = PLANT_2_START;
     plants[plantIndex].plant_canshoot = true;
     plants[plantIndex].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT;
-    plant_bullet_timer = getPlantReloadTimer(PLANT_BULLET_RELOAD_MIN);
+    plant_bullet_timer = getPlantReloadTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
 
-
+    insertObject(plants[plantIndex]); // Potrebbe non servire
     // Ciclo di esecuzione della pianta
     while (should_not_exit)
     {
         while (block)
         {
         }
-        
 
         // Aggiornamento timer
         plant_bullet_timer--;
         // Se il timer è scaduto
         if (plant_bullet_timer <= 0)
-        { 
+        {
             // Inizializzazione proiettile
             bulletData *plantBullet = (bulletData *)malloc(sizeof(plantBullet));
             plantBullet->x = plants[plantIndex].x;
@@ -62,15 +65,20 @@ void *plant_thread(void *id)
 /* ----------------------------------------------
           PLANT BULLET
    ----------------------------------------------*/
-void *plant_bullet_thread(void *data)
+void *plant_bullet_thread(void *data, void *gameData)
 {
     bulletData *plantBullet = (bulletData *)data;
+    GameData *game_data = (GameData *)gameData;
 
+    // Inizializzazione proiettile
     objectData plant_bullet[N_PLANT_BULLETS];
     int bulletIndex = *((int *)plantBullet->id);
     plant_bullet[bulletIndex].x = plantBullet->x;
     plant_bullet[bulletIndex].y = plantBullet->y;
 
+    // Salvataggio dato difficoltà
+    int difficulty;
+    difficulty = game_data->difficulty;
 
     // Estrazione dell'id passato alla funzione
     unsigned int thread_id = (unsigned int)(size_t)pthread_self();
@@ -80,7 +88,7 @@ void *plant_bullet_thread(void *data)
     int plant_bullet_delay;
 
     // Inizializzazione proiettile
-    switch (gamedata.difficulty)
+    switch (difficulty)
     {
     case EASY:
         plant_bullet_delay = PLANT_BULLET_DELAY_EASY;
@@ -123,11 +131,11 @@ void *plant_bullet_thread(void *data)
  */
 
 // Restituisce un timer per il prossimo sparo della pianta
-int getPlantReloadTimer(int min)
+int getPlantReloadTimer(int min, int difficulty)
 {
     int randomTimer;
 
-    switch (gamedata.difficulty)
+    switch (difficulty)
     {
     case (EASY):
         randomTimer = rand() % (min + 1) + PLANT_BULLET_RELOAD_EASY;

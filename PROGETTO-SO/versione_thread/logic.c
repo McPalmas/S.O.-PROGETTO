@@ -5,6 +5,7 @@
    ----------------------------------------------*/
 void initialize_game()
 {
+    GameData gamedata;
     // i coccodrilli si immergono a caso sempre non solo se ci salgo sopra
     // Inizializzazione variabili
     srand(time(NULL));
@@ -27,6 +28,7 @@ void initialize_game()
     objectData plants[N_PLANTS];
     objectData plant_bullets[N_PLANT_BULLETS];
     objectData crocodiles[N_CROCODILE];
+    objectData river_flow[RIVER_LANES_NUMBER];
 
     /**
      * Definizione id
@@ -39,8 +41,8 @@ void initialize_game()
     }
 
     // Inizializzazione dei flussi del fiume
-    initialize_river_flows();
-    crocodiles_inizializer(crocodiles);
+    initialize_river_flows(gamedata, river_flow);
+    crocodiles_inizializer(crocodiles,gamedata, river_flow);
 
     /**
      * Gestione dei threads
@@ -96,7 +98,7 @@ void initialize_game()
         pthread_join(crocodile_t[i], NULL);
     }
 
-    analyze_data();
+    analyze_data(gamedata);
 }
 
 /*-----------------------------------------------------------------------
@@ -141,7 +143,7 @@ void insertObject(objectData newObject)
 /* ----------------------------------------------
           ANALISI DEI DATI E GESTIONE FINE PARTITA
    ----------------------------------------------*/
-void analyze_data()
+void analyze_data(GameData gamedata)
 {
     // Termina la riproduzione dei suoni della partita
     system("killall aplay");
@@ -213,7 +215,7 @@ void analyze_data()
 /* ----------------------------------------------
          GESTIONE MANCHE, STAMPE E COLLISIONI
    ----------------------------------------------*/
-void *gameManche_thread(void *a, objectData frog, objectData frog_bullet, objectData plant[N_PLANTS], objectData plant_bullet[N_PLANT_BULLETS], objectData crocodile[N_CROCODILE], objectData time)
+void *gameManche_thread(void *a, objectData frog, objectData frog_bullet, objectData plant[N_PLANTS], objectData plant_bullet[N_PLANT_BULLETS], objectData crocodile[N_CROCODILE], objectData time, GameData gamedata)
 {
     sleep(1);
 
@@ -228,7 +230,7 @@ void *gameManche_thread(void *a, objectData frog, objectData frog_bullet, object
     objectData crocodileData[N_CROCODILE] = crocodile;
     objectData time;
 
-    int crocodile_immersion_timer = getCrocodileTimer(100, gamedata.difficulty); // = getRandomTimer (tempo minimo, difficoltà)
+    int crocodile_immersion_timer = getCrocodileTimer(100, gamedata); // = getRandomTimer (tempo minimo, difficoltà)
 
     while (should_not_exit)
     {
@@ -679,7 +681,7 @@ void *gameManche_thread(void *a, objectData frog, objectData frog_bullet, object
 /* ----------------------------------------------
          INIZIALIZZAZIONE COCCODRILLI
    ----------------------------------------------*/
-void crocodiles_inizializer(objectData crocodiles[])
+void crocodiles_inizializer(objectData crocodiles[], GameData gamedata, objectData river_flows[])
 {
     int crocodileIndex = 0;
 
@@ -737,7 +739,7 @@ void crocodiles_inizializer(objectData crocodiles[])
 /* ----------------------------------------------
          INIZIALIZZAZIONE FIUMI
    ----------------------------------------------*/
-void initialize_river_flows()
+void initialize_river_flows(GameData gamedata, objectData river_flows[])
 {
     // Inizializza i flussi del fiume con direzioni e velocità casuali
     for (int i = 0; i < RIVER_LANES_NUMBER; ++i)
@@ -773,7 +775,7 @@ bool getRandomBoolean(float probability)
 }
 
 // Restituisce un timer casuale per l'immersione dei coccodrilli
-int getCrocodileTimer()
+int getCrocodileTimer(int min, GameData gamedata)
 {
     int randomTimer;
 
