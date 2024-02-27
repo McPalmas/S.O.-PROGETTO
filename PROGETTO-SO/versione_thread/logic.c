@@ -236,7 +236,7 @@ void *gameManche_thread(void *game_data)
         // stampa tane
         printDens(gamedata.dens);
 
-                // STAMPA ELEMENTI ----------------------------------------
+        // STAMPA ELEMENTI ----------------------------------------
 
         // stampa dei coccodrilli
 
@@ -352,6 +352,14 @@ void *gameManche_thread(void *game_data)
             time.time_left = receivedPacket.time_left;
         }
 
+
+        for(int i = 0; i++; i < N_CROCODILE){
+            if(!crocodileData[i].is_crocodile_alive){
+                crocodileData[i].is_crocodile_alive = true;
+                crocodileData[i].crocodile_is_good = rand() % 2; // test
+                insertObject(crocodileData[i]);
+            }
+        }
         /*
             Collisioni che prima erano gestite in crocodile.c e vanno implementate
         */
@@ -819,21 +827,20 @@ void initialize_plants(objectData plants[], objectData plant_bullets[], int diff
         default:
             break;
         }
-        
-        switch(plants[i].id){
-            case PLANT_ID_0:
-                plants[i].x = PLANT_0_START;
-                break;
-            case PLANT_ID_1:
-                plants[i].x = PLANT_1_START;
-                break;
-            case PLANT_ID_2:
-                plants[i].x = PLANT_2_START;
-                break;
-        }
-        
-    }
 
+        switch (plants[i].id)
+        {
+        case PLANT_ID_0:
+            plants[i].x = PLANT_0_START;
+            break;
+        case PLANT_ID_1:
+            plants[i].x = PLANT_1_START;
+            break;
+        case PLANT_ID_2:
+            plants[i].x = PLANT_2_START;
+            break;
+        }
+    }
 }
 
 /* ----------------------------------------------
