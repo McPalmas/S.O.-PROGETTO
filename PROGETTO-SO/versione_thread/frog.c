@@ -4,22 +4,13 @@
           FROG
    ----------------------------------------------*/
 // Funzione per la gestione del thread frog
-void *frog_thread(void *a)
+void *frog_thread(void *frogData)
 {
-    objectData frog;
+    objectData frog = *(objectData *)frogData;
     pthread_t frog_thread, frog_bullet_thread_t;
 
-    // Posizione di partenza della rana
-    int frog_start_y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 3;
-    int frog_start_x = FROG_START;
-
-    // Inizializzazione dei parametri di Frog
-    frog.y = frog_start_y;
-    frog.x = frog_start_x;
-    frog.frog_canshoot = true;
-    // frog.frog_candie = true; Sarà gestita in logic
-
-    insertObject(frog);
+    int frog_start_x = frog.x;
+    int frog_start_y = frog.y;
 
     // Ciclo di esecuzione di Frog
     while (should_not_exit)
@@ -107,11 +98,9 @@ void *frog_bullet_thread(void *a)
     frog_bullet.x = frogBullet->x;
     frog_bullet.y = frogBullet->y;
 
-
     // Estrazione dell'id passato alla funzione
     unsigned int thread_id = (unsigned int)(size_t)pthread_self();
     srand(thread_id);
-
 
     insertObject(frog_bullet);
 

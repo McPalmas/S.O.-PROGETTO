@@ -329,11 +329,12 @@ void *plant_bullet_thread(void *data); // thread per la gestione del proiettile 
 void *time_thread(void *time_data); // thread per la gestione del tempo di gioco
 
 // logic.c
-void *gameManche_thread(void *game_data);                                                         // thread per la gestione della partita
+void *gameManche_thread(void *game_data); // thread per la gestione della partita
+void initialize_frog(objectData *frogData);
 void crocodiles_inizializer(objectData crocodiles[], GameData gamedata, objectData river_flow[]); // inizializzazione dei coccodrilli
 void initialize_river_flows(GameData gamedata, objectData RiverFlow[]);                           // inizializzazione del flusso del fiume
 void plants_initializer(objectData plants[], objectData plant_bullets[], int difficulty);         // inizializzazione delle piante
-void initialize_time(objectData time, int difficulty);                                            // inizializzazione del tempo di gioco
+void initialize_time(objectData *time, int difficulty);                                           // inizializzazione del tempo di gioco
 void initialize_plants(objectData plants[], objectData plant_bullets[], int difficulty);
 // funzioni di supporto
 int getPlantReloadTimer(int min, int difficulty); // restituisce il tempo di ricarica del proiettile della pianta
