@@ -3,19 +3,22 @@
 /* ----------------------------------------------
           TIMER PARTITA
    ----------------------------------------------*/
-void *time_thread(void *data)
+void *time_thread(void *data, void *gameData)
 {
     objectData *timeData = (objectData *)data;
+    GameData *gamedata = (GameData *)gameData;
 
     objectData time;
     time.time_left = timeData->time_left;
+    int difficulty;
+    difficulty = gamedata->difficulty;
 
     // Tempo massimo in base alla difficoltà
-    if (gamedata.difficulty == EASY)
+    if (difficulty == EASY)
     {
         time.time_left = TIMELIMIT_EASY;
     }
-    else if (gamedata.difficulty == NORMAL)
+    else if (difficulty == NORMAL)
     {
         time.time_left = TIMELIMIT_NORMAL;
     }
