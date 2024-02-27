@@ -188,7 +188,7 @@
 #define TIME_ID 33
 
 #define DIMBUFFER 100000 /* Capacità massima del Buffer Condiviso */
-int in,out; /* Indici per la gestione del buffer */
+
 
 /*----------------------------------------------------------------------
                ENUMERAZIONI
@@ -262,7 +262,7 @@ typedef struct
 
 // Dati posizione proiettili
 typedef struct {
-    int x,y,id;
+    int x,y,id,timer;
 } bulletData;
 
 typedef struct {
@@ -273,22 +273,20 @@ typedef struct {
 /*----------------------------------------------------------------------
                VARIABILI GLOBALI -> Queste dovremmo rimuoverle?
    ----------------------------------------------------------------------*/
-// Variabili di gioco
- int start_dens[5];
-
 
 // Thread
-// extern pthread_mutex_t mutex;
 extern bool should_not_exit;
 extern bool block;
 
-extern objectData buffer[DIMBUFFER];
-extern objectData consumedObject;
+ objectData buffer[DIMBUFFER];
+ objectData consumedObject;
 
-extern pthread_mutex_t mutexBuffer; /* Mutex per il buffer */
+ pthread_mutex_t mutexBuffer; /* Mutex per il buffer */
 
-sem_t semaphoreSlotFull;  /* Semaforo che conta quanti slot del buffer sono pieni */
-sem_t semaphoreSlotEmpty; /* Semaforo che conta quanti slot del buffer sono vuoti */
+ sem_t semaphoreSlotFull;  /* Semaforo che conta quanti slot del buffer sono pieni */
+ sem_t semaphoreSlotEmpty; /* Semaforo che conta quanti slot del buffer sono vuoti */
+ int in,out; /* Indici per la gestione del buffer */
+
 
 /*----------------------------------------------------------------------
                FUNZIONI
@@ -311,7 +309,7 @@ void plantBullett(int y, int x);  // stampa il proiettile della pianta
 void printAll();
 void pausePrint(); // stampa la scritta pausa
 
-void initialize_game();
+void initialize_game(GameData gamedata);
 void analyze_data();
 
 // frog.c

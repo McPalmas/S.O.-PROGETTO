@@ -14,8 +14,11 @@ void *crocodile_thread(void *data)
     // Estrazione dei dati passati alla funzione
     args *receivedData = (args *)data;
     objectData crocodileData = receivedData->object;
-    objectData river_flowData[RIVER_LANES_NUMBER] = receivedData->riverFlow;
-    insertObject(crocodileData);
+    objectData river_flowData[RIVER_LANES_NUMBER];
+    for(int i = 0; i < RIVER_LANES_NUMBER; i++){
+        river_flowData[i].flow_speed = receivedData->riverFlow[i].flow_speed;
+        river_flowData[i].direction = receivedData->riverFlow[i].direction;
+    }
 
     // Ciclo di esecuzione di crocodile
     while (should_not_exit)

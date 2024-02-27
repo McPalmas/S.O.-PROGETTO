@@ -11,8 +11,13 @@ void initialize_game(GameData game_data)
     GameData *gamedata = (GameData *)malloc(sizeof(GameData));
     
     // Inizializzazione variabili
-    gamedata=&game_data;
+    gamedata = &game_data;
     should_not_exit = true;
+    
+    /* Inizializzazione di mutex buffer e semafori */
+    pthread_mutex_init(&mutexBuffer, NULL);
+    sem_init(&semaphoreSlotFull, 0, 0);
+    sem_init(&semaphoreSlotEmpty, 0, BUFSIZ);
 
     pthread_t gameManche_t;
 
@@ -33,7 +38,6 @@ void initialize_game(GameData game_data)
    -----------------------------------------------------------------------*/
 void removeObject()
 {
-
     sem_wait(&semaphoreSlotFull);     /* Esegue una wait sul semaforo full */
     pthread_mutex_lock(&mutexBuffer); /* Blocca il mutex principale */
 
@@ -163,7 +167,8 @@ void *gameManche_thread(void *game_data)
     objectData crocodileData[N_CROCODILE];
     objectData time;
     objectData river_flow[RIVER_LANES_NUMBER];
-    GameData gamedata = *((GameData *)game_data);
+    GameData *receivedData = (GameData *)game_data;
+    GameData gamedata = *receivedData;
 
     int crocodile_immersion_timer = getCrocodileTimer(100, gamedata); // = getRandomTimer (tempo minimo, difficoltà)
 
@@ -172,15 +177,21 @@ void *gameManche_thread(void *game_data)
     initialize_river_flows(gamedata, river_flow);
     crocodiles_inizializer(crocodileData, gamedata, river_flow);
     initialize_time(time, gamedata.difficulty);
+    
+    args crocodile_dataPacket;
+    for(int i = 0; i < RIVER_LANES_NUMBER; i++){
+        crocodile_dataPacket.riverFlow[i] = river_flow[i];
+    }
 
     // Creazione dei threads
-    pthread_create(&frog_t, NULL, &frog_thread, NULL);
-    pthread_create(&frog_bullet_t, NULL, &frog_bullet_thread, NULL);
+ /*   pthread_create(&frog_t, NULL, &frog_thread, NULL);
     pthread_create(&time_t, NULL, &time_thread, (void *)&time);
     for (int i = 0; i < N_PLANTS; i++)
         pthread_create(&plant_t[i], NULL, &plant_thread, (void *)&plantData[i]);
-    for (int i = 0; i < N_CROCODILE; i++)
-        pthread_create(&crocodile_t[i], NULL, &crocodile_thread, (void *)&crocodileData[i]);
+    for (int i = 0; i < N_CROCODILE; i++){
+        crocodile_dataPacket.object = crocodileData[i];
+        pthread_create(&crocodile_t[i], NULL, &crocodile_thread, (void *)&crocodile_dataPacket);
+    }*/
 
     while (should_not_exit)
     {
@@ -434,7 +445,7 @@ void *gameManche_thread(void *game_data)
             - Proiettile rana con piante
         */
 
-        // SE LA RANA COLLIDE CON UNA PIANTA
+    /*    // SE LA RANA COLLIDE CON UNA PIANTA
         for (int i = 0; i < N_PLANTS; i++)
         {
             if ((frogData.y == plantData[i].y + 1 || frogData.y == plantData[i].y) && (frogData.x - 2 >= plantData[i].x - (FROG_W - 1) && frogData.x + 2 <= plantData[i].x + (FROG_W + 1)))
@@ -466,7 +477,7 @@ void *gameManche_thread(void *game_data)
                     onCrocodile = false;
                     break;
                 };
-                */
+               
                 // Questo in realta si può gestire con una variabile locale come in versione processi
                 if (frogData.frog_candie && frogData.y == crocodileData[i].y && (frogData.x > crocodileData[i].x + 1 && frogData.x < crocodileData[i].x + CROCODILE_W - 2))
                 {
@@ -570,14 +581,14 @@ void *gameManche_thread(void *game_data)
                     frogData.frog_canshoot = true;
                     plantData[i].plant_isalive = false;
 
-                    /*
-                    Qui bisogna uccidere il processo della pianta, se ne creerà uno nuovo al respawn.
-                    Per frog_canshoot, invece, non saprei su come fare. Non possiamo comunicarlo al thread della rana, ed è lì che viene gestito lo sparo.
-                    */
+                    
+                    //Qui bisogna uccidere il processo della pianta, se ne creerà uno nuovo al respawn.
+                    //Per frog_canshoot, invece, non saprei su come fare. Non possiamo comunicarlo al thread della rana, ed è lì che viene gestito lo sparo.
+                   
                 }
             }
         }
-
+*/
         /*
             Morti:
             - Rana per out of bounds

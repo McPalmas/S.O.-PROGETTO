@@ -7,7 +7,7 @@
 void *frog_thread(void *a)
 {
     objectData frog;
-    pthread_t frog_thread, frog_bullet_thread;
+    pthread_t frog_thread, frog_bullet_thread_t;
 
     // Posizione di partenza della rana
     int frog_start_y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 3;
@@ -68,11 +68,12 @@ void *frog_thread(void *a)
                 frog.frog_canshoot = false;
                 // Inizializzazione proiettile
                 bulletData *frogBullet = (bulletData *)malloc(sizeof(frogBullet));
-                frogBullet->x = frog.x;
-                frogBullet->y = frog.y;
-                frogBullet->id = FROG_BULLET_ID;
+                objectData frog_bullet;
+                frog_bullet.x = frog.x;
+                frog_bullet.y = frog.y;
+                frog_bullet.id = FROG_BULLET_ID;
                 // Creazione thread
-                if (pthread_create(&frog_bullet_thread, NULL, &frogBullett, frogBullet) != 0)
+                if (pthread_create(&frog_bullet_thread_t, NULL, &frog_bullet_thread, &frog_bullet) != 0)
                 {
                     _exit(1);
                 }

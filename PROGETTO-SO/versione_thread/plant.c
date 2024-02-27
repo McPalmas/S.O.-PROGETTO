@@ -7,25 +7,29 @@ void *plant_thread(void *plant_data)
 {
     // Estrazione dell'id passato alla funzione
     objectData *plantData = (objectData *)plant_data;
-    int plantIndex = *((int *)plantData->id);
+    int plantIndex = plantData->id;
     // srand sulla base del thread
     unsigned int thread_id = (unsigned int)(size_t)pthread_self();
     srand(thread_id);
     srand(getpid()); // Quale ci va dei due?
 
+
+    pthread_t plant_bullet_thread_t;
     int i;
-
+    
+    objectData plant = *plantData;
+    
     // Inizializzazione piante
-    if (plantData.id == 0)
-        plantData.x = PLANT_0_START;
-    else if (plantData.id == 1)
-        plantData.x = PLANT_1_START;
-    else if (plantData.id == 2)
-        plantData.x = PLANT_2_START;
-    plantData.plant_canshoot = true;
-    plantData.y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT;
+    if (plant.id == 0)
+        plant.x = PLANT_0_START;
+    else if (plant.id == 1)
+        plant.x = PLANT_1_START;
+    else if (plant.id == 2)
+        plant.x = PLANT_2_START;
+    plant.plant_canshoot = true;
+    plant.y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT;
 
-    insertObject(plantData[plantIndex]); // Potrebbe non servire
+    insertObject(plant); // Potrebbe non servire
     // Ciclo di esecuzione della pianta
     while (should_not_exit)
     {
@@ -34,23 +38,24 @@ void *plant_thread(void *plant_data)
         }
 
         // Aggiornamento timer
-        plantData.plant_bullet_timer--;
+        plant.plant_bullet_timer--;
         // Se il timer è scaduto
-        if (plantData.plant_bullet_timer <= 0)
+        if (plant.plant_bullet_timer <= 0)
         {
             // Inizializzazione proiettile
             bulletData *plantBullet = (bulletData *)malloc(sizeof(plantBullet));
-            plantBullet->x = plantData.x;
-            plantBullet->y = plantData.y;
+            plantBullet->x = plant.x;
+            plantBullet->y = plant.y;
             plantBullet->id = PLANT_BULLET_ID_0; // Questa non so come gestirla
+            plantBullet->timer = plant.plant_bullet_timer;
             // Creazione thread
-            if (pthread_create(&frog_bullet_thread, NULL, &frogBullett, plantBullet) != 0)
+            if (pthread_create(&plant_bullet_thread_t, NULL, &plant_bullet_thread, plantBullet) != 0)
             {
                 _exit(1);
             }
         }
 
-        insertObject(plantData);
+        insertObject(plant);
         sleep(1); // 1 secondo
     }
 }
@@ -65,7 +70,7 @@ void *plant_bullet_thread(void *data)
 
     // Inizializzazione proiettile
     objectData plant_bullet;
-    int bulletIndex = *((int *)plantBullet->id);
+    int bulletIndex = plantBullet->id;
     plant_bullet.x = plantBullet->x;
     plant_bullet.y = plantBullet->y;
 

@@ -187,7 +187,7 @@ void menuDifficulty()
 
     refresh();
 
-    initialize_game();
+    initialize_game(gamedata);
 }
 
 /*----------------------------------------------------------------------
