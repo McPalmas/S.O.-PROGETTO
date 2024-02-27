@@ -16,13 +16,12 @@ void *crocodile_thread(void *crocodile_data, void *river_flow_data)
     objectData *river_flowData = (objectData *)river_flow_data;
 
     // Inizializzazione oggetto crocodile
-    objectData crocodiles[N_CROCODILE];
     int crocodileIndex = *((int *)crocodileData->id);
-    crocodiles[crocodileIndex].flow_number = crocodileData->flow_number;
-    crocodiles[crocodileIndex].crocodile_speed = crocodileData->crocodile_speed;
-    crocodiles[crocodileIndex].direction = crocodileData->direction;
-    crocodiles[crocodileIndex].y = crocodileData->y;
-    crocodiles[crocodileIndex].is_crocodile_alive = true;
+    crocodileData[crocodileIndex].flow_number = crocodileData->flow_number;
+    crocodileData[crocodileIndex].crocodile_speed = crocodileData->crocodile_speed;
+    crocodileData[crocodileIndex].direction = crocodileData->direction;
+    crocodileData[crocodileIndex].y = crocodileData->y;
+    crocodileData[crocodileIndex].is_crocodile_alive = true;
 
     // Salvataggio dati dei flussi del fiume
     objectData river_flows[RIVER_LANES_NUMBER];
@@ -32,7 +31,7 @@ void *crocodile_thread(void *crocodile_data, void *river_flow_data)
         river_flows[i].direction = river_flowData[i].direction;
     }
 
-    insertObject(crocodiles[crocodileIndex]);
+    insertObject(crocodileData[crocodileIndex]);
 
     // Ciclo di esecuzione di crocodile
     while (should_not_exit)
@@ -43,53 +42,53 @@ void *crocodile_thread(void *crocodile_data, void *river_flow_data)
         }
 
         // Se crocodile è vivo
-        if (crocodiles[crocodileIndex].is_crocodile_alive)
+        if (crocodileData[crocodileIndex].is_crocodile_alive)
         {
 
             // Se crocodile supera i margini dello schermo, muore
-            if (crocodiles[crocodileIndex].x <= 1 || crocodiles[crocodileIndex].x + CROCODILE_W >= MAXX + CROCODILE_W)
+            if (crocodileData[crocodileIndex].x <= 1 || crocodileData[crocodileIndex].x + CROCODILE_W >= MAXX + CROCODILE_W)
             {
-                crocodiles[crocodileIndex].is_crocodile_alive = false;
+                crocodileData[crocodileIndex].is_crocodile_alive = false;
             }
 
             // Aggiornamento posizione di crocodile
-            if (crocodiles[crocodileIndex].direction == RIGHT)
-                crocodiles[crocodileIndex].x += 1;
+            if (crocodileData[crocodileIndex].direction == RIGHT)
+                crocodileData[crocodileIndex].x += 1;
             else
-                crocodiles[crocodileIndex].x -= 1;
+                crocodileData[crocodileIndex].x -= 1;
         }
         else
         {
             // Aggiornamento posizione di crocodile
-            if (crocodiles[crocodileIndex].direction == RIGHT)
-                crocodiles[crocodileIndex].x += 1;
+            if (crocodileData[crocodileIndex].direction == RIGHT)
+                crocodileData[crocodileIndex].x += 1;
             else
-                crocodiles[crocodileIndex].x -= 1;
+                crocodileData[crocodileIndex].x -= 1;
 
             // Se crocodile è morto, viene inizializzato a una nuova corsia
-            if (crocodiles[crocodileIndex].flow_number == 0 || crocodiles[crocodileIndex].flow_number % 2 == 0)
+            if (crocodileData[crocodileIndex].flow_number == 0 || crocodileData[crocodileIndex].flow_number % 2 == 0)
             {
-                crocodiles[crocodileIndex].y += 2;
-                crocodiles[crocodileIndex].flow_number++;
+                crocodileData[crocodileIndex].y += 2;
+                crocodileData[crocodileIndex].flow_number++;
             }
-            else if (crocodiles[crocodileIndex].flow_number % 2 == 1)
+            else if (crocodileData[crocodileIndex].flow_number % 2 == 1)
             {
-                crocodiles[crocodileIndex].y -= 2;
-                crocodiles[crocodileIndex].flow_number--;
+                crocodileData[crocodileIndex].y -= 2;
+                crocodileData[crocodileIndex].flow_number--;
             }
 
             // Inizializzazione delle nuove variabili di crocodile
-            crocodiles[crocodileIndex].crocodile_speed = river_flows[crocodiles[crocodileIndex].flow_number].flow_speed;
-            crocodiles[crocodileIndex].direction = river_flows[crocodiles[crocodileIndex].flow_number].direction;
-            crocodiles[crocodileIndex].is_crocodile_alive = true;
+            crocodileData[crocodileIndex].crocodile_speed = river_flows[crocodileData[crocodileIndex].flow_number].flow_speed;
+            crocodileData[crocodileIndex].direction = river_flows[crocodileData[crocodileIndex].flow_number].direction;
+            crocodileData[crocodileIndex].is_crocodile_alive = true;
 
-            if (crocodiles[crocodileIndex].direction == LEFT)
-                crocodiles[crocodileIndex].x = MAXX - 2;
+            if (crocodileData[crocodileIndex].direction == LEFT)
+                crocodileData[crocodileIndex].x = MAXX - 2;
             else
-                crocodiles[crocodileIndex].x = 2;
+                crocodileData[crocodileIndex].x = 2;
         }
 
-        insertObject(crocodiles[crocodileIndex]);
-        usleep(crocodiles[crocodileIndex].crocodile_speed);
+        insertObject(crocodileData[crocodileIndex]);
+        usleep(crocodileData[crocodileIndex].crocodile_speed);
     }
 }

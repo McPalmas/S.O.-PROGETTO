@@ -3,102 +3,27 @@
 /* ----------------------------------------------
           LOGIC PARTITA E PROCESSI
    ----------------------------------------------*/
-void initialize_game()
+void initialize_game(GameData game_data)
 {
-    GameData gamedata;
-    // i coccodrilli si immergono a caso sempre non solo se ci salgo sopra
     // Inizializzazione variabili
     srand(time(NULL));
-    gamedata.game_lost = false;
-    gamedata.game_won = false;
+
+    GameData *gamedata = (bulletData *)malloc(sizeof(GameData));
+    
+    // Inizializzazione variabili
+    gamedata=&game_data;
     should_not_exit = true;
 
-    // Dichiarazione threads
-    pthread_t frog_t;
-    pthread_t frog_bullet_t;
-    pthread_t time_t;
-    pthread_t plant_t[N_PLANTS];
-    pthread_t plantBullet_t[N_PLANT_BULLETS];
-    pthread_t crocodile_t[N_CROCODILE];
     pthread_t gameManche_t;
 
-    // Dichiarazione variabili
-    objectData frog;
-    objectData frogBullet;
-    objectData plants[N_PLANTS];
-    objectData plant_bullets[N_PLANT_BULLETS];
-    objectData crocodiles[N_CROCODILE];
-    objectData river_flow[RIVER_LANES_NUMBER];
-
-    /**
-     * Definizione id
-     */
-    // Piante e proiettili piante
-    for (int i = 0; i < N_PLANTS; i++)
-    {
-        plants[i].id = PLANT_ID_0 + i;
-        plant_bullets[i].id = PLANT_BULLET_ID_0 + i;
-    }
-
-    // Inizializzazione dei flussi del fiume
-    initialize_river_flows(gamedata, river_flow);
-    crocodiles_inizializer(crocodiles,gamedata, river_flow);
-
-    /**
-     * Gestione dei threads
-     */
-
-    // Inizializzazione della rana
-    pthread_create(&frog_t, NULL, &frog_thread, NULL);
-    pthread_create(&frog_bullet_t, NULL, &frog_bullet_thread, NULL);
-
-    pthread_create(&gameManche_t, NULL, &gameManche_thread, NULL);
-
-    // Inizializzazione delle piante e dei proiettili delle piante
-    for (int i = 0; i < N_PLANTS; i++)
-    {
-        pthread_create(&plant_t[i], NULL, &plant_thread, (void *)&plants[i].id);
-        pthread_create(&plantBullet_t[i], NULL, &plant_bullet_thread, (void *)&plant_bullets[i].id);
-    }
-
-    // Inizializzazione dei coccodrilli
-    for (int i = 0; i < N_CROCODILE; i++)
-    {
-        pthread_create(&crocodile_t[i], NULL, &crocodile_thread, (void *)&crocodiles[i]);
-    }
-
-    // Inizializzazione del timer
-    pthread_create(&time_t, NULL, &time_thread, NULL);
+    pthread_create(&gameManche_t, NULL, &gameManche_thread, gamedata);
 
     // Inizializzazione del suono del fiume
     system("aplay ../SUONI/riverSound.wav > /dev/null 2>&1 &");
 
-    /**
-     * Gestione della manche
-     */
-    // gameManche();
 
-    /**
-     * Join dei threads
-     */
-
+    // Attendi la terminazione di gameManche_t e termina il thread
     pthread_join(gameManche_t, NULL);
-    pthread_join(frog_t, NULL);
-    pthread_join(frog_bullet_t, NULL);
-    pthread_join(time_t, NULL);
-
-    for (int i = 0; i < N_PLANTS; i++)
-    {
-        pthread_join(plant_t[i], NULL);
-        pthread_join(plantBullet_t[i], NULL);
-    }
-
-    for (int i = 0; i < N_CROCODILE; i++)
-    {
-        pthread_join(crocodile_t[i], NULL);
-    }
-
-    analyze_data(gamedata);
 }
 
 /*-----------------------------------------------------------------------
@@ -181,7 +106,7 @@ void analyze_data(GameData gamedata)
             // tempo di attesa prima del caricamento della schermata successiva
             sleep(2);
 
-            initialize_game();
+            initialize_game(gamedata);
         }
     }
     else
@@ -207,7 +132,7 @@ void analyze_data(GameData gamedata)
                 // tempo di attesa prima del caricamento della schermata successiva
                 sleep(2);
 
-                initialize_game();
+                initialize_game(gamedata);
             }
         }
 }
@@ -215,22 +140,47 @@ void analyze_data(GameData gamedata)
 /* ----------------------------------------------
          GESTIONE MANCHE, STAMPE E COLLISIONI
    ----------------------------------------------*/
-void *gameManche_thread(void *a, objectData frog, objectData frog_bullet, objectData plant[N_PLANTS], objectData plant_bullet[N_PLANT_BULLETS], objectData crocodile[N_CROCODILE], objectData time, GameData gamedata)
+void *gameManche_thread(void *game_data)
 {
     sleep(1);
 
     int start_dens[] = {16, 27, 38, 49, 60};
     bool onCrocodile = true;
 
+    // Dichiarazione threads
+    pthread_t frog_t;
+    pthread_t frog_bullet_t;
+    pthread_t time_t;
+    pthread_t plant_t[N_PLANTS];
+    pthread_t plantBullet_t[N_PLANT_BULLETS];
+    pthread_t crocodile_t[N_CROCODILE];
+
     objectData receivedPacket; // dove ricevo i dati letti
-    objectData frogData = frog;
-    objectData frog_bulletData = frog_bullet;
-    objectData plantData[N_PLANTS] = plant;
-    objectData plant_bulletData[N_PLANT_BULLETS] = plant_bullet;
-    objectData crocodileData[N_CROCODILE] = crocodile;
+    objectData frogData;
+    objectData frog_bulletData;
+    objectData plantData[N_PLANTS];
+    objectData plant_bulletData[N_PLANT_BULLETS];
+    objectData crocodileData[N_CROCODILE];
     objectData time;
+    objectData river_flow[RIVER_LANES_NUMBER];
+    GameData gamedata = *((GameData *)game_data);
 
     int crocodile_immersion_timer = getCrocodileTimer(100, gamedata); // = getRandomTimer (tempo minimo, difficoltà)
+
+    // Inizializzazione variabili
+    initialize_plants(plantData, plant_bulletData, gamedata.difficulty);
+    river_flows_initializer(river_flow, gamedata.difficulty);
+    crocodiles_inizializer(crocodileData, gamedata, river_flow);
+    initialize_time(time, gamedata.difficulty);
+
+    // Creazione dei threads
+    pthread_create(&frog_t, NULL, &frog_thread, NULL);
+    pthread_create(&frog_bullet_t, NULL, &frog_bullet_thread, NULL);
+    pthread_create(&time_t, NULL, &time_thread, NULL);
+    for (int i = 0; i < N_PLANTS; i++)
+        pthread_create(&plant_t[i], NULL, &plant_thread, (void *)&plantData[i]);
+    for (int i = 0; i < N_CROCODILE; i++)
+        pthread_create(&crocodile_t[i], NULL, &crocodile_thread, (void *)&crocodileData[i]);
 
     while (should_not_exit)
     {
@@ -668,6 +618,21 @@ void *gameManche_thread(void *a, objectData frog, objectData frog_bullet, object
         if (gamedata.game_lost || gamedata.game_won)
         {
             should_not_exit = false;
+
+            pthread_join(frog_t, NULL);
+            pthread_join(frog_bullet_t, NULL);
+            pthread_join(time_t, NULL);
+
+            for (int i = 0; i < N_PLANTS; i++)
+            {
+                pthread_join(plant_t[i], NULL);
+                pthread_join(plantBullet_t[i], NULL);
+            }
+
+            for (int i = 0; i < N_CROCODILE; i++)
+            {
+                pthread_join(crocodile_t[i], NULL);
+            }
         }
     }
 
@@ -675,9 +640,8 @@ void *gameManche_thread(void *a, objectData frog, objectData frog_bullet, object
     {
         gamedata.player_score = 0;
     }
-    // analyze_data();
+    analyze_data(gamedata);
 }
-
 
 /* ----------------------------------------------
          INIZIALIZZAZIONE COCCODRILLI
@@ -766,25 +730,27 @@ void initialize_river_flows(GameData gamedata, objectData river_flows[])
 /* ----------------------------------------------
          INIZIALIZZAZIONE PIANTE
    ----------------------------------------------*/
-void initialize_plants(objectData plants[], objectData plant_bullets[], int difficulty){
+void initialize_plants(objectData plants[], objectData plant_bullets[], int difficulty)
+{
     for (int i = 0; i < N_PLANTS; i++)
     {
         plants[i].plant_isalive = true;
         plants[i].id = PLANT_ID_0 + i;
         plants[i].plant_bullet_timer = getPlantReloadTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
 
-        switch(difficulty){
-            case EASY:
-                plant_bullets[i].plant_bullet_delay = PLANT_BULLET_DELAY_EASY;
-                break;
-            case NORMAL:
-                plant_bullets[i].plant_bullet_delay = PLANT_BULLET_DELAY_NORMAL;
-                break;
-            case HARD:
-                plant_bullets[i].plant_bullet_delay = PLANT_BULLET_DELAY_HARD;
-                break;
-            default:
-                break;
+        switch (difficulty)
+        {
+        case EASY:
+            plant_bullets[i].plant_bullet_delay = PLANT_BULLET_DELAY_EASY;
+            break;
+        case NORMAL:
+            plant_bullets[i].plant_bullet_delay = PLANT_BULLET_DELAY_NORMAL;
+            break;
+        case HARD:
+            plant_bullets[i].plant_bullet_delay = PLANT_BULLET_DELAY_HARD;
+            break;
+        default:
+            break;
         }
         plant_bullets[i].id = PLANT_BULLET_ID_0 + i;
     }
@@ -793,7 +759,8 @@ void initialize_plants(objectData plants[], objectData plant_bullets[], int diff
 /* ----------------------------------------------
          INIZIALIZZAZIONE TEMPO
    ----------------------------------------------*/
-void initialize_time(objectData time, int difficulty){
+void initialize_time(objectData time, int difficulty)
+{
     switch (difficulty)
     {
     case EASY:
@@ -809,7 +776,6 @@ void initialize_time(objectData time, int difficulty){
         break;
     }
 }
-
 
 /* ----------------------------------------------
          Utility
@@ -844,7 +810,6 @@ int getCrocodileTimer(int min, GameData gamedata)
     }
     return randomTimer;
 }
-
 
 /**
  * Utility

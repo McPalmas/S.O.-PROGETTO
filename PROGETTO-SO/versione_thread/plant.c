@@ -3,31 +3,29 @@
 /* ----------------------------------------------
           PLANT
    ----------------------------------------------*/
-void *plant_thread(void *id)
+void *plant_thread(void *plant_data)
 {
     // Estrazione dell'id passato alla funzione
-    int plantIndex = *((int *)id);
+    objectData *plantData = (objectData *)plant_data;
+    int plantIndex = *((int *)plantData->id);
     // srand sulla base del thread
     unsigned int thread_id = (unsigned int)(size_t)pthread_self();
     srand(thread_id);
     srand(getpid()); // Quale ci va dei due?
 
-    
-    int plant_bullet_timer;
     int i;
 
     // Inizializzazione piante
-    objectData plants[N_PLANTS];
-    if (plants[plantIndex].id == 0)
-        plants[plantIndex].x = PLANT_0_START;
-    else if (plants[plantIndex].id == 1)
-        plants[plantIndex].x = PLANT_1_START;
-    else if (plants[plantIndex].id == 2)
-        plants[plantIndex].x = PLANT_2_START;
-    plants[plantIndex].plant_canshoot = true;
-    plants[plantIndex].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT;
+    if (plantData[plantIndex].id == 0)
+        plantData[plantIndex].x = PLANT_0_START;
+    else if (plantData[plantIndex].id == 1)
+        plantData[plantIndex].x = PLANT_1_START;
+    else if (plantData[plantIndex].id == 2)
+        plantData[plantIndex].x = PLANT_2_START;
+    plantData[plantIndex].plant_canshoot = true;
+    plantData[plantIndex].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT;
 
-    insertObject(plants[plantIndex]); // Potrebbe non servire
+    insertObject(plantData[plantIndex]); // Potrebbe non servire
     // Ciclo di esecuzione della pianta
     while (should_not_exit)
     {
@@ -36,9 +34,9 @@ void *plant_thread(void *id)
         }
 
         // Aggiornamento timer
-        plant_bullet_timer--;
+        plants[plantIndex].plant_bullet_timer--;
         // Se il timer è scaduto
-        if (plant_bullet_timer <= 0)
+        if (plants[plantIndex].plant_bullet_timer <= 0)
         {
             // Inizializzazione proiettile
             bulletData *plantBullet = (bulletData *)malloc(sizeof(plantBullet));
