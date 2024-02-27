@@ -799,10 +799,12 @@ void initialize_plants(objectData plants[], objectData plant_bullets[], int diff
 {
     for (int i = 0; i < N_PLANTS; i++)
     {
+        plants[i].plant_canshoot = true;
+        plants[i].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT;
         plants[i].plant_isalive = true;
         plants[i].id = PLANT_ID_0 + i;
         plants[i].plant_bullet_timer = getPlantReloadTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
-
+        plant_bullets[i].id = PLANT_BULLET_ID_0 + i;
         switch (difficulty)
         {
         case EASY:
@@ -817,8 +819,21 @@ void initialize_plants(objectData plants[], objectData plant_bullets[], int diff
         default:
             break;
         }
-        plant_bullets[i].id = PLANT_BULLET_ID_0 + i;
+        
+        switch(plants[i].id){
+            case PLANT_ID_0:
+                plants[i].x = PLANT_0_START;
+                break;
+            case PLANT_ID_1:
+                plants[i].x = PLANT_1_START;
+                break;
+            case PLANT_ID_2:
+                plants[i].x = PLANT_2_START;
+                break;
+        }
+        
     }
+
 }
 
 /* ----------------------------------------------
