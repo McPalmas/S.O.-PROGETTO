@@ -35,7 +35,7 @@ objectData buffer[DIMBUFFER];
 objectData consumedObject;
 
 sem_t semaphoreSlotFull;
-sem_t semaphoreSlotEmpty
+sem_t semaphoreSlotEmpty;
 
 bool block = false;
 

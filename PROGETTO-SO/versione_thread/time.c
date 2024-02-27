@@ -5,22 +5,20 @@
    ----------------------------------------------*/
 void *time_thread(void *a)
 {
-
+    objectData time;
     // Tempo massimo in base alla difficoltà
-    pthread_mutex_lock(&mutex);
     if (gamedata.difficulty == EASY)
     {
-        time_left = TIMELIMIT_EASY;
+        time.time_left = TIMELIMIT_EASY;
     }
     else if (gamedata.difficulty == NORMAL)
     {
-        time_left = TIMELIMIT_NORMAL;
+        time.time_left = TIMELIMIT_NORMAL;
     }
     else
     {
-        time_left = TIMELIMIT_HARD;
+        time.time_left = TIMELIMIT_HARD;
     }
-    pthread_mutex_unlock(&mutex);
 
     // Invio del dato
     while (should_not_exit)
@@ -28,9 +26,8 @@ void *time_thread(void *a)
     	while(block){}
     	
         sleep(1);
-        // Aggiorna IL TIMER
-        pthread_mutex_lock(&mutex);
-        time_left--;
-        pthread_mutex_unlock(&mutex);
+        // Aggiorna IL TIMER -> Probabilmente anche lui va gestito con produttore consumatore e non con globale
+        time.time_left--;
+        insertObject(time);
     }
 }

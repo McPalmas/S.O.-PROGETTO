@@ -5,7 +5,7 @@
    ----------------------------------------------*/
 void *plant_thread(void *id)
 {
-
+    objectData plants[N_PLANTS];
     srand(getpid());
 
     // Estrazione dell'id passato alla funzione
@@ -15,11 +15,10 @@ void *plant_thread(void *id)
     srand(thread_id);
 
     int plant_bullet_timer;
-    int plant_respawn_timer;
+    // int plant_respawn_timer;
     int i;
 
     // Inizializzazione piante
-    pthread_mutex_lock(&mutex);
     if (plants[plantIndex].id == 0)
         plants[plantIndex].x = PLANT_0_START;
     else if (plants[plantIndex].id == 1)
@@ -27,64 +26,73 @@ void *plant_thread(void *id)
     else if (plants[plantIndex].id == 2)
         plants[plantIndex].x = PLANT_2_START;
     plants[plantIndex].plant_canshoot = true;
-    plants[plantIndex].plant_isalive = true;
+    // plants[plantIndex].plant_isalive = true;
     plants[plantIndex].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT;
     plant_bullet_timer = getPlantReloadTimer(PLANT_BULLET_RELOAD_MIN);
-    plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1);
-    pthread_mutex_unlock(&mutex);
+
+    // plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1); // Da gestire in logic
 
     // Ciclo di esecuzione della pianta
     while (should_not_exit)
     {
-	while(block){}
-	
+        while (block)
+        {
+        }
+        /*
         if (plants[plantIndex].plant_isalive)
         {
-            // Aggiornamento timer
-            pthread_mutex_lock(&mutex);
-            plant_bullet_timer--;
-            pthread_mutex_unlock(&mutex);
 
-            // Se il timer è scaduto
-            pthread_mutex_lock(&mutex);
-            if (plant_bullet_timer <= 0)
             {
-                plant_bullets[plantIndex].bulletisactive = true;
+                plant_bullets[plantIndex].plant_bulletisactive = true;
                 plant_bullet_timer = getPlantReloadTimer(PLANT_BULLET_RELOAD_MIN);
             }
-            pthread_mutex_unlock(&mutex);
 
             // Se la rana è sulla pianta
-            pthread_mutex_lock(&mutex);
             if (frog.y == plants[plantIndex].y && (frog.x >= plants[plantIndex].x && frog.x < plants[plantIndex].x + 2))
             {
                 frog.frog_candie = false;
                 gamedata.game_lost = true;
             }
-            pthread_mutex_unlock(&mutex);
         }
         else
         {
             // Aggiornamento timer
-            pthread_mutex_lock(&mutex);
             plant_respawn_timer--;
-            pthread_mutex_unlock(&mutex);
 
-            pthread_mutex_lock(&mutex);
             if (plant_respawn_timer <= 0)
             { // a timer scaduto la pianta deve rinascere
                 plants[plantIndex].plant_isalive = true;
                 plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1);
             }
-            pthread_mutex_unlock(&mutex);
         }
+        */
+
+        /*
         // Gestione proiettile
-        pthread_mutex_lock(&mutex);
         if (plant_bullets[plantIndex].y == frog_bullet.y && plant_bullets[plantIndex].x == frog_bullet.x)
         {
-            plant_bullets[plantIndex].bulletisactive = false;
+            plant_bullets[plantIndex].plant_bulletisactive = false;
+        }*/
+        // Da gestire in logic con la distruzione del thread
+
+        // Aggiornamento timer
+        plant_bullet_timer--;
+        // Se il timer è scaduto
+        if (plant_bullet_timer <= 0)
+        { 
+            // Inizializzazione proiettile
+            bulletData *plantBullet = (bulletData *)malloc(sizeof(plantBullet));
+            plantBullet->x = plants[plantIndex].x;
+            plantBullet->y = plants[plantIndex].y;
+            plantBullet->id = PLANT_BULLET_ID_0; // Questa non so come gestirla
+            // Creazione thread
+            if (pthread_create(&frog_bullet_thread, NULL, &frogBullett, plantBullet) != 0)
+            {
+                _exit(1);
+            }
         }
-        pthread_mutex_unlock(&mutex);
+
+        insertObject(plants[plantIndex]);
         sleep(1); // 1 secondo
     }
 }
@@ -94,7 +102,7 @@ void *plant_thread(void *id)
    ----------------------------------------------*/
 void *plant_bullet_thread(void *id)
 {
-
+    objectData plant_bullets[N_PLANTS];
     // Estrazione dell'id passato alla funzione
     int plantBulletIndex = *((int *)id);
     // srand sulla base del thread
@@ -105,9 +113,6 @@ void *plant_bullet_thread(void *id)
     int plant_bullet_delay;
 
     // Inizializzazione proiettile
-    pthread_mutex_lock(&mutex);
-    plant_bullets[plantBulletIndex].x = plants[plantBulletIndex].x + 1;
-    plant_bullets[plantBulletIndex].y = plants[plantBulletIndex].y + 1;
     switch (gamedata.difficulty)
     {
     case EASY:
@@ -122,7 +127,8 @@ void *plant_bullet_thread(void *id)
     default:
         break;
     }
-    pthread_mutex_unlock(&mutex);
+
+    insertObject(plant_bullets[plantBulletIndex]);
 
     // Suono
     system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
@@ -130,30 +136,34 @@ void *plant_bullet_thread(void *id)
     // Ciclo di esecuzione del proiettile
     while (should_not_exit)
     {
-        while(block){}
-        
-        if (plant_bullets[plantBulletIndex].bulletisactive)
+        while (block)
+        {
+        }
+        /*
+        if (plant_bullets[plantBulletIndex].plant_bulletisactive)
         {
             // Posizionamento proiettile
-            pthread_mutex_lock(&mutex);
             plant_bullets[plantBulletIndex].x = plants[plantBulletIndex].x + 1;
             plant_bullets[plantBulletIndex].y = plants[plantBulletIndex].y + 1;
-            pthread_mutex_unlock(&mutex);
 
             while (plant_bullets[plantBulletIndex].y < MAXY - 12)
             {
                 // Aggiornamento posizione
-                pthread_mutex_lock(&mutex);
                 plant_bullets[plantBulletIndex].y += 1;
-                pthread_mutex_unlock(&mutex);
 
                 usleep(plant_bullet_delay);
             }
             // Disattivazione proiettile
-            pthread_mutex_lock(&mutex);
-            plant_bullets[plantBulletIndex].bulletisactive = false;
-            pthread_mutex_unlock(&mutex);
-        }
+            plant_bullets[plantBulletIndex].plant_bulletisactive = false;
+        }*/
+        // Da gestire in logic con la distruzione del thread
+
+        // Aggiornamento posizione
+        plant_bullets[plantBulletIndex].y += 1;
+
+        insertObject(plant_bullets[plantBulletIndex]);
+
+        usleep(plant_bullet_delay);
     }
 }
 

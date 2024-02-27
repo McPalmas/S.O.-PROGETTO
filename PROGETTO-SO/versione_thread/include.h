@@ -11,6 +11,7 @@
 #include <ncurses.h>
 #include <pthread.h>
 #include <stdio.h>
+#include <semaphore.h>
 
 /*-----------------------------------------------------------------------
    MACRO UTILIZZATE COME TASTI PER IL MOVIMENTO VERTICALE DI FROG
@@ -53,7 +54,6 @@
 #define PAUSE_X 50
 #define LIFES_X 22
 #define TIME_X 33
-
 
 /*----------------------------------------------------------------------
    MACRO UTILIZZATE PER DEFINRIE LE DIMENSIONI DEL CAMPO DI GIOCO
@@ -145,21 +145,58 @@
 #define DEATH_SCORE 50
 #define MAX_BONUS_SCORE 100 // punteggio bonus in base al tempo di completamento da aggiungere al punteggio di base
 
-
-
+/*----------------------------------------------------------------------
+               ID OGGETTI
+   ----------------------------------------------------------------------*/
+// Frog
+#define FROG_ID 1
+#define FROG_BULLET_ID 2
+// Crocodile
+#define CROCODILE_ID_0 3
+#define CROCODILE_ID_1 4
+#define CROCODILE_ID_2 5
+#define CROCODILE_ID_3 6
+#define CROCODILE_ID_4 7
+#define CROCODILE_ID_5 8
+#define CROCODILE_ID_6 9
+#define CROCODILE_ID_7 10
+#define CROCODILE_ID_8 11
+#define CROCODILE_ID_9 12
+#define CROCODILE_ID_10 13
+#define CROCODILE_ID_11 14
+#define CROCODILE_ID_12 15
+#define CROCODILE_ID_13 16
+#define CROCODILE_ID_14 17
+#define CROCODILE_ID_15 18
+#define CROCODILE_ID_16 19
+#define CROCODILE_ID_17 20
+#define CROCODILE_ID_18 21
+#define CROCODILE_ID_19 22
+#define CROCODILE_ID_20 23
+#define CROCODILE_ID_21 24
+#define CROCODILE_ID_22 25
+#define CROCODILE_ID_23 26
+// Plant
+#define PLANT_ID_0 27
+#define PLANT_ID_1 28
+#define PLANT_ID_2 29
+// Plant bullet
+#define PLANT_BULLET_ID_0 30
+#define PLANT_BULLET_ID_1 31
+#define PLANT_BULLET_ID_2 32
+// Time
+#define TIME_ID 33
 
 #define DIMBUFFER 100000 /* Capacità massima del Buffer Condiviso */
-extern objectData buffer[DIMBUFFER];
-extern objectData consumedObject;
+objectData buffer[DIMBUFFER];
+objectData consumedObject;
 
+pthread_mutex_t mutexBuffer; /* Mutex per il buffer */
 
-extern pthread_mutex_t mutexBuffer; /* Mutex per il buffer */
+sem_t semaphoreSlotFull;  /* Semaforo che conta quanti slot del buffer sono pieni */
+sem_t semaphoreSlotEmpty; /* Semaforo che conta quanti slot del buffer sono vuoti */
 
-extern sem_t semaphoreSlotFull; /* Semaforo che conta quanti slot del buffer sono pieni */
-extern sem_t semaphoreSlotEmpty; /* Semaforo che conta quanti slot del buffer sono vuoti */
-
-
-
+int in,out; /* Indici per la gestione del buffer */
 
 /*----------------------------------------------------------------------
                ENUMERAZIONI
@@ -179,7 +216,6 @@ enum Direction
    RIGHT
 };
 
-
 /*----------------------------------------------------------------------
                STRUTTURE DATI
    ----------------------------------------------------------------------*/
@@ -195,7 +231,6 @@ typedef struct
    int difficulty;
    int score;
 } GameData;
-
 
 // Dati flusso fiume
 typedef struct
@@ -226,25 +261,26 @@ typedef struct
    bool is_crocodile_immersing;
    bool is_crocodile_alive;
    int flow_number;
+   int flow_speed;
+   // time
+   int time_left;
 } objectData;
 
+// Dati posizione proiettili
+typedef struct {
+    int x,y,id;
+} bulletData;
 
 /*----------------------------------------------------------------------
-               VARIABILI GLOBALI
+               VARIABILI GLOBALI -> Queste dovremmo rimuoverle?
    ----------------------------------------------------------------------*/
 // Variabili di gioco
-extern int time_left;
-extern int start_dens[5];
-extern GameData gamedata;
-extern objectData frog;
-extern objectData frog_bullet;
-extern objectData plants[N_PLANTS];
-extern objectData plant_bullets[N_PLANT_BULLETS];
-extern objectData crocodiles[N_CROCODILE];
-extern objectData river_flows[RIVER_LANES_NUMBER];
+ int start_dens[5];
+ GameData gamedata;
+ objectData river_flows[RIVER_LANES_NUMBER];
 
 // Thread
-//extern pthread_mutex_t mutex;
+// extern pthread_mutex_t mutex;
 extern bool should_not_exit;
 extern bool block;
 
@@ -258,16 +294,16 @@ void menuDifficulty();      // visualizzazione del menu per la scelta della diff
 void endGameMenu(bool win); // menu di fine partita in base a se si è vinto o meno
 
 // graphic.c
-void initializeScr();            // inizializzazione dello schermo per ncurses
-void gameField();                // disegna il terreno di gioco
-void printDens(bool dens[]);     // stampa delle tane
-void frogBody(int x, int y);     // disegna lo sprite della rana
-void frogBullett(int y, int x);  // disegna il proiettile della rana
+void initializeScr();             // inizializzazione dello schermo per ncurses
+void gameField();                 // disegna il terreno di gioco
+void printDens(bool dens[]);      // stampa delle tane
+void frogBody(int x, int y);      // disegna lo sprite della rana
+void frogBullett(int y, int x);   // disegna il proiettile della rana
 void crocodileBody(objectData c); // disegna lo sprite del coccodrillo
-void plantBody(objectData p);         // stampa della pianta
-void plantBullett(int y, int x); // stampa il proiettile della pianta
+void plantBody(objectData p);     // stampa della pianta
+void plantBullett(int y, int x);  // stampa il proiettile della pianta
 void printAll();
-void pausePrint();		 // stampa la scritta pausa
+void pausePrint(); // stampa la scritta pausa
 
 void initialize_game();
 void analyze_data();
@@ -287,13 +323,19 @@ void *plant_bullet_thread(void *a); // thread per la gestione del proiettile del
 void *time_thread(void *a); // thread per la gestione del tempo di gioco
 
 // logic.c
-void *gameManche_thread(void *id); // thread per la gestione della partita
+void *gameManche_thread(void *id, objectData frog, objectData frog_bulletData, objectData plantData[], objectData plant_bulletData[], objectData crocodileData[], objectData time); // thread per la gestione della partita
 void gameManche();                 // funzione per la gestione della partita
-void crocodiles_inizializer(); // inizializzazione dei coccodrilli
-void initialize_river_flows(); // inizializzazione del flusso del fiume
+void crocodiles_inizializer();     // inizializzazione dei coccodrilli
+void initialize_river_flows();     // inizializzazione del flusso del fiume
 
 // funzioni di supporto
-int getPlantReloadTimer(int min);  // restituisce il tempo di ricarica del proiettile della pianta
-int getCrocodileTimer();      // restituisce un timer per l'inabissamento dei coccodrilli
+int getPlantReloadTimer(int min);         // restituisce il tempo di ricarica del proiettile della pianta
+int getCrocodileTimer();                  // restituisce un timer per l'inabissamento dei coccodrilli
 bool getRandomBoolean(float probability); // restituisce un booleano in base alla difficoltà
-int getRandomTimer(int min); // restituisce un timer per la ricarica dei proiettili delle piante
+int getRandomTimer(int min);              // restituisce un timer per la ricarica dei proiettili delle piante
+
+// funzioni di supporto per la gestione del buffer
+void removeObject();          // rimuove un oggetto dal buffer
+void insertObject(objectData obj); // inserisce un oggetto nel buffer
+
+
