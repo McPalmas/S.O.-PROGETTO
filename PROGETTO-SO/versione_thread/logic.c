@@ -38,7 +38,6 @@ void initialize_game()
         plant_bullets[i].id = PLANT_BULLET_ID_0 + i;
     }
 
-
     // Inizializzazione dei flussi del fiume
     initialize_river_flows();
     crocodiles_inizializer(crocodiles);
@@ -356,6 +355,124 @@ void *gameManche_thread(void *a, objectData frog, objectData frog_bullet, object
         refresh();
 
         /*
+            Collisioni che prima erano gestite in crocodile.c e vanno implementate
+        */
+        // crocodiles[crocodileIndex].is_crocodile_immersing = false; Sarà gestita in logic
+        // crocodiles[crocodileIndex].crocodile_immersion_timer = getCrocodileTimer(); Sarà gestita in logic
+        // crocodiles[crocodileIndex].crocodile_immersion_timer_counter = crocodiles[crocodileIndex].crocodile_immersion_timer; Sarà gestita in logic
+        // Aggiornamento posizione di frog se è su crocodile
+        /*
+        if (frog.y == crocodiles[crocodileIndex].y && (frog.x > crocodiles[crocodileIndex].x + 2 - 2 * crocodiles[crocodileIndex].direction && frog.x < (crocodiles[crocodileIndex].x + CROCODILE_W - 1 - 2 * crocodiles[crocodileIndex].direction)))
+        {
+            if (crocodiles[crocodileIndex].direction == RIGHT)
+                frog.x += 1;
+            else
+                frog.x -= 1;
+        }
+        */
+        // Gestione immersione di crocodile
+        /*
+        if (!crocodiles[crocodileIndex].crocodile_is_good && frog.y == crocodiles[crocodileIndex].y && (frog.x > (crocodiles[crocodileIndex].x) && frog.x < (crocodiles[crocodileIndex].x + CROCODILE_W - 2)))
+        {
+            crocodiles[crocodileIndex].crocodile_immersion_timer_counter--;
+            if (crocodiles[crocodileIndex].crocodile_immersion_timer_counter < (crocodiles[crocodileIndex].crocodile_immersion_timer / 2))
+                crocodiles[crocodileIndex].is_crocodile_immersing = true;
+        }
+        */
+        // crocodiles[crocodileIndex].is_crocodile_immersing = false; // Da gestire in logic (forse)
+        // crocodiles[crocodileIndex].crocodile_is_good = rand() % 2; - Da gestire in logic
+        // crocodiles[crocodileIndex].crocodile_immersion_timer = getCrocodileTimer();                                           - Da gestire in logic
+        // crocodiles[crocodileIndex].crocodile_immersion_timer_counter = crocodiles[crocodileIndex].crocodile_immersion_timer;  - Da gestire in logic
+
+        /*
+            Collisioni che prima erano gestite in plant.c e vanno implementate
+        */
+        // plants[plantIndex].plant_isalive = true;
+        // plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1); // Da gestire in logic
+        /*
+        if (plants[plantIndex].plant_isalive)
+        {
+
+            {
+                plant_bullets[plantIndex].plant_bulletisactive = true;
+                plant_bullet_timer = getPlantReloadTimer(PLANT_BULLET_RELOAD_MIN);
+            }
+
+            // Se la rana è sulla pianta
+            if (frog.y == plants[plantIndex].y && (frog.x >= plants[plantIndex].x && frog.x < plants[plantIndex].x + 2))
+            {
+                frog.frog_candie = false;
+                gamedata.game_lost = true;
+            }
+        }
+        else
+        {
+            // Aggiornamento timer
+            plant_respawn_timer--;
+
+            if (plant_respawn_timer <= 0)
+            { // a timer scaduto la pianta deve rinascere
+                plants[plantIndex].plant_isalive = true;
+                plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1);
+            }
+        }
+        */
+
+        /*
+        // Gestione proiettile
+        if (plant_bullets[plantIndex].y == frog_bullet.y && plant_bullets[plantIndex].x == frog_bullet.x)
+        {
+            plant_bullets[plantIndex].plant_bulletisactive = false;
+        }*/
+        /*
+        if (plant_bullets[plantBulletIndex].plant_bulletisactive)
+        {
+            // Posizionamento proiettile
+            plant_bullets[plantBulletIndex].x = plants[plantBulletIndex].x + 1;
+            plant_bullets[plantBulletIndex].y = plants[plantBulletIndex].y + 1;
+
+            while (plant_bullets[plantBulletIndex].y < MAXY - 12)
+            {
+                // Aggiornamento posizione
+                plant_bullets[plantBulletIndex].y += 1;
+
+                usleep(plant_bullet_delay);
+            }
+            // Disattivazione proiettile
+            plant_bullets[plantBulletIndex].plant_bulletisactive = false;
+        }*/
+
+        /*
+            Collisioni che prima erano gestite in frog.c e vanno implementate
+        */
+        /*
+        for (int i = 0; i < N_PLANT_BULLETS; i++)
+        {
+            if (frog_bullet.bulletisactive && plant_bullets[i].bulletisactive > 0)
+            {
+                if (frog_bullet.x == plant_bullets[i].x && frog_bullet.y == plant_bullets[i].y)
+                {
+                    // Se il proiettile della rana colpisce un proiettile delle piante, entrambi vengono disattivati
+                    frog_bullet.bulletisactive = false;
+                    plant_bullets[i].bulletisactive = false;
+                }
+            }
+        }
+        */
+        /*
+        if (frog_bullet.frog_bulletisactive)
+        {
+            while (frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT) // Logic
+            {
+                // Aggiornamento posizione del proiettile
+            }
+            // Se il proiettile esce dallo schermo, viene disattivato
+            // frog_bullet.frog_bulletisactive = false;
+            // frog.frog_canshoot = true; -> Questo non so ancora come gestirlo.
+        }
+        */
+
+        /*
             Collisioni:
             - Rana con piante
             - Rana con proiettili piante
@@ -629,13 +746,13 @@ void initialize_river_flows()
         switch (gamedata.difficulty)
         {
         case EASY:
-            // river_flows[i].speed = MIN_RIVER_SPEED_EASY + rand() % (MAX_RIVER_SPEED_EASY - MIN_RIVER_SPEED_EASY + 1);
+            river_flows[i].flow_speed = MIN_RIVER_SPEED_EASY + rand() % (MAX_RIVER_SPEED_EASY - MIN_RIVER_SPEED_EASY + 1);
             break;
         case NORMAL:
-            // river_flows[i].speed = MIN_RIVER_SPEED_NORMAL + rand() % (MAX_RIVER_SPEED_NORMAL - MIN_RIVER_SPEED_NORMAL + 1);
+            river_flows[i].flow_speed = MIN_RIVER_SPEED_NORMAL + rand() % (MAX_RIVER_SPEED_NORMAL - MIN_RIVER_SPEED_NORMAL + 1);
             break;
         case HARD:
-            // river_flows[i].speed = MIN_RIVER_SPEED_HARD + rand() % (MAX_RIVER_SPEED_HARD - MIN_RIVER_SPEED_HARD + 1);
+            river_flows[i].flow_speed = MIN_RIVER_SPEED_HARD + rand() % (MAX_RIVER_SPEED_HARD - MIN_RIVER_SPEED_HARD + 1);
             break;
         default:
             break;

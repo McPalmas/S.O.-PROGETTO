@@ -64,12 +64,6 @@ void *frog_thread(void *a)
         case SPACE:
             if (frog.frog_canshoot)
             {
-                /*
-                frog_bullet.y = frog.y - 1;
-                frog_bullet.x = frog.x; -> Questo non so ancora come gestirlo.
-                frog_bullet.frog_bulletisactive = true; // Da sostituire con creazione thread
-                */
-
                 // Aggiornamento variabile
                 frog.frog_canshoot = false;
                 // Inizializzazione proiettile
@@ -95,23 +89,6 @@ void *frog_thread(void *a)
             }
             break;
         }
-
-        /*
-        for (int i = 0; i < N_PLANT_BULLETS; i++)
-        {
-            if (frog_bullet.bulletisactive && plant_bullets[i].bulletisactive > 0)
-            {
-                if (frog_bullet.x == plant_bullets[i].x && frog_bullet.y == plant_bullets[i].y)
-                {
-                    // Se il proiettile della rana colpisce un proiettile delle piante, entrambi vengono disattivati
-                    frog_bullet.bulletisactive = false;
-                    plant_bullets[i].bulletisactive = false;
-                }
-            }
-        }
-        */
-        // Da gestire in logic
-
         insertObject(frog);
         usleep(1000);
     }
@@ -142,19 +119,6 @@ void *frog_bullet_thread(void *a)
         while (block)
         {
         }
-        /*
-        if (frog_bullet.frog_bulletisactive)
-        {
-            while (frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT) // Logic
-            {
-                // Aggiornamento posizione del proiettile
-            }
-            // Se il proiettile esce dallo schermo, viene disattivato
-            // frog_bullet.frog_bulletisactive = false;
-            // frog.frog_canshoot = true; -> Questo non so ancora come gestirlo.
-        }
-        */
-        // Da gestire in logic con la distruzione dei thread, meno la 146
 
         frog_bullet.y -= 1;
 

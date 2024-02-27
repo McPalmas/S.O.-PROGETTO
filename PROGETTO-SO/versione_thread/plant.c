@@ -15,7 +15,6 @@ void *plant_thread(void *id)
     srand(thread_id);
 
     int plant_bullet_timer;
-    // int plant_respawn_timer;
     int i;
 
     // Inizializzazione piante
@@ -26,11 +25,9 @@ void *plant_thread(void *id)
     else if (plants[plantIndex].id == 2)
         plants[plantIndex].x = PLANT_2_START;
     plants[plantIndex].plant_canshoot = true;
-    // plants[plantIndex].plant_isalive = true;
     plants[plantIndex].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT;
     plant_bullet_timer = getPlantReloadTimer(PLANT_BULLET_RELOAD_MIN);
 
-    // plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1); // Da gestire in logic
 
     // Ciclo di esecuzione della pianta
     while (should_not_exit)
@@ -38,42 +35,7 @@ void *plant_thread(void *id)
         while (block)
         {
         }
-        /*
-        if (plants[plantIndex].plant_isalive)
-        {
-
-            {
-                plant_bullets[plantIndex].plant_bulletisactive = true;
-                plant_bullet_timer = getPlantReloadTimer(PLANT_BULLET_RELOAD_MIN);
-            }
-
-            // Se la rana è sulla pianta
-            if (frog.y == plants[plantIndex].y && (frog.x >= plants[plantIndex].x && frog.x < plants[plantIndex].x + 2))
-            {
-                frog.frog_candie = false;
-                gamedata.game_lost = true;
-            }
-        }
-        else
-        {
-            // Aggiornamento timer
-            plant_respawn_timer--;
-
-            if (plant_respawn_timer <= 0)
-            { // a timer scaduto la pianta deve rinascere
-                plants[plantIndex].plant_isalive = true;
-                plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1);
-            }
-        }
-        */
-
-        /*
-        // Gestione proiettile
-        if (plant_bullets[plantIndex].y == frog_bullet.y && plant_bullets[plantIndex].x == frog_bullet.x)
-        {
-            plant_bullets[plantIndex].plant_bulletisactive = false;
-        }*/
-        // Da gestire in logic con la distruzione del thread
+        
 
         // Aggiornamento timer
         plant_bullet_timer--;
@@ -146,24 +108,6 @@ void *plant_bullet_thread(void *data)
         while (block)
         {
         }
-        /*
-        if (plant_bullets[plantBulletIndex].plant_bulletisactive)
-        {
-            // Posizionamento proiettile
-            plant_bullets[plantBulletIndex].x = plants[plantBulletIndex].x + 1;
-            plant_bullets[plantBulletIndex].y = plants[plantBulletIndex].y + 1;
-
-            while (plant_bullets[plantBulletIndex].y < MAXY - 12)
-            {
-                // Aggiornamento posizione
-                plant_bullets[plantBulletIndex].y += 1;
-
-                usleep(plant_bullet_delay);
-            }
-            // Disattivazione proiettile
-            plant_bullets[plantBulletIndex].plant_bulletisactive = false;
-        }*/
-        // Da gestire in logic con la distruzione del thread
 
         // Aggiornamento posizione
         plant_bullet[bulletIndex].y += 1;
