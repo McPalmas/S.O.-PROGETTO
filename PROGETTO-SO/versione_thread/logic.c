@@ -236,64 +236,7 @@ void *gameManche_thread(void *game_data)
         // stampa tane
         printDens(gamedata.dens);
 
-        removeObject();
-        receivedPacket = consumedObject;
-
-        // assegnamento del dato al rispettivo elemento
-        if (receivedPacket.id == FROG_ID)
-        {
-            frogData.x = receivedPacket.x;
-            frogData.y = receivedPacket.y;
-        }
-        else if (receivedPacket.id == FROG_BULLET_ID)
-        {
-            frog_bulletData.x = receivedPacket.x;
-            frog_bulletData.y = receivedPacket.y;
-        }
-        else if (receivedPacket.id >= PLANT_BULLET_ID_0 && receivedPacket.id <= PLANT_BULLET_ID_2)
-        {
-            for (int i = 0; i < N_PLANT_BULLETS; i++)
-            {
-                if (receivedPacket.id == i + PLANT_BULLET_ID_0)
-                {
-                    plant_bulletData[i].x = receivedPacket.x;
-                    plant_bulletData[i].y = receivedPacket.y;
-                }
-            }
-        }
-        else if (receivedPacket.id >= PLANT_ID_0 && receivedPacket.id <= PLANT_ID_2)
-        {
-            for (int i = 0; i < N_PLANTS; i++)
-            {
-                if (receivedPacket.id == i + PLANT_ID_0)
-                {
-                    // in realtà non mi serve nulla della pianta deve fare tutt0  da sola però quando la sparo gli devo comunicare che è morta
-                    //  In caso di collisione dovremo fare l'uccisione del processo
-                }
-            }
-        }
-        else if (receivedPacket.id >= CROCODILE_ID_0 && receivedPacket.id <= CROCODILE_ID_23)
-        {
-            for (int i = 0; i < N_CROCODILE; i++)
-            {
-                if (receivedPacket.id == i + CROCODILE_ID_0)
-                {
-                    crocodileData[i].x = receivedPacket.x;
-                    crocodileData[i].y = receivedPacket.y;
-                    crocodileData[i].flow_number = receivedPacket.flow_number;
-                    crocodileData[i].crocodile_speed = receivedPacket.crocodile_speed;
-                    crocodileData[i].direction = receivedPacket.direction;
-                    crocodileData[i].is_crocodile_alive = receivedPacket.is_crocodile_alive;
-                    crocodileData[i].is_crocodile_immersing = receivedPacket.is_crocodile_immersing;
-                }
-            }
-        }
-        else if (receivedPacket.id == TIME_ID)
-        {
-            time.time_left = receivedPacket.time_left;
-        }
-
-        // STAMPA ELEMENTI ----------------------------------------
+                // STAMPA ELEMENTI ----------------------------------------
 
         // stampa dei coccodrilli
 
@@ -351,6 +294,63 @@ void *gameManche_thread(void *game_data)
         attroff(COLOR_PAIR(WHITE_BLUE));
 
         // refresh();
+
+        removeObject();
+        receivedPacket = consumedObject;
+
+        // assegnamento del dato al rispettivo elemento
+        if (receivedPacket.id == FROG_ID)
+        {
+            frogData.x = receivedPacket.x;
+            frogData.y = receivedPacket.y;
+        }
+        else if (receivedPacket.id == FROG_BULLET_ID)
+        {
+            frog_bulletData.x = receivedPacket.x;
+            frog_bulletData.y = receivedPacket.y;
+        }
+        else if (receivedPacket.id >= PLANT_BULLET_ID_0 && receivedPacket.id <= PLANT_BULLET_ID_2)
+        {
+            for (int i = 0; i < N_PLANT_BULLETS; i++)
+            {
+                if (receivedPacket.id == i + PLANT_BULLET_ID_0)
+                {
+                    plant_bulletData[i].x = receivedPacket.x;
+                    plant_bulletData[i].y = receivedPacket.y;
+                }
+            }
+        }
+        else if (receivedPacket.id >= PLANT_ID_0 && receivedPacket.id <= PLANT_ID_2)
+        {
+            for (int i = 0; i < N_PLANTS; i++)
+            {
+                if (receivedPacket.id == i + PLANT_ID_0)
+                {
+                    // in realtà non mi serve nulla della pianta deve fare tutt0  da sola però quando la sparo gli devo comunicare che è morta
+                    //  In caso di collisione dovremo fare l'uccisione del processo
+                }
+            }
+        }
+        else if (receivedPacket.id >= CROCODILE_ID_0 && receivedPacket.id <= CROCODILE_ID_23)
+        {
+            for (int i = 0; i < N_CROCODILE; i++)
+            {
+                if (receivedPacket.id == i + CROCODILE_ID_0)
+                {
+                    crocodileData[i].x = receivedPacket.x;
+                    crocodileData[i].y = receivedPacket.y;
+                    crocodileData[i].flow_number = receivedPacket.flow_number;
+                    crocodileData[i].crocodile_speed = receivedPacket.crocodile_speed;
+                    crocodileData[i].direction = receivedPacket.direction;
+                    crocodileData[i].is_crocodile_alive = receivedPacket.is_crocodile_alive;
+                    crocodileData[i].is_crocodile_immersing = receivedPacket.is_crocodile_immersing;
+                }
+            }
+        }
+        else if (receivedPacket.id == TIME_ID)
+        {
+            time.time_left = receivedPacket.time_left;
+        }
 
         /*
             Collisioni che prima erano gestite in crocodile.c e vanno implementate
