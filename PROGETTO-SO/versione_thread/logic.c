@@ -199,20 +199,25 @@ void *gameManche_thread(void *game_data)
     int crocodile_immersion_timer = getCrocodileTimer(CROCODILE_IMMERSION_TIME_MIN, gamedata); // = getRandomTimer (tempo minimo, difficoltà)
 
     // Inizializzazione variabili
-    initialize_frog(&frogData);
+
     initialize_plants(plantData, plant_bulletData, gamedata.difficulty);
     initialize_river_flows(gamedata, river_flow);
+    initialize_frog(&frogData);
     crocodiles_inizializer(crocodileData, gamedata, river_flow);
     initialize_time(&time, gamedata.difficulty);
 
+    args frog_dataPacket;
     args crocodile_dataPacket;
     for (int i = 0; i < RIVER_LANES_NUMBER; i++)
     {
         crocodile_dataPacket.riverFlow[i] = river_flow[i];
+        frog_dataPacket.riverFlow[i] = river_flow[i];
     }
+    frog_dataPacket.object = frogData;
+
 
     // Creazione dei threads
-    pthread_create(&frog_t, NULL, &frog_thread, (void *)&frogData);
+    pthread_create(&frog_t, NULL, &frog_thread, (void *)&frog_dataPacket);
     pthread_create(&time_t, NULL, &time_thread, (void *)&time);
     for (int i = 0; i < N_PLANTS; i++)
         pthread_create(&plant_t[i], NULL, &plant_thread, (void *)&plantData[i]);
@@ -305,7 +310,8 @@ void *gameManche_thread(void *game_data)
         // Assegnamento dati
         if (receivedPacket.id == FROG_ID)
         {
-            frogData = receivedPacket;
+            frogData.x = receivedPacket.x;
+            frogData.y = receivedPacket.y;
         }
         else if (receivedPacket.id == FROG_BULLET_ID)
         {
