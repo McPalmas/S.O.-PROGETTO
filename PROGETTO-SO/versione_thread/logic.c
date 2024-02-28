@@ -196,7 +196,7 @@ void *gameManche_thread(void *game_data)
     objectData *river_flow = (objectData *)malloc(RIVER_LANES_NUMBER * sizeof(objectData));
     GameData gamedata = *(GameData *)game_data;
 
-    int crocodile_immersion_timer = getCrocodileTimer(100, gamedata); // = getRandomTimer (tempo minimo, difficoltà)
+    int crocodile_immersion_timer = getCrocodileTimer(CROCODILE_IMMERSION_TIME_MIN, gamedata); // = getRandomTimer (tempo minimo, difficoltà)
 
     // Inizializzazione variabili
     initialize_frog(&frogData);
@@ -292,12 +292,17 @@ void *gameManche_thread(void *game_data)
         mvprintw(TOTAL_HEIGHT + 1, TIME_X + 15, "Time: %d", time.time_left);
         attroff(COLOR_PAIR(WHITE_BLUE));
 
-        // refresh();
+        /*
+            Gestione dati:
+            - Ricezione dati
+            - Assegnamento dati
+        */
 
+        // Ricezione dati
         removeObject();
         receivedPacket = consumedObject;
 
-        // assegnamento del dato al rispettivo elemento
+        // Assegnamento dati
         if (receivedPacket.id == FROG_ID)
         {
             frogData = receivedPacket;
@@ -337,7 +342,12 @@ void *gameManche_thread(void *game_data)
                     crocodileData[i].direction = receivedPacket.direction;
                     crocodileData[i].is_crocodile_alive = receivedPacket.is_crocodile_alive;
                     if (crocodileData[i].is_crocodile_alive == false)
-                        crocodileData[i].crocodile_is_good = getRandomBoolean(crocodileData[i].crocodile_is_bad_probability); // test
+                    {
+                        crocodileData[i].crocodile_is_good = getRandomBoolean(crocodileData[i].crocodile_is_bad_probability);
+                        crocodileData[i].is_crocodile_immersing = false;
+                        crocodileData[i].crocodile_immersion_timer = getCrocodileTimer(CROCODILE_IMMERSION_TIME_MIN, gamedata);
+                        crocodileData[i].crocodile_immersion_timer_counter = crocodileData[i].crocodile_immersion_timer;
+                    }
                 }
             }
         }
@@ -345,123 +355,6 @@ void *gameManche_thread(void *game_data)
         {
             time.time_left = receivedPacket.time_left;
         }
-
-        /*
-            Collisioni che prima erano gestite in crocodile.c e vanno implementate
-        */
-        // crocodiles[crocodileIndex].is_crocodile_immersing = false; Sarà gestita in logic
-        // crocodiles[crocodileIndex].crocodile_immersion_timer = getCrocodileTimer(); Sarà gestita in logic
-        // crocodiles[crocodileIndex].crocodile_immersion_timer_counter = crocodiles[crocodileIndex].crocodile_immersion_timer; Sarà gestita in logic
-        // Aggiornamento posizione di frog se è su crocodile
-        /*
-        if (frog.y == crocodiles[crocodileIndex].y && (frog.x > crocodiles[crocodileIndex].x + 2 - 2 * crocodiles[crocodileIndex].direction && frog.x < (crocodiles[crocodileIndex].x + CROCODILE_W - 1 - 2 * crocodiles[crocodileIndex].direction)))
-        {
-            if (crocodiles[crocodileIndex].direction == RIGHT)
-                frog.x += 1;
-            else
-                frog.x -= 1;
-        }
-        */
-        // Gestione immersione di crocodile
-        /*
-        if (!crocodiles[crocodileIndex].crocodile_is_good && frog.y == crocodiles[crocodileIndex].y && (frog.x > (crocodiles[crocodileIndex].x) && frog.x < (crocodiles[crocodileIndex].x + CROCODILE_W - 2)))
-        {
-            crocodiles[crocodileIndex].crocodile_immersion_timer_counter--;
-            if (crocodiles[crocodileIndex].crocodile_immersion_timer_counter < (crocodiles[crocodileIndex].crocodile_immersion_timer / 2))
-                crocodiles[crocodileIndex].is_crocodile_immersing = true;
-        }
-        */
-        // crocodiles[crocodileIndex].is_crocodile_immersing = false; // Da gestire in logic (forse)
-        // crocodiles[crocodileIndex].crocodile_is_good = rand() % 2; - Da gestire in logic
-        // crocodiles[crocodileIndex].crocodile_immersion_timer = getCrocodileTimer();                                           - Da gestire in logic
-        // crocodiles[crocodileIndex].crocodile_immersion_timer_counter = crocodiles[crocodileIndex].crocodile_immersion_timer;  - Da gestire in logic
-
-        /*
-            Collisioni che prima erano gestite in plant.c e vanno implementate
-        */
-
-        /*
-        if (plants[plantIndex].plant_isalive)
-        {
-
-            {
-                plant_bullets[plantIndex].plant_bulletisactive = true;
-                plant_bullet_timer = getPlantReloadTimer(PLANT_BULLET_RELOAD_MIN);
-            }
-
-            // Se la rana è sulla pianta
-            if (frog.y == plants[plantIndex].y && (frog.x >= plants[plantIndex].x && frog.x < plants[plantIndex].x + 2))
-            {
-                frog.frog_candie = false;
-                gamedata.game_lost = true;
-            }
-        }
-        else
-        {
-            // Aggiornamento timer
-            plant_respawn_timer--;
-
-            if (plant_respawn_timer <= 0)
-            { // a timer scaduto la pianta deve rinascere
-                plants[plantIndex].plant_isalive = true;
-                plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1);
-            }
-        }
-        */
-
-        /*
-        // Gestione proiettile
-        if (plant_bullets[plantIndex].y == frog_bullet.y && plant_bullets[plantIndex].x == frog_bullet.x)
-        {
-            plant_bullets[plantIndex].plant_bulletisactive = false;
-        }*/
-        /*
-        if (plant_bullets[plantBulletIndex].plant_bulletisactive)
-        {
-            // Posizionamento proiettile
-            plant_bullets[plantBulletIndex].x = plants[plantBulletIndex].x + 1;
-            plant_bullets[plantBulletIndex].y = plants[plantBulletIndex].y + 1;
-
-            while (plant_bullets[plantBulletIndex].y < MAXY - 12)
-            {
-                // Aggiornamento posizione
-                plant_bullets[plantBulletIndex].y += 1;
-
-                usleep(plant_bullet_delay);
-            }
-            // Disattivazione proiettile
-            plant_bullets[plantBulletIndex].plant_bulletisactive = false;
-        }*/
-
-        /*
-            Collisioni che prima erano gestite in frog.c e vanno implementate
-        */
-        /*
-        for (int i = 0; i < N_PLANT_BULLETS; i++)
-        {
-            if (frog_bullet.bulletisactive && plant_bullets[i].bulletisactive > 0)
-            {
-                if (frog_bullet.x == plant_bullets[i].x && frog_bullet.y == plant_bullets[i].y)
-                {
-                    // Se il proiettile della rana colpisce un proiettile delle piante, entrambi vengono disattivati
-                    frog_bullet.bulletisactive = false;
-                    plant_bullets[i].bulletisactive = false;
-                }
-            }
-        }
-        */
-        /*
-        if (frog_bullet.frog_bulletisactive)
-        {
-            while (frog_bullet.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT) // Logic
-            {
-                // Aggiornamento posizione del proiettile
-            }
-            // Se il proiettile esce dallo schermo, viene disattivato
-            // frog_bullet.frog_bulletisactive = false;
-            // frog.frog_canshoot = true; -> Questo non so ancora come gestirlo.
-        }
-        */
 
         /*
             Collisioni:
@@ -473,6 +366,7 @@ void *gameManche_thread(void *game_data)
             - Proiettile rana con piante
             - Proiettile rana Out of Bounds
             - Proiettile pianta Out of Bounds
+            - Proiettile rana con proiettile pianta
         */
 
         // SE LA RANA COLLIDE CON UNA PIANTA - OK
@@ -484,33 +378,35 @@ void *gameManche_thread(void *game_data)
                 gamedata.player_score += DEATH_SCORE;
             }
         }
-        /*
-                    // SE LA RANA E' COLPITA DA UN PROIETTILE DELLA PIANTA
-                    for (int i = 0; i < N_PLANT_BULLETS; i++)
-                    {
-                        if (plant_bulletData[i].plant_bulletisactive && frogData.y == plant_bulletData[i].y && (frogData.x >= plant_bulletData[i].x - 2 && frogData.x <= plant_bulletData[i].x + 2))
-                        {
-                            // La rana muore
-                            frogData.frog_candie = false; // idem di sopra
-                            gamedata.game_lost = true;
-                        }
-                    }
-                    */
+
+        // SE LA RANA E' COLPITA DA UN PROIETTILE DELLA PIANTA
+        for (int i = 0; i < N_PLANT_BULLETS; i++)
+        {
+            if (plant_bulletData[i].plant_bulletisactive && frogData.y == plant_bulletData[i].y && (frogData.x >= plant_bulletData[i].x - 2 && frogData.x <= plant_bulletData[i].x + 2))
+            {
+                // La rana muore
+                frogData.frog_candie = false;
+                gamedata.game_lost = true;
+            }
+        }
+
         // SE LA RANA E' SUL COCCODRILLO
         if (frogData.frog_candie && frogData.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frogData.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT)
         {
             for (int i = 0; i < N_CROCODILE; i++)
             {
-                /*
-                if (crocodileData[i].crocodile_immersion_timer_counter < 0)
-                {
-                    onCrocodile = false;
-                    break;
-                };
-            */
+
                 if (frogData.frog_candie && frogData.y == crocodileData[i].y && (frogData.x > crocodileData[i].x + 1 && frogData.x < crocodileData[i].x + CROCODILE_W - 2))
                 {
                     onCrocodile = true;
+                    if (!crocodileData[i].crocodile_is_good)
+                    {
+                        crocodileData[i].crocodile_immersion_timer_counter--;
+                        if (crocodileData[i].crocodile_immersion_timer_counter < (crocodileData[i].crocodile_immersion_timer / 2))
+                            crocodileData[i].is_crocodile_immersing = true;
+                    }
+                    if (crocodileData[i].crocodile_immersion_timer_counter <= 0)
+                        onCrocodile = false;
                     break;
                 }
                 else
@@ -567,8 +463,6 @@ void *gameManche_thread(void *game_data)
             {
                 if (!crocodileData[i].crocodile_is_good)
                 {
-                    // se il coccodrillo è cattivo diventa buono
-                    // va sistemata
                     crocodileData[i].crocodile_is_good = true;
                     break;
                 }
@@ -625,13 +519,30 @@ void *gameManche_thread(void *game_data)
             destroyFrogBullet(&frog_bulletData);
         }
 
-        // SE IL PROIETTILE DELLA PIANTA ESCE DALLO SCHERMO - OK
+        /* Proiettili rana */
         for (int i = 0; i < N_PLANT_BULLETS; i++)
         {
+            // SE IL PROIETTILE DELLA PIANTA ESCE DALLO SCHERMO - OK
             if (plant_bulletData[i].plant_bulletisactive && plant_bulletData[i].y >= SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2))
             {
-                destroyPlantBullet(&plant_bulletData[i]);    
+                destroyPlantBullet(&plant_bulletData[i]);
             }
+
+            // SE IL PROIETTILE DELLA RANA COLPISCE IL PROIETTILE DELLA PIANTA - OK
+            if (frog_bulletData.frog_bulletisactive && plant_bulletData[i].plant_bulletisactive > 0)
+            {
+                if (frog_bulletData.x == plant_bulletData[i].x && frog_bulletData.y == plant_bulletData[i].y)
+                {
+                    // Se il proiettile della rana colpisce un proiettile delle piante, entrambi vengono disattivati
+                    destroyFrogBullet(&frog_bulletData);
+                    destroyPlantBullet(&plant_bulletData[i]);
+                }
+            }
+        }
+
+        // SE IL PROIETTILE DELLA RANA COLPISCE IL PROIETTILE DELLA PIANTA - OK
+        for (int i = 0; i < N_PLANT_BULLETS; i++)
+        {
         }
 
         /*
@@ -642,16 +553,16 @@ void *gameManche_thread(void *game_data)
         */
 
         // MORTE RANA PER OUT OF BOUNDS
-        /*
+
         if (frogData.x - 2 < MINX || frogData.x + 2 > MAXX - 1 || frogData.y < SCORE_ZONE_HEIGHT)
         {
             gamedata.player_score -= DEATH_SCORE;
             frogData.frog_candie = false;
             gamedata.game_lost = true;
-        }*/
+        }
 
         // MORTE RANA PER CADUTA IN ACQUA
-        if (false)
+        if (!onCrocodile)
         {
             frogData.frog_candie = false;
             gamedata.game_lost = true;
@@ -739,6 +650,8 @@ void crocodiles_inizializer(objectData crocodiles[], GameData gamedata, objectDa
             crocodiles[crocodileIndex].is_crocodile_alive = true;
             crocodiles[crocodileIndex].is_crocodile_immersing = false;
             crocodiles[crocodileIndex].id = CROCODILE_ID_0 + crocodileIndex;
+            crocodiles[crocodileIndex].crocodile_immersion_timer = getCrocodileTimer(CROCODILE_IMMERSION_TIME_MIN, gamedata);
+            crocodiles[crocodileIndex].crocodile_immersion_timer_counter = crocodiles[crocodileIndex].crocodile_immersion_timer;
             switch (gamedata.difficulty)
             {
             case EASY:

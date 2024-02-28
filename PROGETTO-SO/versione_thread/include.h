@@ -101,10 +101,10 @@
 #define CROCODILE_IS_BAD_PROBABILITY_NORMAL 0.35
 #define CROCODILE_IS_BAD_PROBABILITY_HARD 0.5
 // Tempo di immersione del coccodrillo
-#define CROCODILE_IMMERSION_TIME_EASY 24
-#define CROCODILE_IMMERSION_TIME_NORMAL 18
-#define CROCODILE_IMMERSION_TIME_HARD 12
-#define CROCODILE_IMMERSION_TIME_MIN 12
+#define CROCODILE_IMMERSION_TIME_EASY 2400
+#define CROCODILE_IMMERSION_TIME_NORMAL 1800
+#define CROCODILE_IMMERSION_TIME_HARD 1200
+#define CROCODILE_IMMERSION_TIME_MIN 1200
 // Velocità dei proiettili delle piante
 #define PLANT_BULLET_DELAY_EASY 100000
 #define PLANT_BULLET_DELAY_NORMAL 80000
@@ -253,6 +253,8 @@ typedef struct
    bool crocodile_is_good;
    float crocodile_is_bad_probability;
    bool is_crocodile_immersing;
+   int crocodile_immersion_timer;
+   int crocodile_immersion_timer_counter;
    bool is_crocodile_alive;
    int flow_number;
    int flow_speed;
