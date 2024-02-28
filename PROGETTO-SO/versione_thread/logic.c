@@ -27,9 +27,6 @@ void initialize_game(GameData game_data)
 
     pthread_create(&gameManche_t, NULL, &gameManche_thread, &gameData);
 
-    // Inizializzazione del suono del fiume
-    system("aplay ../SUONI/riverSound.wav > /dev/null 2>&1 &");
-
     // Attendi la terminazione di gameManche_t e termina il thread
     pthread_join(gameManche_t, NULL);
 }
@@ -103,9 +100,6 @@ void insertData(GameData newData)
    ----------------------------------------------*/
 void analyze_data(GameData gamedata)
 {
-    // Termina la riproduzione dei suoni della partita
-    system("killall aplay");
-
     // Pulisce lo schermo
     erase();
     bkgd(COLOR_PAIR(WHITE_WHITE)); /* Setta il background color dello schermo */
@@ -140,6 +134,7 @@ void analyze_data(GameData gamedata)
             sleep(2);
 
             initialize_game(gamedata);
+            pthread_join(gamedata.thread_id, NULL);
         }
     }
     else
@@ -155,6 +150,7 @@ void analyze_data(GameData gamedata)
                 mvprintw(3, 14, "Punti : %d    Vite : %d    Tane raggiunte : %d", gamedata.player_score, gamedata.player_lives, taken_dens);
                 attroff(COLOR_PAIR(BLACK_RED));
                 endGameMenu(0);
+                pthread_join(gamedata.thread_id, NULL);
             }
             else
             { // altrimenti stampa relativa al numero di vite rimanenti
@@ -166,6 +162,7 @@ void analyze_data(GameData gamedata)
                 sleep(2);
 
                 initialize_game(gamedata);
+                pthread_join(gamedata.thread_id, NULL);
             }
         }
 }
@@ -175,6 +172,9 @@ void analyze_data(GameData gamedata)
    ----------------------------------------------*/
 void *gameManche_thread(void *game_data)
 {
+    // Inizializzazione del suono del fiume
+    system("aplay ../SUONI/riverSound.wav > /dev/null 2>&1 &");
+
     int start_dens[] = {16, 27, 38, 49, 60};
     bool onCrocodile = true;
 
@@ -195,6 +195,7 @@ void *gameManche_thread(void *game_data)
     objectData time;
     objectData *river_flow = (objectData *)malloc(RIVER_LANES_NUMBER * sizeof(objectData));
     GameData gamedata = *(GameData *)game_data;
+    gamedata.thread_id = pthread_self();
 
     int crocodile_immersion_timer = getCrocodileTimer(CROCODILE_IMMERSION_TIME_MIN, gamedata); // = getRandomTimer (tempo minimo, difficoltà)
 
@@ -214,7 +215,6 @@ void *gameManche_thread(void *game_data)
         frog_dataPacket.riverFlow[i] = river_flow[i];
     }
     frog_dataPacket.object = frogData;
-
 
     // Creazione dei threads
     pthread_create(&frog_t, NULL, &frog_thread, (void *)&frog_dataPacket);
@@ -396,7 +396,7 @@ void *gameManche_thread(void *game_data)
             }
         }
 
-        // SE LA RANA E' SUL COCCODRILLO
+   /*     // SE LA RANA E' SUL COCCODRILLO
         if (frogData.frog_candie && frogData.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frogData.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT)
         {
             for (int i = 0; i < N_CROCODILE; i++)
@@ -418,7 +418,7 @@ void *gameManche_thread(void *game_data)
                 else
                     onCrocodile = false;
             }
-        }
+        }*/
 
         // SE LA RANA RAGGIUNGE UNA TANA - OK
         if (frogData.y < SCORE_ZONE_HEIGHT + 2)
@@ -476,7 +476,7 @@ void *gameManche_thread(void *game_data)
                 destroyFrogBullet(&frog_bulletData);
             }
         }
-
+        
         // SE IL PROIETTILE DELLA RANA COLPISCE UNA PIANTA - OK
         for (int i = 0; i < N_PLANTS; i++)
         {
@@ -512,9 +512,9 @@ void *gameManche_thread(void *game_data)
                 if (plantData[i].plant_respawn_timer <= 0)
                 {
                     // Da vedere se va bene
-                    // plantData[i].plant_isalive = true;
+                    plantData[i].plant_isalive = true;
                     plantData[i].plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1);
-                    // pthread_create(&plant_t[i], NULL, &plant_thread, (void *)&plantData[i]);
+                    pthread_create(&plant_t[i], NULL, &plant_thread, (void *)&plantData[i]);
                 }
             }
         }
@@ -616,6 +616,8 @@ void *gameManche_thread(void *game_data)
     {
         gamedata.player_score = 0;
     }
+    // Termina la riproduzione dei suoni della partita
+    system("killall aplay");
     analyze_data(gamedata);
 }
 
