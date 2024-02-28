@@ -3,6 +3,11 @@
 /* ----------------------------------------------
           FROG
    ----------------------------------------------*/
+
+pthread_mutex_t frogBulletMutex;
+pthread_cond_t cond_var;
+int thread_created = 0;
+
 // Funzione per la gestione del thread frog
 void *frog_thread(void *frogData)
 {
@@ -13,6 +18,10 @@ void *frog_thread(void *frogData)
 
     int frog_start_x = frog.x;
     int frog_start_y = frog.y;
+
+    // Inizializza il mutex e la variabile di condizione
+    pthread_mutex_init(&frogBulletMutex, NULL);
+    pthread_cond_init(&cond_var, NULL);
 
     // Ciclo di esecuzione di Frog
     while (should_not_exit)
@@ -52,22 +61,25 @@ void *frog_thread(void *frogData)
             break;
         case KEY_RIGHT:
             frog.x += 1;
-            break;  
+            break;
         // Proiettile
         case SPACE:
-            if (true)
+            if (!thread_created)
             {
+                pthread_mutex_lock(&frogBulletMutex);
                 // Inizializzazione proiettile
                 objectData *frogBullet = (objectData *)malloc(sizeof(frogBullet));
                 objectData frog_bullet = *frogBullet;
                 frog_bullet.x = frog.x;
-                frog_bullet.y = frog.y;
+                frog_bullet.y = frog.y - 1;
                 frog_bullet.id = FROG_BULLET_ID;
                 // Creazione thread
                 if (pthread_create(&frog_bullet_thread_t, NULL, &frog_bullet_thread, &frog_bullet) != 0)
                 {
                     _exit(1);
-                } 
+                }
+                thread_created = 1;
+                pthread_mutex_unlock(&frogBulletMutex);
 
                 system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1 &");
             }
@@ -84,6 +96,9 @@ void *frog_thread(void *frogData)
         insertObject(frog);
         usleep(1000);
     }
+    // Rilascia il mutex e la variabile di condizione
+    pthread_mutex_destroy(&frogBulletMutex);
+    pthread_cond_destroy(&cond_var);
 }
 
 /* ----------------------------------------------
@@ -92,6 +107,7 @@ void *frog_thread(void *frogData)
 // Funzione per la gestione del processo frog_bullet
 void *frog_bullet_thread(void *a)
 {
+    pthread_cleanup_push(bulletDeletion, NULL);
     objectData *frogBullet = (objectData *)a;
     objectData frog_bullet = *frogBullet;
     frog_bullet.thread_id = pthread_self();
@@ -104,8 +120,18 @@ void *frog_bullet_thread(void *a)
         }
         pthread_testcancel();
         frog_bullet.y -= 1;
-        
+
         insertObject(frog_bullet);
         usleep(FROG_BULLET_DELAY);
     }
+    pthread_cleanup_pop(1);
+}
+
+void bulletDeletion()
+{
+    pthread_mutex_lock(&frogBulletMutex);
+    thread_created = 0;             // Il thread è terminato, quindi possiamo creare un altro thread
+    pthread_cond_signal(&cond_var); // Notifica il main thread che il thread è terminato
+    pthread_mutex_unlock(&frogBulletMutex);
+    pthread_exit(0);
 }

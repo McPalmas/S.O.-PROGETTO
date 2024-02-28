@@ -247,6 +247,7 @@ typedef struct
    bool plant_bulletisactive;
    bool plant_bullet_timer;
    bool plant_bullet_delay;
+   int plant_respawn_timer;
    // crocodile
    enum Direction direction;
    int crocodile_speed;
@@ -348,4 +349,8 @@ int getRandomTimer(int min);                      // restituisce un timer per la
 // funzioni di supporto per la gestione del buffer
 void removeObject();               // rimuove un oggetto dal buffer
 void insertObject(objectData obj); // inserisce un oggetto nel buffer
-void destroyFrogBullet(objectData frog_bulletData);
+void destroyFrogBullet(objectData *frog_bulletData);
+
+void bulletDeletion();
+void plantDeletion(void *a);
+void plantBulletDeletion(void *a);

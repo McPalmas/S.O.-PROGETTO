@@ -3,6 +3,9 @@
 /* ----------------------------------------------
           PLANT
    ----------------------------------------------*/
+
+pthread_mutex_t plantMutex,plantBulletMutex;
+
 void *plant_thread(void *plant_data)
 {
     // Estrazione dell'id passato alla funzione
@@ -11,7 +14,6 @@ void *plant_thread(void *plant_data)
 
     pthread_t plant_bullet_thread_t;
     int i;
-    
     insertObject(plantData);
     // Ciclo di esecuzione della pianta
     while (should_not_exit)
@@ -56,7 +58,6 @@ void *plant_bullet_thread(void *data)
     objectData plant_bullet = *plantBullet;
 
     plant_bullet.thread_id = pthread_self();
-    plant_bullet.plant_bulletisactive = true;
 
     insertObject(plant_bullet);
     // Suono

@@ -7,8 +7,10 @@ void *time_thread(void *time_data)
 {
 
     objectData *timeData = (objectData *)time_data;
-    objectData time = *timeData;
+    objectData time;
+    time.id = timeData->id;
     time.thread_id = pthread_self();
+    time.time_left = timeData->time_left;
     
     insertObject(time);
     // Invio del dato
