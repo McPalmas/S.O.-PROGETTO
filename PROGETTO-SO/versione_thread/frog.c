@@ -24,6 +24,7 @@ void *frog_thread(void *data)
     }
     
     int timer_counter = 0;
+    int last_frog_y = frog.y;
 
     pthread_t frog_bullet_thread_t;
 
@@ -122,15 +123,15 @@ void *frog_thread(void *data)
         
         if(inRiver){
             timer_counter++;   
-            if (timer_counter == delay/1000)
+            if (timer_counter == delay/2000 - 27)
                 {
-            	    frog.x += (frog.direction == RIGHT) ? 1 : -1;
+            	    if(last_frog_y==frog.y)frog.x += (frog.direction == RIGHT) ? 1 : -1;
             	    timer_counter = 0; // Reimposta il contatore
         	}
         }
         	
         insertObject(frog);
-
+        last_frog_y = frog.y;
         usleep(1000);//ogni millisecondo
     }
     // Rilascia il mutex e la variabile di condizione
