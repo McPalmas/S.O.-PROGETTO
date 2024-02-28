@@ -221,6 +221,7 @@ typedef struct
    int player_lives;
    int difficulty;
    int score;
+   pthread_t thread_id;
 } GameData;
 
 // Dati flusso fiume
