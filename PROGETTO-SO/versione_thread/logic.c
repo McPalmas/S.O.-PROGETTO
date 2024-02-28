@@ -267,7 +267,7 @@ void *gameManche_thread(void *game_data)
         // stampa dei proiettili delle piante
         for (int i = 0; i < N_PLANT_BULLETS; i++)
         {
-            if (plant_bulletData[i].frog_bulletisactive)
+            if (plant_bulletData[i].plant_bulletisactive)
             {
                 plantBullett(plant_bulletData[i].x, plant_bulletData[i].y);
             }
@@ -322,7 +322,7 @@ void *gameManche_thread(void *game_data)
             {
                 if (receivedPacket.id == i + PLANT_ID_0)
                 {
-                    plantData[i]=receivedPacket;
+                    plantData[i] = receivedPacket;
                 }
             }
         }
@@ -467,6 +467,7 @@ void *gameManche_thread(void *game_data)
             - Proiettile rana con coccodrillo
             - Proiettile rana con piante
             - Proiettile rana Out of Bounds
+            - Proiettile pianta Out of Bounds
         */
 
         // SE LA RANA COLLIDE CON UNA PIANTA - OK
@@ -508,7 +509,7 @@ void *gameManche_thread(void *game_data)
                     break;
                 }
                 else
-                    onCrocodile = true; // momentaneamente a true
+                    onCrocodile = false;
             }
         }
 
@@ -599,14 +600,16 @@ void *gameManche_thread(void *game_data)
                     pthread_cancel(plantData[i].thread_id);
                     destroyFrogBullet(&frog_bulletData);
                 }
-            }else{
+            }
+            else
+            {
                 plantData[i].plant_respawn_timer--;
                 if (plantData[i].plant_respawn_timer <= 0)
                 {
                     // Da vedere se va bene
-                    //plantData[i].plant_isalive = true;
+                    // plantData[i].plant_isalive = true;
                     plantData[i].plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1);
-                    //pthread_create(&plant_t[i], NULL, &plant_thread, (void *)&plantData[i]);
+                    // pthread_create(&plant_t[i], NULL, &plant_thread, (void *)&plantData[i]);
                 }
             }
         }
@@ -617,6 +620,15 @@ void *gameManche_thread(void *game_data)
             destroyFrogBullet(&frog_bulletData);
         }
 
+        // SE IL PROIETTILE DELLA PIANTA ESCE DALLO SCHERMO - OK
+        for (int i = 0; i < N_PLANT_BULLETS; i++)
+        {
+            if (plant_bulletData[i].plant_bulletisactive && plant_bulletData[i].y >= SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2))
+            {
+                destroyPlantBullet(&plant_bulletData[i]);    
+            }
+        }
+
         /*
             Morti:
             - Rana per out of bounds
@@ -624,7 +636,7 @@ void *gameManche_thread(void *game_data)
             - Rana per tempo
         */
 
-        // MORTE RANA PER OUT OF BOUNDS - C'è un problema
+        // MORTE RANA PER OUT OF BOUNDS
         /*
         if (frogData.x - 2 < MINX || frogData.x + 2 > MAXX - 1 || frogData.y < SCORE_ZONE_HEIGHT)
         {
@@ -640,7 +652,7 @@ void *gameManche_thread(void *game_data)
             gamedata.game_lost = true;
         }
 
-        // MORTE RANA PER TEMPO - C'è un problema con time
+        // MORTE RANA PER TEMPO
 
         if (time.time_left <= 0 && frogData.frog_candie)
         {
@@ -918,4 +930,11 @@ void destroyFrogBullet(objectData *frog_bulletData)
     // Termina il processo del proiettile
     frog_bulletData->frog_bulletisactive = false;
     pthread_cancel(frog_bulletData->thread_id);
+}
+
+void destroyPlantBullet(objectData *plant_bulletData)
+{
+    // Termina il processo del proiettile
+    plant_bulletData->plant_bulletisactive = false;
+    pthread_cancel(plant_bulletData->thread_id);
 }
