@@ -15,9 +15,9 @@ void *plant_thread(void *plant_data)
     objectData plantData = *plant;
     plantData.thread_id = pthread_self();
     plantData.plant_bullet_timer = plant->plant_bullet_timer;
-
-    int plant_timer = plantData.plant_bullet_timer;
-
+    
+    int bullet_timer = getPlantReloadTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
+    
     pthread_t plant_bullet_thread_t;
     int i;
     insertObject(plantData);
@@ -28,7 +28,7 @@ void *plant_thread(void *plant_data)
         {
         }
         // Se il timer è scaduto
-        if (plantData.plant_bullet_timer <= 0 && !plant_thread_created)
+        if (bullet_timer <=0 && !plant_thread_created)
         {
             pthread_mutex_lock(&plantBulletMutex);
             // Inizializzazione proiettile
@@ -37,9 +37,9 @@ void *plant_thread(void *plant_data)
             plant_bullet.x = plantData.x;
             plant_bullet.y = plantData.y+1;
             plant_bullet.id = plantData.id+3;
-            if(plant_timer == PLANT_BULLET_RELOAD_EASY)plant_bullet.plant_bullet_delay = PLANT_BULLET_DELAY_EASY;
-            else if(plant_timer == PLANT_BULLET_RELOAD_NORMAL)plant_bullet.plant_bullet_delay = PLANT_BULLET_DELAY_NORMAL;
-            else if(plant_timer == PLANT_BULLET_RELOAD_HARD)plant_bullet.plant_bullet_delay = PLANT_BULLET_DELAY_HARD;
+            if(difficulty == EASY)plant_bullet.plant_bullet_delay = PLANT_BULLET_DELAY_EASY;
+            else if(difficulty == NORMAL)plant_bullet.plant_bullet_delay = PLANT_BULLET_DELAY_NORMAL;
+            else if(difficulty == HARD)plant_bullet.plant_bullet_delay = PLANT_BULLET_DELAY_HARD;
             // Creazione thread
             
             if (pthread_create(&plant_bullet_thread_t, NULL, &plant_bullet_thread, &plant_bullet) != 0)
@@ -47,11 +47,11 @@ void *plant_thread(void *plant_data)
                 _exit(1);
             }
             plant_thread_created = 1;
-            plantData.plant_bullet_timer = plant_timer;
+            bullet_timer = getPlantReloadTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
             pthread_mutex_unlock(&plantBulletMutex);
 
             system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
-        }else plantData.plant_bullet_timer--;
+        }else if(bullet_timer > 0)bullet_timer--;
 
         insertObject(plantData);
         sleep(1); // 1 secondo

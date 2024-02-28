@@ -165,18 +165,22 @@ void menuDifficulty()
             { // Play: Avvia il gioco in modalita easy
                 exitMenu = true;
                 gamedata.difficulty = EASY;
+                difficulty = EASY;
                 gamedata.player_lives = 3;
+                
             }
             if (selection == 1)
             { // Play: Avvia il gioco in modalita medium
                 exitMenu = true;
                 gamedata.difficulty = NORMAL;
+                difficulty = NORMAL;
                 gamedata.player_lives = 2;
             }
             if (selection == 2)
             { // Play: Avvia il gioco in modalita hard
                 exitMenu = true;
                 gamedata.difficulty = HARD;
+                difficulty = HARD;
                 gamedata.player_lives = 1;
             }
             break;

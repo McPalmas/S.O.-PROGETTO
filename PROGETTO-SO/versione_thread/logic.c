@@ -396,7 +396,7 @@ void *gameManche_thread(void *game_data)
             }
         }
 
-        // SE LA RANA E' SUL COCCODRILLO
+   /*     // SE LA RANA E' SUL COCCODRILLO
         if (frogData.frog_candie && frogData.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frogData.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT)
         {
             for (int i = 0; i < N_CROCODILE; i++)
@@ -418,7 +418,7 @@ void *gameManche_thread(void *game_data)
                 else
                     onCrocodile = false;
             }
-        }
+        }*/
 
         // SE LA RANA RAGGIUNGE UNA TANA - OK
         if (frogData.y < SCORE_ZONE_HEIGHT + 2)
@@ -476,7 +476,7 @@ void *gameManche_thread(void *game_data)
                 destroyFrogBullet(&frog_bulletData);
             }
         }
-
+        
         // SE IL PROIETTILE DELLA RANA COLPISCE UNA PIANTA - OK
         for (int i = 0; i < N_PLANTS; i++)
         {
@@ -512,9 +512,9 @@ void *gameManche_thread(void *game_data)
                 if (plantData[i].plant_respawn_timer <= 0)
                 {
                     // Da vedere se va bene
-                    // plantData[i].plant_isalive = true;
+                    plantData[i].plant_isalive = true;
                     plantData[i].plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1);
-                    // pthread_create(&plant_t[i], NULL, &plant_thread, (void *)&plantData[i]);
+                    pthread_create(&plant_t[i], NULL, &plant_thread, (void *)&plantData[i]);
                 }
             }
         }

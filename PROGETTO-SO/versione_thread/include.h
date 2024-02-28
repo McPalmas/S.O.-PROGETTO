@@ -115,8 +115,8 @@
 #define PLANT_BULLET_RELOAD_NORMAL 15
 #define PLANT_BULLET_RELOAD_HARD 10
 // Tempo di respawn delle piante
-#define PLANT_RESPAWN_MIN 10
-#define PLANT_RESPAWN_MAX 20
+#define PLANT_RESPAWN_MIN 4000
+#define PLANT_RESPAWN_MAX 7000
 // Velocità del fiume
 #define MIN_RIVER_SPEED_EASY 600000
 #define MIN_RIVER_SPEED_NORMAL 300000
@@ -284,6 +284,7 @@ typedef struct
 // Thread
 extern bool should_not_exit;
 extern bool block;
+extern enum Difficulty difficulty;
 
 extern objectData buffer[DIMBUFFER];
 extern objectData consumedObject;
