@@ -18,7 +18,7 @@ sem_t semaphoreSlotEmpty;
 int in,out,data_in,data_out;
 
 bool block = false;
-enum Difficulty difficulty;
+
 bool should_not_exit = true;
 
 
