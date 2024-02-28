@@ -66,7 +66,6 @@ void *crocodile_thread(void *data)
                 crocodileData.x = 2;
 
             crocodileData.is_crocodile_alive = true;
-            crocodileData.crocodile_is_good = getRandomBoolean(crocodileData.crocodile_is_bad_probability); // test
         }
 
         insertObject(crocodileData);

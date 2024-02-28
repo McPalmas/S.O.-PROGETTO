@@ -332,7 +332,12 @@ void *gameManche_thread(void *game_data)
             {
                 if (receivedPacket.id == i + CROCODILE_ID_0)
                 {
-                    crocodileData[i] = receivedPacket;
+                    crocodileData[i].x = receivedPacket.x;
+                    crocodileData[i].y = receivedPacket.y;
+                    crocodileData[i].direction = receivedPacket.direction;
+                    crocodileData[i].is_crocodile_alive = receivedPacket.is_crocodile_alive;
+                    if (crocodileData[i].is_crocodile_alive == false)
+                        crocodileData[i].crocodile_is_good = getRandomBoolean(crocodileData[i].crocodile_is_bad_probability); // test
                 }
             }
         }
@@ -646,7 +651,7 @@ void *gameManche_thread(void *game_data)
         }*/
 
         // MORTE RANA PER CADUTA IN ACQUA
-        if (!onCrocodile)
+        if (false)
         {
             frogData.frog_candie = false;
             gamedata.game_lost = true;
