@@ -396,7 +396,7 @@ void *gameManche_thread(void *game_data)
             }
         }
 
-   /*     // SE LA RANA E' SUL COCCODRILLO
+        // SE LA RANA E' SUL COCCODRILLO
         if (frogData.frog_candie && frogData.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frogData.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT)
         {
             for (int i = 0; i < N_CROCODILE; i++)
@@ -418,7 +418,7 @@ void *gameManche_thread(void *game_data)
                 else
                     onCrocodile = false;
             }
-        }*/
+        }
 
         // SE LA RANA RAGGIUNGE UNA TANA - OK
         if (frogData.y < SCORE_ZONE_HEIGHT + 2)
@@ -448,6 +448,7 @@ void *gameManche_thread(void *game_data)
                         // Chiudi la tana e setta win a true per il reload del game
                         gamedata.game_won = true;
                         gamedata.dens[i] = true;
+                        break;
                     }
                     else
                     {
@@ -456,6 +457,7 @@ void *gameManche_thread(void *game_data)
                             gamedata.player_score -= DEATH_SCORE;
                         else
                             gamedata.player_score = 0;
+                        break;
                     }
                 }
             }
