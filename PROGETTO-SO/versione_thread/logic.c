@@ -594,8 +594,7 @@ void *gameManche_thread(void *game_data)
                         gamedata.player_score += DEN_SCORE_HARD;
                     }
 
-                    // disattiva il proiettile e uccidi plant -> commento sotto
-                    plantData[i].plant_respawn_timer = PLANT_RESPAWN_MIN + rand() % (PLANT_RESPAWN_MAX - PLANT_RESPAWN_MIN + 1); // Da gestire in logic
+                    // disattiva il proiettile e uccidi plant
                     plantData[i].plant_isalive = false;
                     pthread_cancel(plantData[i].thread_id);
                     destroyFrogBullet(&frog_bulletData);

@@ -238,7 +238,6 @@ typedef struct
    int x;
    int y;
    // frog
-   bool frog_canshoot;
    bool frog_candie;
    bool frog_bulletisactive;
    // plant
