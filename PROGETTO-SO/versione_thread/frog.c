@@ -52,13 +52,11 @@ void *frog_thread(void *frogData)
             break;
         case KEY_RIGHT:
             frog.x += 1;
-            break;
+            break;  
         // Proiettile
         case SPACE:
-            if (frog.frog_canshoot)
+            if (true)
             {
-                // Aggiornamento variabile
-                frog.frog_canshoot = false;
                 // Inizializzazione proiettile
                 objectData *frogBullet = (objectData *)malloc(sizeof(frogBullet));
                 objectData frog_bullet = *frogBullet;
@@ -69,8 +67,8 @@ void *frog_thread(void *frogData)
                 if (pthread_create(&frog_bullet_thread_t, NULL, &frog_bullet_thread, &frog_bullet) != 0)
                 {
                     _exit(1);
-                }
-                // Suono
+                } 
+
                 system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1 &");
             }
             break;
@@ -104,9 +102,9 @@ void *frog_bullet_thread(void *a)
         while (block)
         {
         }
-
+        pthread_testcancel();
         frog_bullet.y -= 1;
-
+        
         insertObject(frog_bullet);
         usleep(FROG_BULLET_DELAY);
     }

@@ -259,7 +259,7 @@ typedef struct
    // time
    int time_left;
 
-   pid_t thread_id;
+   pthread_t thread_id;
 } objectData;
 
 // Dati posizione proiettili

@@ -353,7 +353,8 @@ void *gameManche_thread(void *game_data)
 
         if(frog_bulletData.frog_bulletisactive && frog_bulletData.y <= SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT){
             frog_bulletData.frog_bulletisactive = false;
-            //destroyFrogBullet(frog_bulletData); -> Fa crashare il gioco
+            frogData.frog_canshoot = true;
+            destroyFrogBullet(frog_bulletData);
         }
         if (banana == 1)
         {
