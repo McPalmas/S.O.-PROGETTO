@@ -199,20 +199,25 @@ void *gameManche_thread(void *game_data)
     int crocodile_immersion_timer = getCrocodileTimer(100, gamedata); // = getRandomTimer (tempo minimo, difficoltà)
 
     // Inizializzazione variabili
-    initialize_frog(&frogData);
+
     initialize_plants(plantData, plant_bulletData, gamedata.difficulty);
     initialize_river_flows(gamedata, river_flow);
+    initialize_frog(&frogData);
     crocodiles_inizializer(crocodileData, gamedata, river_flow);
     initialize_time(&time, gamedata.difficulty);
 
+    args frog_dataPacket;
     args crocodile_dataPacket;
     for (int i = 0; i < RIVER_LANES_NUMBER; i++)
     {
         crocodile_dataPacket.riverFlow[i] = river_flow[i];
+        frog_dataPacket.riverFlow[i] = river_flow[i];
     }
+    frog_dataPacket.object = frogData;
+
 
     // Creazione dei threads
-    pthread_create(&frog_t, NULL, &frog_thread, (void *)&frogData);
+    pthread_create(&frog_t, NULL, &frog_thread, (void *)&frog_dataPacket);
     pthread_create(&time_t, NULL, &time_thread, (void *)&time);
     for (int i = 0; i < N_PLANTS; i++)
         pthread_create(&plant_t[i], NULL, &plant_thread, (void *)&plantData[i]);
@@ -292,15 +297,14 @@ void *gameManche_thread(void *game_data)
         mvprintw(TOTAL_HEIGHT + 1, TIME_X + 15, "Time: %d", time.time_left);
         attroff(COLOR_PAIR(WHITE_BLUE));
 
-        // refresh();
-
         removeObject();
         receivedPacket = consumedObject;
 
         // assegnamento del dato al rispettivo elemento
         if (receivedPacket.id == FROG_ID)
         {
-            frogData = receivedPacket;
+            frogData.x = receivedPacket.x;
+            frogData.y = receivedPacket.y;
         }
         else if (receivedPacket.id == FROG_BULLET_ID)
         {
@@ -353,15 +357,7 @@ void *gameManche_thread(void *game_data)
         // crocodiles[crocodileIndex].crocodile_immersion_timer = getCrocodileTimer(); Sarà gestita in logic
         // crocodiles[crocodileIndex].crocodile_immersion_timer_counter = crocodiles[crocodileIndex].crocodile_immersion_timer; Sarà gestita in logic
         // Aggiornamento posizione di frog se è su crocodile
-        /*
-        if (frog.y == crocodiles[crocodileIndex].y && (frog.x > crocodiles[crocodileIndex].x + 2 - 2 * crocodiles[crocodileIndex].direction && frog.x < (crocodiles[crocodileIndex].x + CROCODILE_W - 1 - 2 * crocodiles[crocodileIndex].direction)))
-        {
-            if (crocodiles[crocodileIndex].direction == RIGHT)
-                frog.x += 1;
-            else
-                frog.x -= 1;
-        }
-        */
+
         // Gestione immersione di crocodile
         /*
         if (!crocodiles[crocodileIndex].crocodile_is_good && frog.y == crocodiles[crocodileIndex].y && (frog.x > (crocodiles[crocodileIndex].x) && frog.x < (crocodiles[crocodileIndex].x + CROCODILE_W - 2)))
@@ -630,7 +626,7 @@ void *gameManche_thread(void *game_data)
         {
             if (plant_bulletData[i].plant_bulletisactive && plant_bulletData[i].y >= SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2))
             {
-                destroyPlantBullet(&plant_bulletData[i]);    
+                destroyPlantBullet(&plant_bulletData[i]);
             }
         }
 

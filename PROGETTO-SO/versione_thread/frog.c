@@ -9,10 +9,19 @@ pthread_cond_t cond_var;
 int thread_created = 0;
 
 // Funzione per la gestione del thread frog
-void *frog_thread(void *frogData)
+void *frog_thread(void *data)
 {
-    objectData frog = *(objectData *)frogData;
+    args *receivedData = (args *)data;
+    objectData frog = receivedData->object;
     frog.thread_id = pthread_self();
+    objectData river_flowData[RIVER_LANES_NUMBER];
+    int laneY[RIVER_LANES_NUMBER];
+    for (int i = 0; i < RIVER_LANES_NUMBER; ++i)
+    {
+        river_flowData[i].flow_speed = receivedData->riverFlow[i].flow_speed;
+        river_flowData[i].direction = receivedData->riverFlow[i].direction;
+        laneY[i] = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + i * 2;
+    }
 
     pthread_t frog_bullet_thread_t;
 
@@ -93,8 +102,25 @@ void *frog_thread(void *frogData)
             }
             break;
         }
+
+        bool inRiver = false;
+        int delay = 0;
+        for(int i = 0; i < RIVER_LANES_NUMBER; i++)
+        {
+            if (frog.y == laneY[i])
+            {
+                frog.flow_speed = river_flowData[i].flow_speed;
+                frog.direction = river_flowData[i].direction;
+                delay = frog.flow_speed;
+                inRiver = true;
+                frog.x += (frog.direction == RIGHT) ? 1 : -1;
+                break;
+            }
+        }
         insertObject(frog);
-        usleep(1000);
+
+        if(!inRiver)usleep(1000);
+        else usleep(delay);
     }
     // Rilascia il mutex e la variabile di condizione
     pthread_mutex_destroy(&frogBulletMutex);

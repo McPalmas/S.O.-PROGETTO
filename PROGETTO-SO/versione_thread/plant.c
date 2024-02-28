@@ -56,6 +56,9 @@ void *plant_thread(void *plant_data)
         insertObject(plantData);
         sleep(1); // 1 secondo
     }
+    // Rilascia il mutex e la variabile di condizione
+    pthread_mutex_destroy(&plantBulletMutex);
+    pthread_cond_destroy(&cond_var_plant);
 }
 
 /* ----------------------------------------------
