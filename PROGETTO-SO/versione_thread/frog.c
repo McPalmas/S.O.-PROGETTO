@@ -22,6 +22,8 @@ void *frog_thread(void *data)
         river_flowData[i].direction = receivedData->riverFlow[i].direction;
         laneY[i] = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + i * 2;
     }
+    
+    int timer_counter = 0;
 
     pthread_t frog_bullet_thread_t;
 
@@ -108,19 +110,28 @@ void *frog_thread(void *data)
         for(int i = 0; i < RIVER_LANES_NUMBER; i++)
         {
             if (frog.y == laneY[i])
-            {
+            {   
                 frog.flow_speed = river_flowData[i].flow_speed;
                 frog.direction = river_flowData[i].direction;
                 delay = frog.flow_speed;
                 inRiver = true;
-                frog.x += (frog.direction == RIGHT) ? 1 : -1;
+                //frog.x += (frog.direction == RIGHT) ? 1 : -1;               
                 break;
             }
         }
+        
+        if(inRiver){
+            timer_counter++;   
+            if (timer_counter == delay/1000)
+                {
+            	    frog.x += (frog.direction == RIGHT) ? 1 : -1;
+            	    timer_counter = 0; // Reimposta il contatore
+        	}
+        }
+        	
         insertObject(frog);
 
-        if(!inRiver)usleep(1000);
-        else usleep(delay);
+        usleep(1000);//ogni millisecondo
     }
     // Rilascia il mutex e la variabile di condizione
     pthread_mutex_destroy(&frogBulletMutex);
