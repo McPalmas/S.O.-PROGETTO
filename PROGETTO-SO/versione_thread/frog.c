@@ -131,6 +131,7 @@ void *frog_thread(void *data)
                 {
                     if(frog.direction == RIGHT && frog.x < MAXX - 3)frog.x += 1;
                     else if(frog.direction == LEFT && frog.x > MINX + 2)frog.x -= 1;
+                    timer_counter = 0 ;
                 }
             }
         }

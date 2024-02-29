@@ -638,7 +638,7 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[2], int pipe_destroy_frog
         */
 
         // MORTE RANA PER OUT OF BOUNDS
-        if (frog.x - 2 < MINX || frog.x + 2 > MAXX - 1 || frog.y < SCORE_ZONE_HEIGHT)
+        if (frog.y < SCORE_ZONE_HEIGHT)
         {
             gamedata.player_score -= DEATH_SCORE;
             frog.frog_candie = false;

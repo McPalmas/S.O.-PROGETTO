@@ -66,10 +66,12 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
             }
             break;
         case KEY_LEFT:
-            frog.x -= 1;
+            if(frog.x > MINX + 2)
+                 frog.x -= 1;
             break;
         case KEY_RIGHT:
-            frog.x += 1;
+            if(frog.x < MAXX - 3)
+                frog.x += 1;
             break;
         // Proiettile
         case SPACE:
@@ -89,10 +91,13 @@ void frog_process(int pipe[2], int pipe_shoot[2], int pipe_canshoot[2], int pipe
             if (frog.y == crocodile.y && (frog.x > crocodile.x + 2 - 2 * crocodile.direction && frog.x < (crocodile.x + CROCODILE_W - 1 - 2 * crocodile.direction)))
             {
                 // la posizione di Frog è aggiornata
-                if (crocodile.direction == LEFT)
-                    frog.x -= 1;
-                else
-                    frog.x += 1;
+                if (crocodile.direction == LEFT){
+                    if(frog.x > MINX +2)
+                        frog.x -= 1;
+                }else{
+                    if(frog.x < MAXX - 3)
+                        frog.x += 1;
+                }
             }
         }
         

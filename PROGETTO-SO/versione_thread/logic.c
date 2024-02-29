@@ -505,7 +505,7 @@ void *gameManche_thread(void *game_data)
             - Rana per tempo
         */
         // Morte rana per out of bounds
-        if (frogData.x - 2 < MINX || frogData.x + 2 > MAXX - 1 || frogData.y < SCORE_ZONE_HEIGHT)
+        if (frogData.y < SCORE_ZONE_HEIGHT)
         {
             gamedata.player_score -= DEATH_SCORE;
             frogData.frog_candie = false;
