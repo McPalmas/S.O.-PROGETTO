@@ -8,14 +8,14 @@
 void *crocodile_thread(void *data)
 {
     // Estrazione dei dati passati alla funzione
-    args *receivedData = (args *)data;
-    objectData crocodileData = receivedData->object;
+    objectData crocodileData = *(objectData *)data;
     crocodileData.thread_id = pthread_self();
+    
     objectData river_flowData[RIVER_LANES_NUMBER];
     for (int i = 0; i < RIVER_LANES_NUMBER; i++)
     {
-        river_flowData[i].flow_speed = receivedData->riverFlow[i].flow_speed;
-        river_flowData[i].direction = receivedData->riverFlow[i].direction;
+        river_flowData[i].flow_speed = crocodileData.river_flow[i].speed;
+        river_flowData[i].direction = crocodileData.river_flow[i].direction;
     }
     int is_bad_probability = crocodileData.crocodile_is_bad_probability;
     insertObject(crocodileData);

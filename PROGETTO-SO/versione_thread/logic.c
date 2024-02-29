@@ -207,23 +207,14 @@ void *gameManche_thread(void *game_data)
     crocodiles_inizializer(crocodileData, gamedata, river_flow);
     initialize_time(&time, gamedata.difficulty);
 
-    args frog_dataPacket;
-    args crocodile_dataPacket;
-    for (int i = 0; i < RIVER_LANES_NUMBER; i++)
-    {
-        crocodile_dataPacket.riverFlow[i] = river_flow[i];
-    }
-    frog_dataPacket.object = frogData;
-
     // Creazione dei threads
-    pthread_create(&frog_t, NULL, &frog_thread, (void *)&frog_dataPacket);
+    pthread_create(&frog_t, NULL, &frog_thread, (void *)&frogData);
     pthread_create(&time_t, NULL, &time_thread, (void *)&time);
     for (int i = 0; i < N_PLANTS; i++)
         pthread_create(&plant_t[i], NULL, &plant_thread, (void *)&plantData[i]);
     for (int i = 0; i < N_CROCODILE; i++)
     {
-        crocodile_dataPacket.object = crocodileData[i];
-        pthread_create(&crocodile_t[i], NULL, &crocodile_thread, (void *)&crocodile_dataPacket);
+        pthread_create(&crocodile_t[i], NULL, &crocodile_thread, (void *)&crocodileData[i]);
     }
 
     while (should_not_exit)
@@ -651,6 +642,15 @@ void initialize_frog(objectData *frogData, objectData river_flows[])
 void crocodiles_inizializer(objectData crocodiles[], GameData gamedata, objectData river_flows[])
 {
     int crocodileIndex = 0;
+
+    RiverFlow riverFlow[RIVER_LANES_NUMBER];
+    for(int i=0; i<RIVER_LANES_NUMBER; i++){
+        riverFlow[i].speed = river_flows[i].flow_speed;
+        riverFlow[i].direction = river_flows[i].direction;
+        for(int j=0; j<N_CROCODILE; j++){
+            crocodiles[j].river_flow[i] = riverFlow[i];
+        }
+    }
 
     // Itera su ciascun fiume
     for (int riverIndex = 0; riverIndex < RIVER_LANES_NUMBER; riverIndex++)
