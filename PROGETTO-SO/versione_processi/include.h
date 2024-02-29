@@ -15,7 +15,7 @@
 /*-----------------------------------------------------------------------
    MACRO UTILIZZATE COME TASTI PER IL MOVIMENTO VERTICALE DI FROG
    -----------------------------------------------------------------------*/
-#define UP 65 /* Tasto 'Freccia su' \
+#define UP 65 /* Tasto 'Freccia su' */
 #define DOWN      66    /* Tasto 'Freccia giù' */
 
 /*-----------------------------------------------------------------------
@@ -258,7 +258,6 @@ extern int start_dens[5];
 /*----------------------------------------------------------------------
                FUNZIONI
    ----------------------------------------------------------------------*/
-
 // menu.c
 void mainMenu();            // visualizzazione del menu principale
 void menuDifficulty();      // visualizzazione del menu per la scelta della difficoltà

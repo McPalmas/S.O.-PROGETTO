@@ -1,16 +1,8 @@
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <time.h>
-#include <stdbool.h>
-#include <string.h>
-#include <fcntl.h>
-#include <signal.h>
-#include <curses.h>
 #include <ncurses.h>
 #include <pthread.h>
-#include <stdio.h>
 #include <semaphore.h>
 
 /*-----------------------------------------------------------------------
@@ -210,7 +202,6 @@ enum Direction
 /*----------------------------------------------------------------------
                STRUTTURE DATI
    ----------------------------------------------------------------------*/
-
 // Dati partita
 typedef struct
 {
@@ -238,10 +229,10 @@ typedef struct
    int id;
    int x;
    int y;
+   RiverFlow river_flow[RIVER_LANES_NUMBER];
    // frog
    bool frog_candie;
    bool frog_bulletisactive;
-   RiverFlow river_flow[RIVER_LANES_NUMBER];
    // plant
    bool plant_isalive;
    bool plant_canshoot;
@@ -266,42 +257,24 @@ typedef struct
    pthread_t thread_id;
 } objectData;
 
-// Dati posizione proiettili
-typedef struct
-{
-   int x, y, id, timer;
-} bulletData;
-
-typedef struct
-{
-   objectData object;
-   objectData riverFlow[];
-} args;
-
 /*----------------------------------------------------------------------
-               VARIABILI GLOBALI -> Queste dovremmo rimuoverle?
+               VARIABILI GLOBALI CONDIVISE
    ----------------------------------------------------------------------*/
-
 // Thread
 extern bool should_not_exit;
 extern bool block;
 extern enum Difficulty difficulty;
-
+// Buffer
 extern objectData buffer[DIMBUFFER];
 extern objectData consumedObject;
-extern GameData dataBuffer[DIMBUFFER];
-extern GameData consumedData;
+extern pthread_mutex_t mutexBuffer; // Mutex per il buffer
+extern sem_t semaphoreSlotFull;     // Semaforo che conta quanti slot del buffer sono pieni
+extern sem_t semaphoreSlotEmpty;    // Semaforo che conta quanti slot del buffer sono vuoti
+extern int in, out;                 // Indici per la gestione del buffer
 
-extern pthread_mutex_t mutexBuffer; /* Mutex per il buffer */
-
-extern sem_t semaphoreSlotFull;  /* Semaforo che conta quanti slot del buffer sono pieni */
-extern sem_t semaphoreSlotEmpty; /* Semaforo che conta quanti slot del buffer sono vuoti */
-extern int in, out;              /* Indici per la gestione del buffer */
-extern int data_in, data_out;    /* Indici per la gestione del buffer */
 /*----------------------------------------------------------------------
                FUNZIONI
    ----------------------------------------------------------------------*/
-
 // menu.c
 void mainMenu();            // visualizzazione del menu principale
 void menuDifficulty();      // visualizzazione del menu per la scelta della difficoltà
@@ -319,43 +292,39 @@ void plantBullett(int y, int x);  // stampa il proiettile della pianta
 void printAll();
 void pausePrint(); // stampa la scritta pausa
 
-void initialize_game(GameData gamedata);
 void analyze_data();
 
 // frog.c
 void *frog_thread(void *a);                      // thread per la gestione della rana
 void *frog_bullet_thread(void *frogBullet_data); // thread per la gestione del proiettile della rana
-
+void bulletDeletion();                           // funzione di pulizia del thread del proiettile della rana
 // crocodile.c
 void *crocodile_thread(void *args); // thread per la gestione del coccodrillo
 
 // plant.c
 void *plant_thread(void *id);          // thread per la gestione della pianta
 void *plant_bullet_thread(void *data); // thread per la gestione del proiettile della pianta
+void plantBulletDeletion();            // funzione di pulizia del thread del proiettile della pianta
 
 // time.c
 void *time_thread(void *time_data); // thread per la gestione del tempo di gioco
 
 // logic.c
-void *gameManche_thread(void *game_data); // thread per la gestione della partita
-void initialize_frog(objectData *frogData, objectData river_flow[]);                                 // inizializzazione della rana
-void crocodiles_inizializer(objectData crocodiles[], GameData gamedata, objectData river_flow[]); // inizializzazione dei coccodrilli
-void initialize_river_flows(GameData gamedata, objectData RiverFlow[]);                           // inizializzazione del flusso del fiume
+void initialize_game(GameData gamedata);                                                          // inizializzazione della partita
+void *gameManche_thread(void *game_data);                                                         // thread per la gestione della partita
+void initialize_frog(objectData *frogData, RiverFlow river_flow[]);                              // inizializzazione della rana
+void crocodiles_inizializer(objectData crocodiles[], GameData gamedata, RiverFlow river_flow[]); // inizializzazione dei coccodrilli
+void initialize_river_flows(GameData gamedata, RiverFlow RiverFlow[]);                            // inizializzazione dei flussi del fiume
 void plants_initializer(objectData plants[], objectData plant_bullets[], int difficulty);         // inizializzazione delle piante
 void initialize_time(objectData *time, int difficulty);                                           // inizializzazione del tempo di gioco
-void initialize_plants(objectData plants[], objectData plant_bullets[], int difficulty);
+void initialize_plants(objectData plants[], objectData plant_bullets[], int difficulty);          // inizializzazione delle piante
+void destroyFrogBullet(objectData *frog_bulletData);                                              // distrugge il proiettile della rana
+void destroyPlantBullet(objectData *plant_bulletData);                                            // distrugge il proiettile della pianta
 // funzioni di supporto
 int getPlantReloadTimer(int min, int difficulty); // restituisce il tempo di ricarica del proiettile della pianta
 int getCrocodileTimer();                          // restituisce un timer per l'inabissamento dei coccodrilli
 bool getRandomBoolean(float probability);         // restituisce un booleano in base alla difficoltà
 int getRandomTimer(int min);                      // restituisce un timer per la ricarica dei proiettili delle piante
-
 // funzioni di supporto per la gestione del buffer
 void removeObject();               // rimuove un oggetto dal buffer
 void insertObject(objectData obj); // inserisce un oggetto nel buffer
-
-
-void destroyFrogBullet(objectData *frog_bulletData);
-void destroyPlantBullet(objectData *plant_bulletData);
-void bulletDeletion();
-void plantBulletDeletion();

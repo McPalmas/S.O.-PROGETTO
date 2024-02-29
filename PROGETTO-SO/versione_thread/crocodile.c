@@ -10,15 +10,17 @@ void *crocodile_thread(void *data)
     // Estrazione dei dati passati alla funzione
     objectData crocodileData = *(objectData *)data;
     crocodileData.thread_id = pthread_self();
-    
+    // Salvataggio dei dati relativi ai flussi del fiume
     objectData river_flowData[RIVER_LANES_NUMBER];
     for (int i = 0; i < RIVER_LANES_NUMBER; i++)
     {
         river_flowData[i].flow_speed = crocodileData.river_flow[i].speed;
         river_flowData[i].direction = crocodileData.river_flow[i].direction;
     }
+    // Inizializzazione delle variabili di crocodile
     int is_bad_probability = crocodileData.crocodile_is_bad_probability;
     insertObject(crocodileData);
+    
     // Ciclo di esecuzione di crocodile
     while (should_not_exit)
     {
@@ -68,6 +70,7 @@ void *crocodile_thread(void *data)
             crocodileData.is_crocodile_alive = true;
         }
 
+        // Inserimento di crocodile nel buffer
         insertObject(crocodileData);
         usleep(crocodileData.crocodile_speed);
     }

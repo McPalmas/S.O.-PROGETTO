@@ -4,22 +4,25 @@
           PLANT
    ----------------------------------------------*/
 
+// Mutex e variabile di condizione per la gestione dei thread
 pthread_mutex_t plantBulletMutex;
 pthread_cond_t cond_var_plant;
 int plant_thread_created = 0;
 
 void *plant_thread(void *plant_data)
 {
-    // Estrazione dell'id passato alla funzione
+    // Estrazione dei dati della pianta
     objectData *plant = (objectData *)plant_data;
     objectData plantData = *plant;
+
+    // Dichiarazione del thread del proiettile
+    pthread_t plant_bullet_thread_t;
+
+    // Inizializzazione variabili
     plantData.thread_id = pthread_self();
     plantData.plant_bullet_timer = plant->plant_bullet_timer;
-    
     int bullet_timer = getPlantReloadTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
-    
-    pthread_t plant_bullet_thread_t;
-    int i;
+
     insertObject(plantData);
     // Ciclo di esecuzione della pianta
     while (should_not_exit)
@@ -41,7 +44,6 @@ void *plant_thread(void *plant_data)
             else if(difficulty == NORMAL)plant_bullet.plant_bullet_delay = PLANT_BULLET_DELAY_NORMAL;
             else if(difficulty == HARD)plant_bullet.plant_bullet_delay = PLANT_BULLET_DELAY_HARD;
             // Creazione thread
-            
             if (pthread_create(&plant_bullet_thread_t, NULL, &plant_bullet_thread, &plant_bullet) != 0)
             {
                 _exit(1);
@@ -66,17 +68,19 @@ void *plant_thread(void *plant_data)
    ----------------------------------------------*/
 void *plant_bullet_thread(void *data)
 {
+    // Inizializzazione cleanup handler
     pthread_cleanup_push(plantBulletDeletion, NULL);
-    // Inizializzazione proiettile
+
+    // Estrazione dei dati del proiettile
     objectData *plantBullet = (objectData *)data;
     objectData plant_bullet = *plantBullet;
 
+    // Inizializzazione variabili
     plant_bullet.thread_id = pthread_self();
     plant_bullet.plant_bulletisactive = true;
     plant_bullet.x = plantBullet->x;
     plant_bullet.y = plantBullet->y;
     plant_bullet.plant_bullet_delay = plantBullet->plant_bullet_delay;
-
 
     insertObject(plant_bullet);
     // Ciclo di esecuzione del proiettile
@@ -88,7 +92,6 @@ void *plant_bullet_thread(void *data)
 
         // Aggiornamento posizione
         plant_bullet.y += 1;
-
         insertObject(plant_bullet);
         usleep(PLANT_BULLET_DELAY_EASY);
     }

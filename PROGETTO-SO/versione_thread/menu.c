@@ -7,7 +7,6 @@ void mainMenu()
 {
     // Riproduzione audio senza la visualizzazione dell'output sulla console
     system("aplay -q ../SUONI/mainMenu.wav & > /dev/null 2>&1");
-    refresh();
     int selection = 0; // Tiene traccia dell'opzione correntemente selezionata
     int c;             // Carattere della Getch, per le varie opzioni del menù
     bool exitMenu = false;
@@ -36,7 +35,6 @@ void mainMenu()
         else
             mvprintw(MAXY / 3 + 6, 40, ">");
 
-        refresh();
         c = getch();
 
         switch (c)
@@ -127,7 +125,6 @@ void menuDifficulty()
             break;
         }
 
-        refresh();
         c = getch();
 
         switch (c)
@@ -188,9 +185,6 @@ void menuDifficulty()
             break;
         }
     }
-
-    refresh();
-
     initialize_game(gamedata);
 }
 
@@ -242,7 +236,6 @@ void endGameMenu(bool win)
         else
             mvprintw(MAXY / 3 + 6, 46, ">");
 
-        refresh();
         c = getch();
 
         switch (c)

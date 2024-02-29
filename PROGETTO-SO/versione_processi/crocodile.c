@@ -7,7 +7,6 @@
 // Funzione per la gestione del processo crocodile
 void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int pipe_frog_on_crocodile[2], int pipe_crocodile_is_shot[2], int difficulty, RiverFlow river_flows[])
 {
-
     // Gestione pipe
     close(pipe[0]);
     close(pipe_crocodile_position[1]);
@@ -21,8 +20,6 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
     
     // Inizializzazione oggetto crocodile
     read(pipe_crocodile_position[0], &crocodile, sizeof(objectData));
-
-
     crocodile.id = id;
     crocodile.is_crocodile_immersing = false;
     crocodile.is_crocodile_alive = true;

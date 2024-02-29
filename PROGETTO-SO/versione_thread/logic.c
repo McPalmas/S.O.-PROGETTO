@@ -1,47 +1,40 @@
 #include "include.h"
 
 /* ----------------------------------------------
-          LOGIC PARTITA E PROCESSI
+        LOGIC PARTITA E PROCESSI
    ----------------------------------------------*/
 void initialize_game(GameData game_data)
 {
     // Inizializzazione variabili
     srand(time(NULL));
-
-    // Inizializzazione variabili
     GameData gameData = game_data;
     should_not_exit = true;
-
     in = 0;
     out = 0;
-
     gameData.game_won = false;
     gameData.game_lost = false;
 
-    /* Inizializzazione di mutex buffer e semafori */
+    // Inizializzazione di mutex buffer e semafori
     pthread_mutex_init(&mutexBuffer, NULL);
     sem_init(&semaphoreSlotFull, 0, 0);
     sem_init(&semaphoreSlotEmpty, 0, BUFSIZ);
-
+    // Creazione del thread gameManche
     pthread_t gameManche_t;
-
     pthread_create(&gameManche_t, NULL, &gameManche_thread, &gameData);
 
     // Attendi la terminazione di gameManche_t e termina il thread
     pthread_join(gameManche_t, NULL);
 }
 
-/*-----------------------------------------------------------------------
-   PROCEDURA 'CONSUMATORE' - CONSUME OBJECT IN BUFFER
-   La procedura si occupa di prelevare/consumare un elemento presente
-   all'interno del buffer
-   -----------------------------------------------------------------------*/
+/*-------------------------------------------------
+        PROCEDURA 'CONSUMATORE'
+   -----------------------------------------------*/
 void removeObject()
 {
     sem_wait(&semaphoreSlotFull);     /* Esegue una wait sul semaforo full */
     pthread_mutex_lock(&mutexBuffer); /* Blocca il mutex principale */
 
-    /* SEZIONE CRITICA */
+    // Sezione critica
     consumedObject = buffer[out]; /* Preleva l'elemento e scorre l'indice del buffer */
     out = (out + 1) % DIMBUFFER;
 
@@ -49,32 +42,16 @@ void removeObject()
     sem_post(&semaphoreSlotEmpty);      /* Esegue una SIGNAL al semaforo empty */
 }
 
-void removeData()
-{
-    sem_wait(&semaphoreSlotFull);     /* Esegue una wait sul semaforo full */
-    pthread_mutex_lock(&mutexBuffer); /* Blocca il mutex principale */
-
-    /* SEZIONE CRITICA */
-    consumedData = dataBuffer[data_out]; /* Preleva l'elemento e scorre l'indice del buffer */
-    data_out = (data_out + 1) % DIMBUFFER;
-
-    pthread_mutex_unlock(&mutexBuffer); /* Sblocca il mutex principale */
-    sem_post(&semaphoreSlotEmpty);      /* Esegue una SIGNAL al semaforo empty */
-}
-
-/*-----------------------------------------------------------------------
-   PROCEDURA 'PRODUTTORE' - NEW OBJECT IN BUFFER
-   La procedura si occupa di aggiungere un nuovo elemento nel buffer.
-   Come parametro prende l'oggetto che andrà inserito
-   all'interno del Buffer stesso.
-   -----------------------------------------------------------------------*/
+/*------------------------------------------------
+        PROCEDURA 'PRODUTTORE'
+   ----------------------------------------------*/
 void insertObject(objectData newObject)
 {
 
     sem_wait(&semaphoreSlotEmpty);    /* Esegue una wait sul semaforo empty */
     pthread_mutex_lock(&mutexBuffer); /* Blocca il mutex principale */
 
-    /* SEZIONE CRITICA */
+    // Sezione critica
     buffer[in] = newObject; /* Inserisce l'elemento e scorre l'indice del buffer */
     in = (in + 1) % DIMBUFFER;
 
@@ -82,21 +59,8 @@ void insertObject(objectData newObject)
     sem_post(&semaphoreSlotFull);       /* Esegue una SIGNAL al semaforo full */
 }
 
-void insertData(GameData newData)
-{
-    sem_wait(&semaphoreSlotEmpty);    /* Esegue una wait sul semaforo empty */
-    pthread_mutex_lock(&mutexBuffer); /* Blocca il mutex principale */
-
-    /* SEZIONE CRITICA */
-    dataBuffer[data_in] = newData; /* Inserisce l'elemento e scorre l'indice del buffer */
-    data_in = (data_in + 1) % DIMBUFFER;
-
-    pthread_mutex_unlock(&mutexBuffer); /* Sblocca mutex */
-    sem_post(&semaphoreSlotFull);       /* Esegue una SIGNAL al semaforo full */
-}
-
-/* ----------------------------------------------
-          ANALISI DEI DATI E GESTIONE FINE PARTITA
+/* -----------------------------------------------
+        ANALISI DEI DATI E GESTIONE FINE PARTITA
    ----------------------------------------------*/
 void analyze_data(GameData gamedata)
 {
@@ -105,9 +69,8 @@ void analyze_data(GameData gamedata)
     bkgd(COLOR_PAIR(WHITE_WHITE)); /* Setta il background color dello schermo */
     attron(COLOR_PAIR(BLACK_WHITE));
 
+    // Calcola il numero di tane occupate
     int taken_dens = 0;
-
-    // Conta le tane occupate
     for (int i = 0; i < N_DENS; i++)
         if (gamedata.dens[i] == true)
             taken_dens++;
@@ -132,7 +95,6 @@ void analyze_data(GameData gamedata)
             system("aplay ../SUONI/tanaRaggiunta.wav > /dev/null 2>&1");
             // tempo di attesa prima del caricamento della schermata successiva
             sleep(2);
-
             initialize_game(gamedata);
             pthread_join(gamedata.thread_id, NULL);
         }
@@ -160,7 +122,6 @@ void analyze_data(GameData gamedata)
                 system("aplay ../SUONI/death.wav > /dev/null 2>&1");
                 // tempo di attesa prima del caricamento della schermata successiva
                 sleep(2);
-
                 initialize_game(gamedata);
                 pthread_join(gamedata.thread_id, NULL);
             }
@@ -186,21 +147,22 @@ void *gameManche_thread(void *game_data)
     pthread_t plantBullet_t[N_PLANT_BULLETS];
     pthread_t crocodile_t[N_CROCODILE];
 
-    objectData receivedPacket; // dove ricevo i dati letti
+    // Dichiarazione variabili
+    objectData receivedPacket;
     objectData frogData;
     objectData frog_bulletData;
     objectData *plantData = (objectData *)malloc(N_PLANTS * sizeof(objectData));
     objectData *plant_bulletData = (objectData *)malloc(N_PLANT_BULLETS * sizeof(objectData));
     objectData *crocodileData = (objectData *)malloc(N_CROCODILE * sizeof(objectData));
     objectData time;
-    objectData *river_flow = (objectData *)malloc(RIVER_LANES_NUMBER * sizeof(objectData));
-    GameData gamedata = *(GameData *)game_data;
-    gamedata.thread_id = pthread_self();
+    RiverFlow *river_flow = (RiverFlow *)malloc(RIVER_LANES_NUMBER * sizeof(RiverFlow));
 
-    int crocodile_immersion_timer = getCrocodileTimer(CROCODILE_IMMERSION_TIME_MIN, gamedata); // = getRandomTimer (tempo minimo, difficoltà)
+    // Estrazione dei dati
+    GameData gamedata = *(GameData *)game_data;
 
     // Inizializzazione variabili
-
+    gamedata.thread_id = pthread_self();
+    int crocodile_immersion_timer = getCrocodileTimer(CROCODILE_IMMERSION_TIME_MIN, gamedata);
     initialize_plants(plantData, plant_bulletData, gamedata.difficulty);
     initialize_river_flows(gamedata, river_flow);
     initialize_frog(&frogData, river_flow);
@@ -217,6 +179,7 @@ void *gameManche_thread(void *game_data)
         pthread_create(&crocodile_t[i], NULL, &crocodile_thread, (void *)&crocodileData[i]);
     }
 
+    // Ciclo di gioco
     while (should_not_exit)
     {
 
@@ -233,7 +196,6 @@ void *gameManche_thread(void *game_data)
         // STAMPA ELEMENTI ----------------------------------------
 
         // stampa dei coccodrilli
-
         for (int i = 0; i < N_CROCODILE; i++)
         {
             if (crocodileData[i].is_crocodile_alive)
@@ -292,7 +254,6 @@ void *gameManche_thread(void *game_data)
             - Ricezione dati
             - Assegnamento dati
         */
-
         // Ricezione dati
         removeObject();
         receivedPacket = consumedObject;
@@ -364,8 +325,7 @@ void *gameManche_thread(void *game_data)
             - Proiettile pianta Out of Bounds
             - Proiettile rana con proiettile pianta
         */
-
-        // SE LA RANA COLLIDE CON UNA PIANTA - OK
+        // Rana con piante
         for (int i = 0; i < N_PLANTS; i++)
         {
             if ((frogData.y == plantData[i].y + 1 || frogData.y == plantData[i].y) && (frogData.x - 2 >= plantData[i].x - (FROG_W - 1) && frogData.x + 2 <= plantData[i].x + (FROG_W + 1)))
@@ -375,7 +335,7 @@ void *gameManche_thread(void *game_data)
             }
         }
 
-        // SE LA RANA E' COLPITA DA UN PROIETTILE DELLA PIANTA
+        // Rana con proiettili piante
         for (int i = 0; i < N_PLANT_BULLETS; i++)
         {
             if (plant_bulletData[i].plant_bulletisactive && frogData.y == plant_bulletData[i].y && (frogData.x >= plant_bulletData[i].x - 2 && frogData.x <= plant_bulletData[i].x + 2))
@@ -386,7 +346,7 @@ void *gameManche_thread(void *game_data)
             }
         }
 
-        // SE LA RANA E' SUL COCCODRILLO
+        // Rana con coccodrillo
         if (frogData.frog_candie && frogData.y < SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) && frogData.y > SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT)
         {
             for (int i = 0; i < N_CROCODILE; i++)
@@ -410,7 +370,7 @@ void *gameManche_thread(void *game_data)
             }
         }
 
-        // SE LA RANA RAGGIUNGE UNA TANA - OK
+        // Rana con tane
         if (frogData.y < SCORE_ZONE_HEIGHT + 2)
         {
             // per ogni tana
@@ -453,7 +413,7 @@ void *gameManche_thread(void *game_data)
             }
         }
 
-        // SE IL PROIETTILE DELLA RANA COLPISCE UN COCCODRILLO - OK
+        // Proiettile rana con coccodrillo
         for (int i = 0; i < N_CROCODILE; i++)
         {
             // se il proiettile sta sul coccodrillo corrente
@@ -468,8 +428,8 @@ void *gameManche_thread(void *game_data)
                 destroyFrogBullet(&frog_bulletData);
             }
         }
-        
-        // SE IL PROIETTILE DELLA RANA COLPISCE UNA PIANTA - OK
+
+        // Proiettile rana con piante
         for (int i = 0; i < N_PLANTS; i++)
         {
             // se è presente plant e la rana può sparare
@@ -511,7 +471,7 @@ void *gameManche_thread(void *game_data)
             }
         }
 
-        // SE IL PROIETTILE DELLA RANA ESCE DALLO SCHERMO - OK
+        // Proiettile rana Out of Bounds
         if (frog_bulletData.frog_bulletisactive && frog_bulletData.y <= SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT)
         {
             destroyFrogBullet(&frog_bulletData);
@@ -520,13 +480,13 @@ void *gameManche_thread(void *game_data)
         /* Proiettili rana */
         for (int i = 0; i < N_PLANT_BULLETS; i++)
         {
-            // SE IL PROIETTILE DELLA PIANTA ESCE DALLO SCHERMO - OK
+            // Proiettile pianta Out of Bounds
             if (plant_bulletData[i].plant_bulletisactive && plant_bulletData[i].y >= SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2))
             {
                 destroyPlantBullet(&plant_bulletData[i]);
             }
 
-            // SE IL PROIETTILE DELLA RANA COLPISCE IL PROIETTILE DELLA PIANTA - OK
+            // Proiettile rana con proiettile pianta
             if (frog_bulletData.frog_bulletisactive && plant_bulletData[i].plant_bulletisactive > 0)
             {
                 if (frog_bulletData.x == plant_bulletData[i].x && frog_bulletData.y == plant_bulletData[i].y)
@@ -538,20 +498,13 @@ void *gameManche_thread(void *game_data)
             }
         }
 
-        // SE IL PROIETTILE DELLA RANA COLPISCE IL PROIETTILE DELLA PIANTA - OK
-        for (int i = 0; i < N_PLANT_BULLETS; i++)
-        {
-        }
-
         /*
             Morti:
             - Rana per out of bounds
             - Rana per caduta in acqua
             - Rana per tempo
         */
-
-        // MORTE RANA PER OUT OF BOUNDS
-
+        // Morte rana per out of bounds
         if (frogData.x - 2 < MINX || frogData.x + 2 > MAXX - 1 || frogData.y < SCORE_ZONE_HEIGHT)
         {
             gamedata.player_score -= DEATH_SCORE;
@@ -559,15 +512,14 @@ void *gameManche_thread(void *game_data)
             gamedata.game_lost = true;
         }
 
-        // MORTE RANA PER CADUTA IN ACQUA
+        // Morte rana per caduta in acqua
         if (!onCrocodile)
         {
             frogData.frog_candie = false;
             gamedata.game_lost = true;
         }
 
-        // MORTE RANA PER TEMPO
-
+        // Morte rana per tempo
         if (time.time_left <= 0 && frogData.frog_candie)
         {
             frogData.frog_candie = false;
@@ -579,13 +531,10 @@ void *gameManche_thread(void *game_data)
             - Vittoria manche
             - Sconfitta manche
         */
-
         // se la manche è stata vinta o persa, fai terminare tutti i processi cambiando il valore di questa variabile
         if (gamedata.game_lost || gamedata.game_won)
         {
             should_not_exit = false;
-
-            insertData(gamedata);
 
             pthread_join(frog_t, NULL);
             pthread_join(frog_bullet_t, NULL);
@@ -616,11 +565,13 @@ void *gameManche_thread(void *game_data)
 /* ----------------------------------------------
          INIZIALIZZAZIONE RANA
    ----------------------------------------------*/
-void initialize_frog(objectData *frogData, objectData river_flows[])
+void initialize_frog(objectData *frogData, RiverFlow river_flows[])
 {
+    // Salvataggio flussi del fiume
     RiverFlow riverFlow[RIVER_LANES_NUMBER];
-    for(int i=0; i<RIVER_LANES_NUMBER; i++){
-        riverFlow[i].speed = river_flows[i].flow_speed;
+    for (int i = 0; i < RIVER_LANES_NUMBER; i++)
+    {
+        riverFlow[i].speed = river_flows[i].speed;
         riverFlow[i].direction = river_flows[i].direction;
 
         frogData->river_flow[i] = riverFlow[i];
@@ -639,15 +590,18 @@ void initialize_frog(objectData *frogData, objectData river_flows[])
 /* ----------------------------------------------
          INIZIALIZZAZIONE COCCODRILLI
    ----------------------------------------------*/
-void crocodiles_inizializer(objectData crocodiles[], GameData gamedata, objectData river_flows[])
+void crocodiles_inizializer(objectData crocodiles[], GameData gamedata, RiverFlow river_flows[])
 {
     int crocodileIndex = 0;
 
+    // Salvataggio flussi del fiume
     RiverFlow riverFlow[RIVER_LANES_NUMBER];
-    for(int i=0; i<RIVER_LANES_NUMBER; i++){
-        riverFlow[i].speed = river_flows[i].flow_speed;
+    for (int i = 0; i < RIVER_LANES_NUMBER; i++)
+    {
+        riverFlow[i].speed = river_flows[i].speed;
         riverFlow[i].direction = river_flows[i].direction;
-        for(int j=0; j<N_CROCODILE; j++){
+        for (int j = 0; j < N_CROCODILE; j++)
+        {
             crocodiles[j].river_flow[i] = riverFlow[i];
         }
     }
@@ -661,7 +615,7 @@ void crocodiles_inizializer(objectData crocodiles[], GameData gamedata, objectDa
             // Assegna l'indice del fiume al coccodrillo
             crocodiles[crocodileIndex].flow_number = riverIndex;
             // Assegna speed e direction dal fiume corrispondente
-            crocodiles[crocodileIndex].crocodile_speed = river_flows[riverIndex].flow_speed;
+            crocodiles[crocodileIndex].crocodile_speed = river_flows[riverIndex].speed;
             crocodiles[crocodileIndex].direction = river_flows[riverIndex].direction;
             crocodiles[crocodileIndex].y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (riverIndex * 2);
             crocodiles[crocodileIndex].is_crocodile_alive = true;
@@ -711,7 +665,7 @@ void crocodiles_inizializer(objectData crocodiles[], GameData gamedata, objectDa
 /* ----------------------------------------------
          INIZIALIZZAZIONE FIUMI
    ----------------------------------------------*/
-void initialize_river_flows(GameData gamedata, objectData river_flows[])
+void initialize_river_flows(GameData gamedata, RiverFlow river_flows[])
 {
     // Inizializza i flussi del fiume con direzioni e velocità casuali
     for (int i = 0; i < RIVER_LANES_NUMBER; ++i)
@@ -720,13 +674,13 @@ void initialize_river_flows(GameData gamedata, objectData river_flows[])
         switch (gamedata.difficulty)
         {
         case EASY:
-            river_flows[i].flow_speed = MIN_RIVER_SPEED_EASY + rand() % (MAX_RIVER_SPEED_EASY - MIN_RIVER_SPEED_EASY + 1);
+            river_flows[i].speed = MIN_RIVER_SPEED_EASY + rand() % (MAX_RIVER_SPEED_EASY - MIN_RIVER_SPEED_EASY + 1);
             break;
         case NORMAL:
-            river_flows[i].flow_speed = MIN_RIVER_SPEED_NORMAL + rand() % (MAX_RIVER_SPEED_NORMAL - MIN_RIVER_SPEED_NORMAL + 1);
+            river_flows[i].speed = MIN_RIVER_SPEED_NORMAL + rand() % (MAX_RIVER_SPEED_NORMAL - MIN_RIVER_SPEED_NORMAL + 1);
             break;
         case HARD:
-            river_flows[i].flow_speed = MIN_RIVER_SPEED_HARD + rand() % (MAX_RIVER_SPEED_HARD - MIN_RIVER_SPEED_HARD + 1);
+            river_flows[i].speed = MIN_RIVER_SPEED_HARD + rand() % (MAX_RIVER_SPEED_HARD - MIN_RIVER_SPEED_HARD + 1);
             break;
         default:
             break;
@@ -802,7 +756,6 @@ void initialize_time(objectData *time, int difficulty)
 /* ----------------------------------------------
          Utility
    ----------------------------------------------*/
-
 // Genera un booleano casuale con una certa probabilità
 bool getRandomBoolean(float probability)
 {
@@ -833,10 +786,6 @@ int getCrocodileTimer(int min, GameData gamedata)
     return randomTimer;
 }
 
-/**
- * Utility
- */
-
 // Restituisce un timer per il prossimo sparo della pianta
 int getPlantReloadTimer(int min, int difficulty)
 {
@@ -860,13 +809,15 @@ int getPlantReloadTimer(int min, int difficulty)
     return randomTimer;
 }
 
+// Termina il processo del proiettile
 void destroyFrogBullet(objectData *frog_bulletData)
 {
-    // Termina il processo del proiettile
+
     frog_bulletData->frog_bulletisactive = false;
     pthread_cancel(frog_bulletData->thread_id);
 }
 
+// Termina il processo del proiettile della pianta
 void destroyPlantBullet(objectData *plant_bulletData)
 {
     // Termina il processo del proiettile
