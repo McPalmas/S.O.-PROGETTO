@@ -504,7 +504,6 @@ GameData gameManche(int pip[2], int pipe_plant_is_dead[2], int pipe_destroy_frog
             {
                 for(int y = 0; y < N_CROCODILE; y++ )
                     write(pipe_crocodile_is_shot[1], &crocodile[i],sizeof(objectData));
-
                 // comunica al frog bullet di distruggere il proiettile
                 frog_bullet.frog_bulletisactive = false;
                 frog.frog_canshoot = true;

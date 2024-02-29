@@ -44,6 +44,7 @@ void crocodile_process(int id, int pipe[2], int pipe_crocodile_position[2], int 
                 if (crocodileData.id == crocodile.id){
                     crocodile = crocodileData;
                     crocodile.crocodile_is_good = true;
+                    crocodile.is_crocodile_immersing = false;
                 }
 
             // Aggiornamento posizione di crocodile
