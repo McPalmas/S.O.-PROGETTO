@@ -203,7 +203,7 @@ void *gameManche_thread(void *game_data)
 
     initialize_plants(plantData, plant_bulletData, gamedata.difficulty);
     initialize_river_flows(gamedata, river_flow);
-    initialize_frog(&frogData);
+    initialize_frog(&frogData, river_flow);
     crocodiles_inizializer(crocodileData, gamedata, river_flow);
     initialize_time(&time, gamedata.difficulty);
 
@@ -212,7 +212,6 @@ void *gameManche_thread(void *game_data)
     for (int i = 0; i < RIVER_LANES_NUMBER; i++)
     {
         crocodile_dataPacket.riverFlow[i] = river_flow[i];
-        frog_dataPacket.riverFlow[i] = river_flow[i];
     }
     frog_dataPacket.object = frogData;
 
@@ -626,8 +625,16 @@ void *gameManche_thread(void *game_data)
 /* ----------------------------------------------
          INIZIALIZZAZIONE RANA
    ----------------------------------------------*/
-void initialize_frog(objectData *frogData)
+void initialize_frog(objectData *frogData, objectData river_flows[])
 {
+    RiverFlow riverFlow[RIVER_LANES_NUMBER];
+    for(int i=0; i<RIVER_LANES_NUMBER; i++){
+        riverFlow[i].speed = river_flows[i].flow_speed;
+        riverFlow[i].direction = river_flows[i].direction;
+
+        frogData->river_flow[i] = riverFlow[i];
+    }
+
     // Posizione di partenza della rana
     frogData->y = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + (RIVER_LANES_NUMBER * 2) + START_ZONE_HEIGHT - 3;
     frogData->x = FROG_START;

@@ -11,15 +11,13 @@ int thread_created = 0;
 // Funzione per la gestione del thread frog
 void *frog_thread(void *data)
 {
-    args *receivedData = (args *)data;
-    objectData frog = receivedData->object;
+    objectData frog = *(objectData *)data;
     frog.thread_id = pthread_self();
-    objectData river_flowData[RIVER_LANES_NUMBER];
+
     int laneY[RIVER_LANES_NUMBER];
     for (int i = 0; i < RIVER_LANES_NUMBER; ++i)
     {
-        river_flowData[i].flow_speed = receivedData->riverFlow[i].flow_speed;
-        river_flowData[i].direction = receivedData->riverFlow[i].direction;
+
         laneY[i] = SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT + PLANTS_ZONE_HEIGHT + i * 2;
     }
     
@@ -93,7 +91,7 @@ void *frog_thread(void *data)
                 thread_created = 1;
                 pthread_mutex_unlock(&frogBulletMutex);
 
-                system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1 &");
+                
             }
             break;
         case 'q':
@@ -112,11 +110,10 @@ void *frog_thread(void *data)
         {
             if (frog.y == laneY[i])
             {   
-                frog.flow_speed = river_flowData[i].flow_speed;
-                frog.direction = river_flowData[i].direction;
+                frog.flow_speed = frog.river_flow[i].speed;
+                frog.direction = frog.river_flow[i].direction;
                 delay = frog.flow_speed;
                 inRiver = true;
-                //frog.x += (frog.direction == RIGHT) ? 1 : -1;               
                 break;
             }
         }
@@ -150,6 +147,7 @@ void *frog_bullet_thread(void *a)
     objectData frog_bullet = *frogBullet;
     frog_bullet.thread_id = pthread_self();
     frog_bullet.frog_bulletisactive = true;
+    system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1 &");
     insertObject(frog_bullet);
     while (should_not_exit)
     {
