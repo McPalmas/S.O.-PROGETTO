@@ -233,6 +233,7 @@ typedef struct
    // frog
    bool frog_candie;
    bool frog_bulletisactive;
+   bool frog_is_shooting;
    // plant
    bool plant_isalive;
    bool plant_canshoot;
@@ -318,7 +319,7 @@ void initialize_river_flows(GameData gamedata, RiverFlow RiverFlow[]);          
 void plants_initializer(objectData plants[], objectData plant_bullets[], int difficulty);         // inizializzazione delle piante
 void initialize_time(objectData *time, int difficulty);                                           // inizializzazione del tempo di gioco
 void initialize_plants(objectData plants[], objectData plant_bullets[], int difficulty);          // inizializzazione delle piante
-void destroyFrogBullet(objectData *frog_bulletData);                                              // distrugge il proiettile della rana
+void destroyFrogBullet(objectData *frog_bulletData, bool *frogBulletCreated);                                              // distrugge il proiettile della rana
 void destroyPlantBullet(objectData *plant_bulletData);                                            // distrugge il proiettile della pianta
 // funzioni di supporto
 int getPlantReloadTimer(int min, int difficulty); // restituisce il tempo di ricarica del proiettile della pianta

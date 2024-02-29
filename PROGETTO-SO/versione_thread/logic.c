@@ -141,6 +141,7 @@ void *gameManche_thread(void *game_data)
 
     // Dichiarazione threads
     pthread_t frog_t;
+    pthread_t frog_bullet_thread_t;
     pthread_t frog_bullet_t;
     pthread_t time_t;
     pthread_t plant_t[N_PLANTS];
@@ -156,7 +157,7 @@ void *gameManche_thread(void *game_data)
     objectData *crocodileData = (objectData *)malloc(N_CROCODILE * sizeof(objectData));
     objectData time;
     RiverFlow *river_flow = (RiverFlow *)malloc(RIVER_LANES_NUMBER * sizeof(RiverFlow));
-
+    bool frogBulletCreated = false;
     // Estrazione dei dati
     GameData gamedata = *(GameData *)game_data;
 
@@ -263,6 +264,23 @@ void *gameManche_thread(void *game_data)
         {
             frogData.x = receivedPacket.x;
             frogData.y = receivedPacket.y;
+            frogData.frog_is_shooting = receivedPacket.frog_is_shooting;
+            if (frogData.frog_is_shooting && !frogBulletCreated)
+            {
+                // Inizializzazione proiettile
+                objectData *frogBullet = (objectData *)malloc(sizeof(frogBullet));
+                objectData frog_bullet = *frogBullet;
+                frog_bullet.x = frogData.x;
+                frog_bullet.y = frogData.y - 1;
+                frog_bullet.id = FROG_BULLET_ID;
+                frog_bullet.plant_bulletisactive = true;
+                frogBulletCreated = true;
+                // Creazione thread
+                if (pthread_create(&frog_bullet_thread_t, NULL, &frog_bullet_thread, &frog_bullet) != 0)
+                {
+                    _exit(1);
+                }
+            }
         }
         else if (receivedPacket.id == FROG_BULLET_ID)
         {
@@ -425,7 +443,7 @@ void *gameManche_thread(void *game_data)
                     break;
                 }
                 // comunica al frog bullet di distruggere il proiettile
-                destroyFrogBullet(&frog_bulletData);
+                destroyFrogBullet(&frog_bulletData, &frogBulletCreated);
             }
         }
 
@@ -455,7 +473,7 @@ void *gameManche_thread(void *game_data)
                     // disattiva il proiettile e uccidi plant
                     plantData[i].plant_isalive = false;
                     pthread_cancel(plantData[i].thread_id);
-                    destroyFrogBullet(&frog_bulletData);
+                    destroyFrogBullet(&frog_bulletData, &frogBulletCreated);
                 }
             }
             else
@@ -474,7 +492,7 @@ void *gameManche_thread(void *game_data)
         // Proiettile rana Out of Bounds
         if (frog_bulletData.frog_bulletisactive && frog_bulletData.y <= SCORE_ZONE_HEIGHT + DENS_ZONE_HEIGHT)
         {
-            destroyFrogBullet(&frog_bulletData);
+            destroyFrogBullet(&frog_bulletData, &frogBulletCreated);
         }
 
         /* Proiettili rana */
@@ -492,7 +510,7 @@ void *gameManche_thread(void *game_data)
                 if (frog_bulletData.x == plant_bulletData[i].x && frog_bulletData.y == plant_bulletData[i].y)
                 {
                     // Se il proiettile della rana colpisce un proiettile delle piante, entrambi vengono disattivati
-                    destroyFrogBullet(&frog_bulletData);
+                    destroyFrogBullet(&frog_bulletData, &frogBulletCreated);
                     destroyPlantBullet(&plant_bulletData[i]);
                 }
             }
@@ -810,9 +828,10 @@ int getPlantReloadTimer(int min, int difficulty)
 }
 
 // Termina il processo del proiettile
-void destroyFrogBullet(objectData *frog_bulletData)
+void destroyFrogBullet(objectData *frog_bulletData, bool *frogBulletCreated)
 {
-
+    *frogBulletCreated = false;
+    // Termina il processo del proiettile
     frog_bulletData->frog_bulletisactive = false;
     pthread_cancel(frog_bulletData->thread_id);
 }

@@ -4,11 +4,6 @@
           PLANT
    ----------------------------------------------*/
 
-// Mutex e variabile di condizione per la gestione dei thread
-pthread_mutex_t plantBulletMutex;
-pthread_cond_t cond_var_plant;
-int plant_thread_created = 0;
-
 void *plant_thread(void *plant_data)
 {
     // Estrazione dei dati della pianta
@@ -31,9 +26,8 @@ void *plant_thread(void *plant_data)
         {
         }
         // Se il timer è scaduto
-        if (bullet_timer <=0 && !plant_thread_created)
+        if (bullet_timer <=0)
         {
-            pthread_mutex_lock(&plantBulletMutex);
             // Inizializzazione proiettile
             objectData *plantBullet = (objectData *)malloc(sizeof(plantBullet));
             objectData plant_bullet = *plantBullet;
@@ -48,9 +42,7 @@ void *plant_thread(void *plant_data)
             {
                 _exit(1);
             }
-            plant_thread_created = 1;
             bullet_timer = getPlantReloadTimer(PLANT_BULLET_RELOAD_MIN, difficulty);
-            pthread_mutex_unlock(&plantBulletMutex);
 
             system("aplay ../SUONI/lasershot.wav > /dev/null 2>&1");
         }else if(bullet_timer > 0)bullet_timer--;
@@ -58,9 +50,6 @@ void *plant_thread(void *plant_data)
         insertObject(plantData);
         sleep(1); // 1 secondo
     }
-    // Rilascia il mutex e la variabile di condizione
-    pthread_mutex_destroy(&plantBulletMutex);
-    pthread_cond_destroy(&cond_var_plant);
 }
 
 /* ----------------------------------------------
@@ -68,9 +57,6 @@ void *plant_thread(void *plant_data)
    ----------------------------------------------*/
 void *plant_bullet_thread(void *data)
 {
-    // Inizializzazione cleanup handler
-    pthread_cleanup_push(plantBulletDeletion, NULL);
-
     // Estrazione dei dati del proiettile
     objectData *plantBullet = (objectData *)data;
     objectData plant_bullet = *plantBullet;
@@ -95,14 +81,4 @@ void *plant_bullet_thread(void *data)
         insertObject(plant_bullet);
         usleep(PLANT_BULLET_DELAY_EASY);
     }
-    pthread_cleanup_pop(1);
-}
-
-void plantBulletDeletion()
-{
-    pthread_mutex_lock(&plantBulletMutex);
-    plant_thread_created = 0;             // Il thread è terminato, quindi possiamo creare un altro thread
-    pthread_cond_signal(&cond_var_plant); // Notifica il main thread che il thread è terminato
-    pthread_mutex_unlock(&plantBulletMutex);
-    pthread_exit(0);
 }
