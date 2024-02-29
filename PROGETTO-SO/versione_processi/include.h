@@ -1,16 +1,8 @@
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/types.h>
 #include <sys/wait.h>
-#include <time.h>
-#include <stdbool.h>
-#include <string.h>
 #include <fcntl.h>
-#include <signal.h>
 #include <curses.h>
-#include <ncurses.h>
-#include <pthread.h>
-#include <stdio.h>
 
 /*-----------------------------------------------------------------------
    MACRO UTILIZZATE COME TASTI PER IL MOVIMENTO VERTICALE DI FROG

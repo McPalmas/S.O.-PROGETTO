@@ -1,5 +1,4 @@
 #include "include.h"
-#include <math.h>
 
 /* ----------------------------------------------
           CROCODILE
