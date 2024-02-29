@@ -440,6 +440,7 @@ void *gameManche_thread(void *game_data)
                 if (!crocodileData[i].crocodile_is_good)
                 {
                     crocodileData[i].crocodile_is_good = true;
+                    crocodileData[i].is_crocodile_immersing = false;
                     break;
                 }
                 // comunica al frog bullet di distruggere il proiettile
